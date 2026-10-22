@@ -26,6 +26,23 @@
     });
   });
 
+  const genreButtons = document.querySelectorAll(".genre-chip");
+  const recommendedTracks = document.querySelectorAll(".track-row[data-genre]");
+  genreButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const selectedGenre = button.dataset.filter;
+      genreButtons.forEach((genreButton) => {
+        const selected = genreButton === button;
+        genreButton.classList.toggle("active", selected);
+        genreButton.setAttribute("aria-pressed", String(selected));
+      });
+      recommendedTracks.forEach((track) => {
+        track.hidden =
+          selectedGenre !== "all" && track.dataset.genre !== selectedGenre;
+      });
+    });
+  });
+
   const search = document.getElementById("site-search");
   document.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
