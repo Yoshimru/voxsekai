@@ -27,21 +27,97 @@
   });
 
   const genreButtons = document.querySelectorAll(".genre-chip");
-  const recommendedTracks = document.querySelectorAll(".track-row[data-genre]");
+  const genreItems = document.querySelectorAll(
+    "[data-genre-item], .track-row[data-genre]",
+  );
+  const pageSearch = document.getElementById("page-search");
+  let selectedGenre = "all";
+
+  function filterDirectory() {
+    const query = pageSearch?.value.trim().toLocaleLowerCase("ru") || "";
+    let visibleCount = 0;
+
+    genreItems.forEach((item) => {
+      const itemGenres = (item.dataset.genre || "").split(/\s+/);
+      const itemText = (
+        item.dataset.searchText || item.textContent
+      ).toLocaleLowerCase("ru");
+      const matchesGenre =
+        selectedGenre === "all" || itemGenres.includes(selectedGenre);
+      const matchesQuery = !query || itemText.includes(query);
+      item.hidden = !matchesGenre || !matchesQuery;
+      if (!item.hidden) visibleCount += 1;
+    });
+
+    document.querySelectorAll("[data-results-count]").forEach((counter) => {
+      counter.textContent = String(visibleCount);
+    });
+    document.querySelectorAll(".directory-empty").forEach((emptyState) => {
+      emptyState.hidden = visibleCount > 0;
+    });
+  }
+
   genreButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const selectedGenre = button.dataset.filter;
+      selectedGenre = button.dataset.filter;
       genreButtons.forEach((genreButton) => {
         const selected = genreButton === button;
         genreButton.classList.toggle("active", selected);
         genreButton.setAttribute("aria-pressed", String(selected));
       });
-      recommendedTracks.forEach((track) => {
-        track.hidden =
-          selectedGenre !== "all" && track.dataset.genre !== selectedGenre;
-      });
+      filterDirectory();
     });
   });
+  pageSearch?.addEventListener("input", filterDirectory);
+
+  document.querySelectorAll("select[id$='-sort']").forEach((select) => {
+    select.addEventListener("change", () => {
+      const list = select
+        .closest(".directory-content")
+        ?.querySelector("[data-sort-list]");
+      if (!list) return;
+
+      const items = Array.from(list.children);
+      const sortBy = select.value;
+      items.sort((first, second) => {
+        if (sortBy === "rating") {
+          return Number(second.dataset.rating) - Number(first.dataset.rating);
+        }
+        if (sortBy === "title" || sortBy === "name") {
+          return first.textContent.localeCompare(second.textContent, "ru");
+        }
+        return (
+          Number(second.dataset.tracks || second.dataset.rating) -
+          Number(first.dataset.tracks || first.dataset.rating)
+        );
+      });
+      items.forEach((item) => list.append(item));
+    });
+  });
+
+  document.querySelectorAll("[data-filter-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const expanded = button.getAttribute("aria-expanded") !== "true";
+      button.setAttribute("aria-expanded", String(expanded));
+      button.classList.toggle("is-active", expanded);
+      document
+        .querySelector(".directory-genres")
+        ?.classList.toggle("filters-open", expanded);
+    });
+  });
+
+  document.querySelectorAll("[data-track-title]").forEach((button) => {
+    button.addEventListener("click", () => {
+      notify(`Открываем трек «${button.dataset.trackTitle}»`);
+    });
+  });
+
+  document
+    .querySelector("[data-load-more]")
+    ?.addEventListener("click", (event) => {
+      event.currentTarget.hidden = true;
+      notify("Показаны все исполнители каталога");
+    });
 
   document.querySelectorAll("[data-auth-switch]").forEach((link) => {
     link.addEventListener("click", (event) => {
@@ -101,11 +177,25 @@
   });
   search?.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && search.value.trim()) {
-      notify(
-        `Поиск: ${search.value.trim()} — подключите API для реальных результатов`,
-      );
+      if (pageSearch) {
+        pageSearch.value = search.value.trim();
+        pageSearch.dispatchEvent(new Event("input", { bubbles: true }));
+        pageSearch.focus();
+      } else if (document.body.classList.contains("directory-page") === false) {
+        window.location.assign(
+          `/pages/catalog.html?q=${encodeURIComponent(search.value.trim())}`,
+        );
+      }
     }
   });
+
+  if (pageSearch) {
+    const initialQuery = new URLSearchParams(window.location.search).get("q");
+    if (initialQuery) {
+      pageSearch.value = initialQuery;
+      filterDirectory();
+    }
+  }
 
   const menuToggle = document.getElementById("menu-toggle");
   menuToggle?.addEventListener("click", () =>
@@ -116,8 +206,11 @@
     // Пока страницы не созданы, направляем переход на готовую 404-страницу.
     link.addEventListener("click", (event) => {
       const target = link.getAttribute("href");
-      const isAuthPage = /\/pages\/(login|register)\.html$/.test(target || "");
-      if (target && !target.endsWith("404.html") && !isAuthPage) {
+      const isAvailablePage =
+        /\/pages\/(login|register|catalog|artists|collections)\.html$/.test(
+          target || "",
+        );
+      if (target && !target.endsWith("404.html") && !isAvailablePage) {
         event.preventDefault();
         window.location.href = "/pages/404.html";
       }

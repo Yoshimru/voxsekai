@@ -52,12 +52,16 @@
       </aside>
       <main class="main-area">
         <header class="topbar">
-          <a class="search-box search-link" href="../"
-            ><span>⌕</span
-            ><span class="search-placeholder"
-              >Трек, продюсер или виртуальный голос</span
-            ><kbd>Ctrl K</kbd></a
-          >
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input
+              id="site-search"
+              type="search"
+              placeholder="Трек, продюсер или виртуальный голос"
+              aria-label="Поиск по сайту"
+            />
+            <kbd>Ctrl K</kbd>
+          </label>
           <div class="account-actions">
             <a class="auth-header-link" href="login.html">Войти</a>
             <a

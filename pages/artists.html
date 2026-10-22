@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title>Исполнители — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page artists-page">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="../" aria-label="VoxSekai — главная"
+          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+          ><span>voxsekai</span></a
+        >
+        <nav class="primary-nav" aria-label="Основная навигация">
+          <a class="nav-link" href="../"
+            ><span class="nav-icon">⌂</span>Главная</a
+          >
+          <a class="nav-link" href="catalog.html"
+            ><span class="nav-icon">◉</span>Каталог</a
+          >
+          <a class="nav-link active" href="artists.html"
+            ><span class="nav-icon">♬</span>Исполнители</a
+          >
+          <a class="nav-link" href="tracks.html"
+            ><span class="nav-icon">♫</span>Треки</a
+          >
+          <a class="nav-link" href="collections.html"
+            ><span class="nav-icon">▱</span>Подборки</a
+          >
+          <a class="nav-link" href="events.html"
+            ><span class="nav-icon">▦</span>События</a
+          >
+        </nav>
+        <div class="side-collection">
+          <p class="side-label">МОЯ МУЗЫКА</p>
+          <a class="side-link" href="playlists.html"
+            ><span>☷</span>Мои плейлисты</a
+          >
+          <a class="side-link" href="favorites.html"><span>♡</span>Избранное</a>
+          <a class="side-link" href="statistics.html"
+            ><span>◌</span>Статистика</a
+          >
+          <a class="side-link" href="profile.html"><span>⌁</span>Профиль</a>
+          <div class="side-divider"></div>
+          <a class="create-playlist" href="create-playlist.html"
+            >＋ Создать плейлист</a
+          >
+        </div>
+        <div class="sidebar-about">
+          <p>Твой голос. Твой мир.</p>
+          <span>Всё бесплатно.<br />Без подписок.</span
+          ><a href="login.html">Войти ↗</a
+          ><a href="register.html">Создать аккаунт</a>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <button
+            class="mobile-menu icon-button"
+            id="menu-toggle"
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+          <label class="search-box"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="site-search"
+              type="search"
+              placeholder="Трек, продюсер или виртуальный голос"
+              aria-label="Поиск по сайту"
+            /><kbd>Ctrl K</kbd></label
+          >
+          <div class="account-actions">
+            <a class="auth-header-link" href="login.html">Войти</a
+            ><a
+              class="auth-header-link auth-header-link-primary"
+              href="register.html"
+              >Регистрация</a
+            >
+          </div>
+        </header>
+        <div class="content directory-content artists-content">
+          <section class="artists-hero" aria-label="Каталог исполнителей">
+            <img
+              src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1800&q=85"
+              alt=""
+            />
+            <div class="artists-hero-shade"></div>
+            <div class="artists-hero-copy">
+              <p class="directory-kicker">VOXSEKAI · КАТАЛОГ ИСПОЛНИТЕЛЕЙ</p>
+              <h1>Голоса,<br />которые создают музыку</h1>
+              <p>
+                Виртуальные и электронные исполнители — от легенд вокалоидов до
+                новых голосов.
+              </p>
+              <small
+                >48 исполнителей · 2 600+ треков · обновляется ежедневно</small
+              >
+            </div>
+          </section>
+          <section
+            class="artist-directory-controls"
+            aria-label="Поиск исполнителей"
+          >
+            <label class="directory-search"
+              ><span aria-hidden="true">⌕</span
+              ><input
+                id="page-search"
+                type="search"
+                placeholder="Имя исполнителя или жанр"
+                aria-label="Поиск исполнителей"
+            /></label>
+            <div class="artist-filter-row">
+              <div class="genre-filter" aria-label="Жанры исполнителей">
+                <button
+                  class="genre-chip active"
+                  type="button"
+                  data-filter="all"
+                  aria-pressed="true"
+                >
+                  Все
+                </button>
+                <button
+                  class="genre-chip"
+                  type="button"
+                  data-filter="vocaloid"
+                  aria-pressed="false"
+                >
+                  Вокалоиды
+                </button>
+                <button
+                  class="genre-chip"
+                  type="button"
+                  data-filter="j-pop"
+                  aria-pressed="false"
+                >
+                  J-pop
+                </button>
+                <button
+                  class="genre-chip"
+                  type="button"
+                  data-filter="electronic"
+                  aria-pressed="false"
+                >
+                  Электроника
+                </button>
+                <button
+                  class="genre-chip"
+                  type="button"
+                  data-filter="synthwave"
+                  aria-pressed="false"
+                >
+                  Синтвейв
+                </button>
+                <button
+                  class="genre-chip"
+                  type="button"
+                  data-filter="rock"
+                  aria-pressed="false"
+                >
+                  Рок
+                </button>
+                <button
+                  class="genre-chip"
+                  type="button"
+                  data-filter="experimental"
+                  aria-pressed="false"
+                >
+                  Экспериментальные
+                </button>
+              </div>
+              <label class="sort-control"
+                ><span class="sr-only">Сортировка</span
+                ><select id="artist-sort">
+                  <option value="popular">По популярности</option>
+                  <option value="name">По имени</option>
+                  <option value="tracks">По числу треков</option>
+                </select></label
+              >
+            </div>
+            <p class="artist-results">
+              Показано <strong data-results-count>8</strong> исполнителей
+            </p>
+          </section>
+          <section
+            class="performer-grid"
+            data-sort-list
+            aria-label="Исполнители"
+          >
+            <a
+              class="performer-card performer-miku"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid j-pop"
+              data-search-text="hatsune miku вокалоид j-pop"
+              data-tracks="850"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>MI</b>
+              </div>
+              <div class="performer-info">
+                <p>J-POP · ВОКАЛОИД</p>
+                <h2>Hatsune Miku</h2>
+                <small>Хацунэ Мику · Япония</small
+                ><span>856 треков · 1,2 млн слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-rin"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid j-pop"
+              data-search-text="kagamine rin len вокалоид j-pop"
+              data-tracks="620"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>RL</b>
+              </div>
+              <div class="performer-info">
+                <p>J-POP · ВОКАЛОИД</p>
+                <h2>Kagamine Rin / Len</h2>
+                <small>Кагамине Рин и Лен · Япония</small
+                ><span>620 треков · 980 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-luka"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid j-pop"
+              data-search-text="megurine luka вокалоид j-pop"
+              data-tracks="540"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>LU</b>
+              </div>
+              <div class="performer-info">
+                <p>J-POP · ВОКАЛОИД</p>
+                <h2>Megurine Luka</h2>
+                <small>Мэгуринэ Лука · Япония</small
+                ><span>540 треков · 720 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-kaito"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid j-pop"
+              data-search-text="kaito вокалоид j-pop"
+              data-tracks="410"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>KA</b>
+              </div>
+              <div class="performer-info">
+                <p>J-POP · ВОКАЛОИД</p>
+                <h2>KAITO</h2>
+                <small>Кайто · Япония</small
+                ><span>410 треков · 530 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-mira"
+              href="artist.html"
+              data-genre-item
+              data-genre="electronic synthwave"
+              data-search-text="mira kai electronic synthwave"
+              data-tracks="240"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>MK</b>
+              </div>
+              <div class="performer-info">
+                <p>ЭЛЕКТРОНИКА</p>
+                <h2>Mira Kai</h2>
+                <small>Мира Кай · Япония</small
+                ><span>240 треков · 124 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-meiko"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid rock"
+              data-search-text="meiko вокалоид rock"
+              data-tracks="390"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>ME</b>
+              </div>
+              <div class="performer-info">
+                <p>РОК · ВОКАЛОИД</p>
+                <h2>MEIKO</h2>
+                <small>Мэйко · Япония</small
+                ><span>390 треков · 420 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-gumi"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid electronic"
+              data-search-text="gumi вокалоид electronic"
+              data-tracks="341"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>GU</b>
+              </div>
+              <div class="performer-info">
+                <p>ПОП · ВОКАЛОИД</p>
+                <h2>Gumi</h2>
+                <small>Гуми · Япония</small
+                ><span>341 трек · 390 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+            <a
+              class="performer-card performer-ia"
+              href="artist.html"
+              data-genre-item
+              data-genre="vocaloid experimental"
+              data-search-text="ia вокалоид experimental"
+              data-tracks="220"
+              ><div class="performer-art">
+                <span class="performer-bars"
+                  ><i></i><i></i><i></i><i></i><i></i></span
+                ><b>IA</b>
+              </div>
+              <div class="performer-info">
+                <p>ЭЛЕКТРОНИКА · ЭКСПЕРИМЕНТАЛЬНОЕ</p>
+                <h2>IA</h2>
+                <small>Иа · Япония</small
+                ><span>220 треков · 350 тыс. слушателей</span>
+              </div>
+              <span class="performer-action">Смотреть профиль <b>↗</b></span></a
+            >
+          </section>
+          <p class="directory-empty" hidden>Исполнители не найдены.</p>
+          <button class="load-more" type="button" data-load-more>
+            Показать ещё исполнителей
+          </button>
+          <footer class="site-footer directory-footer">
+            <a class="footer-brand" href="../"
+              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+              >voxsekai</a
+            ><span>© 2026 VoxSekai · Музыка начинается с тебя</span>
+            <nav>
+              <a href="../">О проекте</a><a href="../">Поддержка</a
+              ><a href="../">Правила сервиса</a
+              ><a href="../">Конфиденциальность</a>
+            </nav>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <a href="../">⌂<span>Главная</span></a
+      ><a href="catalog.html">◉<span>Каталог</span></a
+      ><a href="favorites.html">♡<span>Моё</span></a
+      ><a href="profile.html">○<span>Профиль</span></a>
+    </nav>
+  </body>
+</html>

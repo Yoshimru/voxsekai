@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title>Каталог музыки — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page catalog-page">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="../" aria-label="VoxSekai — главная"
+          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+          ><span>voxsekai</span></a
+        >
+        <nav class="primary-nav" aria-label="Основная навигация">
+          <a class="nav-link" href="../"
+            ><span class="nav-icon">⌂</span>Главная</a
+          >
+          <a class="nav-link active" href="catalog.html"
+            ><span class="nav-icon">◉</span>Каталог</a
+          >
+          <a class="nav-link" href="artists.html"
+            ><span class="nav-icon">♬</span>Исполнители</a
+          >
+          <a class="nav-link" href="tracks.html"
+            ><span class="nav-icon">♫</span>Треки</a
+          >
+          <a class="nav-link" href="collections.html"
+            ><span class="nav-icon">▱</span>Подборки</a
+          >
+          <a class="nav-link" href="events.html"
+            ><span class="nav-icon">▦</span>События</a
+          >
+        </nav>
+        <div class="side-collection">
+          <p class="side-label">МОЯ МУЗЫКА</p>
+          <a class="side-link" href="playlists.html"
+            ><span>☷</span>Мои плейлисты</a
+          >
+          <a class="side-link" href="favorites.html"><span>♡</span>Избранное</a>
+          <a class="side-link" href="statistics.html"
+            ><span>◌</span>Статистика</a
+          >
+          <a class="side-link" href="profile.html"><span>⌁</span>Профиль</a>
+          <div class="side-divider"></div>
+          <a class="create-playlist" href="create-playlist.html"
+            >＋ Создать плейлист</a
+          >
+        </div>
+        <div class="sidebar-about">
+          <p>Твой голос. Твой мир.</p>
+          <span>Всё бесплатно.<br />Без подписок.</span
+          ><a href="login.html">Войти ↗</a
+          ><a href="register.html">Создать аккаунт</a>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <button
+            class="mobile-menu icon-button"
+            id="menu-toggle"
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+          <label class="search-box"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="site-search"
+              type="search"
+              placeholder="Трек, продюсер или виртуальный голос"
+              aria-label="Поиск по сайту"
+            /><kbd>Ctrl K</kbd></label
+          >
+          <div class="account-actions">
+            <a class="auth-header-link" href="login.html">Войти</a
+            ><a
+              class="auth-header-link auth-header-link-primary"
+              href="register.html"
+              >Регистрация</a
+            >
+          </div>
+        </header>
+        <div class="content directory-content">
+          <header class="directory-heading">
+            <div>
+              <p class="directory-kicker">DISCOVER / 01</p>
+              <h1>Каталог музыки</h1>
+              <p>Найди следующий трек, который попадёт в настроение.</p>
+            </div>
+          </header>
+          <section
+            class="catalog-controls"
+            aria-label="Поиск и сортировка каталога"
+          >
+            <label class="directory-search"
+              ><span aria-hidden="true">⌕</span
+              ><input
+                id="page-search"
+                type="search"
+                placeholder="Трек, исполнитель, жанр или настроение"
+                aria-label="Поиск в каталоге"
+            /></label>
+            <label class="sort-control"
+              ><span class="sr-only">Сортировка</span
+              ><select id="catalog-sort">
+                <option value="popular">Популярное</option>
+                <option value="rating">По рейтингу</option>
+                <option value="title">По названию</option>
+              </select></label
+            >
+            <button
+              class="filter-control"
+              type="button"
+              data-filter-toggle
+              aria-expanded="false"
+            >
+              ☷ Фильтры
+            </button>
+          </section>
+          <section class="directory-genres" aria-label="Жанры">
+            <p class="directory-label">ЖАНРЫ</p>
+            <div class="genre-filter">
+              <button
+                class="genre-chip active"
+                type="button"
+                data-filter="all"
+                aria-pressed="true"
+              >
+                Все треки
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="electronic"
+                aria-pressed="false"
+              >
+                Электропоп
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="j-pop"
+                aria-pressed="false"
+              >
+                J-pop
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="synthwave"
+                aria-pressed="false"
+              >
+                Синтвейв
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="ambient"
+                aria-pressed="false"
+              >
+                Эмбиент
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="rock"
+                aria-pressed="false"
+              >
+                Нью-вейв
+              </button>
+            </div>
+          </section>
+          <section class="catalog-feature" aria-label="Подборка недели">
+            <div class="catalog-feature-art">
+              <span class="catalog-feature-wave">▥</span
+              ><span>AFTER HOURS</span>
+            </div>
+            <div class="catalog-feature-copy">
+              <p class="eyebrow">ПОДБОРКА НЕДЕЛИ</p>
+              <h2>После полуночи</h2>
+              <p>Нежный синтвейв и электро-поп для ночных поездок.</p>
+              <small>24 трека · 1 ч 18 мин</small>
+            </div>
+            <a class="button button-primary" href="collections.html"
+              >Слушать подборку <span>↗</span></a
+            >
+          </section>
+          <section class="catalog-tracks">
+            <div class="directory-section-heading">
+              <h2>Треки для твоего следующего вайба</h2>
+              <p>
+                <span data-results-count>8</span> треков · сортировка по
+                популярности
+              </p>
+            </div>
+            <div class="catalog-track-grid" data-sort-list>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="electronic"
+                data-search-text="neon afterglow mira kai electronic synth pop"
+                data-rating="4.9"
+              >
+                <div class="catalog-cover cover-cyan">
+                  <span>Neon<br />Afterglow</span><i>初</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>ЭЛЕКТРОНИКА</p>
+                  <h3>Neon Afterglow</h3>
+                  <small>Mira Kai</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.9</span><span>4:08</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Neon Afterglow"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="synthwave"
+                data-search-text="afterimage aoine synthwave"
+                data-rating="4.8"
+              >
+                <div class="catalog-cover cover-violet">
+                  <span>After<br />image</span><i>巡</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>СИНТВЕЙВ</p>
+                  <h3>Afterimage</h3>
+                  <small>Aoine</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.8</span><span>3:42</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Afterimage"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="j-pop"
+                data-search-text="plastic moon yuna 404 j-pop"
+                data-rating="4.7"
+              >
+                <div class="catalog-cover cover-orange">
+                  <span>Plastic<br />Moon</span><i>月</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>J-POP</p>
+                  <h3>Plastic Moon</h3>
+                  <small>Yuna 404</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.7</span><span>3:31</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Plastic Moon"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="electronic"
+                data-search-text="blue signal mira kai electronic"
+                data-rating="4.8"
+              >
+                <div class="catalog-cover cover-pink">
+                  <span>Blue<br />Signal</span><i>青</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>ЭЛЕКТРОНИКА</p>
+                  <h3>Blue Signal</h3>
+                  <small>Mira Kai</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.8</span><span>3:54</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Blue Signal"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="synthwave"
+                data-search-text="glass horizon mira kai synthwave"
+                data-rating="4.8"
+              >
+                <div class="catalog-cover cover-cyan">
+                  <span>Glass<br />Horizon</span><i>硝</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>СИНТВЕЙВ</p>
+                  <h3>Glass Horizon</h3>
+                  <small>Mira Kai</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.8</span><span>3:35</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Glass Horizon"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="ambient"
+                data-search-text="soft reset aoine ambient"
+                data-rating="4.9"
+              >
+                <div class="catalog-cover cover-orange">
+                  <span>Soft<br />Reset</span><i>音</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>ЭМБИЕНТ</p>
+                  <h3>Soft Reset</h3>
+                  <small>Aoine</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.9</span><span>2:58</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Soft Reset"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="j-pop"
+                data-search-text="last train to tokyo yuna 404 j-pop"
+                data-rating="4.7"
+              >
+                <div class="catalog-cover cover-violet">
+                  <span>Last Train<br />to Tokyo</span><i>終</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>J-POP</p>
+                  <h3>Last Train to Tokyo</h3>
+                  <small>Yuna 404</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.7</span><span>4:01</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Last Train to Tokyo"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+              <article
+                class="catalog-track"
+                data-genre-item
+                data-genre="electronic"
+                data-search-text="synthetic bloom mira kai electronic"
+                data-rating="4.8"
+              >
+                <div class="catalog-cover cover-pink">
+                  <span>Synthetic<br />Bloom</span><i>花</i>
+                </div>
+                <div class="catalog-track-main">
+                  <p>ЭЛЕКТРОНИКА</p>
+                  <h3>Synthetic Bloom</h3>
+                  <small>Mira Kai</small>
+                </div>
+                <div class="catalog-track-footer">
+                  <span>★ 4.8</span><span>3:18</span
+                  ><button
+                    class="catalog-more"
+                    type="button"
+                    data-track-title="Synthetic Bloom"
+                  >
+                    Подробнее
+                  </button>
+                </div>
+              </article>
+            </div>
+            <p class="directory-empty" hidden>
+              По этому запросу ничего не найдено.
+            </p>
+          </section>
+          <footer class="site-footer directory-footer">
+            <a class="footer-brand" href="../"
+              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+              >voxsekai</a
+            ><span>© 2026 VoxSekai · Музыка начинается с тебя</span>
+            <nav>
+              <a href="../">О проекте</a><a href="../">Поддержка</a
+              ><a href="../">Правила сервиса</a
+              ><a href="../">Конфиденциальность</a>
+            </nav>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <a href="../">⌂<span>Главная</span></a
+      ><a class="active" href="catalog.html">◉<span>Каталог</span></a
+      ><a href="favorites.html">♡<span>Моё</span></a
+      ><a href="profile.html">○<span>Профиль</span></a>
+    </nav>
+  </body>
+</html>

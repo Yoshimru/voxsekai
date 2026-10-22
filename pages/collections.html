@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title>Подборки — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page collections-page">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="../" aria-label="VoxSekai — главная"
+          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+          ><span>voxsekai</span></a
+        >
+        <nav class="primary-nav" aria-label="Основная навигация">
+          <a class="nav-link" href="../"
+            ><span class="nav-icon">⌂</span>Главная</a
+          >
+          <a class="nav-link" href="catalog.html"
+            ><span class="nav-icon">◉</span>Каталог</a
+          >
+          <a class="nav-link" href="artists.html"
+            ><span class="nav-icon">♬</span>Исполнители</a
+          >
+          <a class="nav-link" href="tracks.html"
+            ><span class="nav-icon">♫</span>Треки</a
+          >
+          <a class="nav-link active" href="collections.html"
+            ><span class="nav-icon">▱</span>Подборки</a
+          >
+          <a class="nav-link" href="events.html"
+            ><span class="nav-icon">▦</span>События</a
+          >
+        </nav>
+        <div class="side-collection">
+          <p class="side-label">МОЯ МУЗЫКА</p>
+          <a class="side-link" href="playlists.html"
+            ><span>☷</span>Мои плейлисты</a
+          >
+          <a class="side-link" href="favorites.html"><span>♡</span>Избранное</a>
+          <a class="side-link" href="statistics.html"
+            ><span>◌</span>Статистика</a
+          >
+          <a class="side-link" href="profile.html"><span>⌁</span>Профиль</a>
+          <div class="side-divider"></div>
+          <a class="create-playlist" href="create-playlist.html"
+            >＋ Создать плейлист</a
+          >
+        </div>
+        <div class="sidebar-about">
+          <p>Твой голос. Твой мир.</p>
+          <span>Всё бесплатно.<br />Без подписок.</span
+          ><a href="login.html">Войти ↗</a
+          ><a href="register.html">Создать аккаунт</a>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <button
+            class="mobile-menu icon-button"
+            id="menu-toggle"
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+          <label class="search-box"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="site-search"
+              type="search"
+              placeholder="Трек, продюсер или виртуальный голос"
+              aria-label="Поиск по сайту"
+            /><kbd>Ctrl K</kbd></label
+          >
+          <div class="account-actions">
+            <a class="auth-header-link" href="login.html">Войти</a
+            ><a
+              class="auth-header-link auth-header-link-primary"
+              href="register.html"
+              >Регистрация</a
+            >
+          </div>
+        </header>
+        <div class="content directory-content collections-content">
+          <header class="directory-heading">
+            <div>
+              <h1>Подборки для тебя</h1>
+              <p>
+                Редакционные коллекции и рекомендации по твоим музыкальным
+                вкусам.
+              </p>
+            </div>
+          </header>
+          <section class="collection-feature" aria-label="Подборка недели">
+            <div class="collection-feature-art">
+              <span class="collection-feature-bars">▥</span
+              ><strong>AFTER HOURS</strong>
+            </div>
+            <div class="collection-feature-copy">
+              <p class="eyebrow">ПОДБОРКА НЕДЕЛИ</p>
+              <h2>После полуночи</h2>
+              <p>
+                Мягкий синтвейв и электро-поп для ночных поездок и тихих мыслей.
+              </p>
+              <a class="button button-primary" href="catalog.html"
+                >Посмотреть треки <span>↗</span></a
+              >
+            </div>
+          </section>
+          <section class="collection-moods">
+            <div class="directory-section-heading">
+              <h2>Выбирай по настроению</h2>
+              <a href="#recommendations" class="view-all"
+                >Для тебя <span>↗</span></a
+              >
+            </div>
+            <div class="collection-mood-grid">
+              <a
+                class="collection-mood-card collection-mood-road"
+                href="catalog.html"
+                ><div class="collection-mood-art">
+                  <span class="collection-feature-bars">▥</span
+                  ><strong>ДЛЯ ДОЛГОЙ ДОРОГИ</strong>
+                </div>
+                <h3>Для долгой дороги</h3>
+                <p>74 трека · Ночной маршрут</p>
+                <span class="collection-card-arrow">↗</span></a
+              >
+              <a
+                class="collection-mood-card collection-mood-new"
+                href="catalog.html"
+                ><div class="collection-mood-art">
+                  <span class="collection-feature-bars">▥</span
+                  ><strong>НОВЫЙ ЗВУК</strong>
+                </div>
+                <h3>Новый звук</h3>
+                <p>Треки недели · 18 треков</p>
+                <span class="collection-card-arrow">↗</span></a
+              >
+              <a
+                class="collection-mood-card collection-mood-soft"
+                href="catalog.html"
+                ><div class="collection-mood-art">
+                  <span class="collection-feature-bars">▥</span
+                  ><strong>МЯГКАЯ ЭНЕРГИЯ</strong>
+                </div>
+                <h3>Мягкая энергия</h3>
+                <p>Для фокуса · 26 треков</p>
+                <span class="collection-card-arrow">↗</span></a
+              >
+              <a
+                class="collection-mood-card collection-mood-tokyo"
+                href="catalog.html"
+                ><div class="collection-mood-art">
+                  <span class="collection-feature-bars">▥</span
+                  ><strong>ПОСЛЕ 22:00</strong>
+                </div>
+                <h3>Ночной Токио</h3>
+                <p>После 22:00 · 42 трека</p>
+                <span class="collection-card-arrow">↗</span></a
+              >
+            </div>
+          </section>
+          <section class="recommendation-banner" id="recommendations">
+            <span class="recommendation-mark">✦</span>
+            <div>
+              <h2>Рекомендуем на основе твоих оценок</h2>
+              <p>
+                Ты высоко оценил 4 трека в жанре синтвейв — попробуй подборку
+                «Холодный неон».
+              </p>
+            </div>
+            <a class="button button-secondary" href="catalog.html"
+              >Посмотреть подборку <span>↗</span></a
+            >
+          </section>
+          <footer class="site-footer directory-footer">
+            <a class="footer-brand" href="../"
+              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+              >voxsekai</a
+            ><span>© 2026 VoxSekai · Музыка начинается с тебя</span>
+            <nav>
+              <a href="../">О проекте</a><a href="../">Поддержка</a
+              ><a href="../">Правила сервиса</a
+              ><a href="../">Конфиденциальность</a>
+            </nav>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <a href="../">⌂<span>Главная</span></a
+      ><a href="catalog.html">◉<span>Каталог</span></a
+      ><a href="favorites.html">♡<span>Моё</span></a
+      ><a href="profile.html">○<span>Профиль</span></a>
+    </nav>
+  </body>
+</html>
