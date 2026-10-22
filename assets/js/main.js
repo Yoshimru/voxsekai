@@ -26,6 +26,23 @@
     });
   });
 
+  document.querySelectorAll("[data-playlist-add]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const added = button.classList.toggle("is-added");
+      const trackName = button.dataset.playlistAdd;
+      button.textContent = added ? "✓" : "＋";
+      button.setAttribute(
+        "aria-label",
+        `${added ? "Убрать" : "Добавить"} ${trackName} ${added ? "из" : "в"} плейлист`,
+      );
+      notify(
+        added
+          ? `«${trackName}» добавлен в плейлист`
+          : `«${trackName}» удалён из плейлиста`,
+      );
+    });
+  });
+
   const genreButtons = document.querySelectorAll(".genre-chip");
   const genreItems = document.querySelectorAll(
     "[data-genre-item], .track-row[data-genre]",
@@ -119,6 +136,90 @@
       notify("Показаны все исполнители каталога");
     });
 
+  const selectedTrackNames = new Set();
+  const selectedCount = document.querySelector("[data-selected-count]");
+  const selectedTracks = document.querySelector("[data-selected-tracks]");
+  document.querySelectorAll("[data-add-track]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const trackName = button.dataset.addTrack;
+      if (selectedTrackNames.has(trackName)) {
+        selectedTrackNames.delete(trackName);
+        button.closest(".available-track")?.classList.remove("is-added");
+        button.classList.remove("is-selected");
+        button.textContent = "+";
+        button.setAttribute("aria-label", `Добавить ${trackName}`);
+      } else {
+        selectedTrackNames.add(trackName);
+        button.closest(".available-track")?.classList.add("is-added");
+        button.classList.add("is-selected");
+        button.textContent = "✓";
+        button.setAttribute("aria-label", `Убрать ${trackName}`);
+      }
+
+      if (selectedCount) {
+        selectedCount.textContent = `${selectedTrackNames.size} выбрано`;
+      }
+      if (selectedTracks) {
+        selectedTracks.textContent = selectedTrackNames.size
+          ? `В плейлисте: ${Array.from(selectedTrackNames).join(", ")}`
+          : "Выбери треки, которые войдут в плейлист.";
+      }
+    });
+  });
+
+  const trackSearch = document.querySelector("[data-track-search]");
+  trackSearch?.addEventListener("input", () => {
+    const query = trackSearch.value.trim().toLocaleLowerCase("ru");
+    document.querySelectorAll(".available-track").forEach((track) => {
+      track.hidden = !track.dataset.trackName
+        .toLocaleLowerCase("ru")
+        .includes(query);
+    });
+  });
+
+  document
+    .querySelector("[data-cover-input]")
+    ?.addEventListener("change", (event) => {
+      const file = event.currentTarget.files?.[0];
+      const upload = event.currentTarget.closest(".cover-upload");
+      const hint = upload?.querySelector("[data-cover-hint]");
+      if (!file || !hint) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        hint.textContent = "Файл должен быть меньше 5 МБ.";
+        event.currentTarget.value = "";
+        return;
+      }
+      hint.textContent = file.name;
+    });
+
+  document
+    .querySelector("[data-playlist-form]")
+    ?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const title = document.querySelector("#playlist-name")?.value.trim();
+      const message = document.querySelector("[data-playlist-message]");
+      if (!message) return;
+      if (!selectedTrackNames.size) {
+        message.textContent = "Добавь хотя бы один трек в плейлист.";
+        message.classList.add("is-visible");
+        return;
+      }
+
+      message.textContent = `«${title}» готов к сохранению после подключения хранилища плейлистов.`;
+      message.classList.add("is-visible");
+    });
+
+  document
+    .querySelector("[data-profile-notice]")
+    ?.addEventListener("click", () => {
+      const message = document.querySelector("[data-profile-message]");
+      if (!message) return;
+      message.textContent =
+        "Редактирование профиля станет доступно после входа в аккаунт.";
+      message.classList.add("is-visible");
+    });
+
   document.querySelectorAll("[data-auth-switch]").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
@@ -181,7 +282,7 @@
         pageSearch.value = search.value.trim();
         pageSearch.dispatchEvent(new Event("input", { bubbles: true }));
         pageSearch.focus();
-      } else if (document.body.classList.contains("directory-page") === false) {
+      } else {
         window.location.assign(
           `/pages/catalog.html?q=${encodeURIComponent(search.value.trim())}`,
         );
@@ -207,7 +308,7 @@
     link.addEventListener("click", (event) => {
       const target = link.getAttribute("href");
       const isAvailablePage =
-        /\/pages\/(login|register|catalog|artists|collections|events)\.html$/.test(
+        /\/pages\/(login|register|catalog|artists|collections|events|playlists|create-playlist|profile)\.html$/.test(
           target || "",
         );
       if (target && !target.endsWith("404.html") && !isAvailablePage) {

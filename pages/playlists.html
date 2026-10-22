@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title>Мои плейлисты — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page playlists-page">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="../" aria-label="VoxSekai — главная"
+          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+          ><span>voxsekai</span></a
+        >
+        <nav class="primary-nav" aria-label="Основная навигация">
+          <a class="nav-link" href="../"
+            ><span class="nav-icon">⌂</span>Главная</a
+          >
+          <a class="nav-link" href="catalog.html"
+            ><span class="nav-icon">♫</span>Треки</a
+          >
+          <a class="nav-link" href="artists.html"
+            ><span class="nav-icon">♬</span>Исполнители</a
+          >
+          <a class="nav-link" href="collections.html"
+            ><span class="nav-icon">▱</span>Подборки</a
+          >
+          <a class="nav-link" href="events.html"
+            ><span class="nav-icon">▦</span>События</a
+          >
+        </nav>
+        <div class="side-collection">
+          <p class="side-label">МОЯ МУЗЫКА</p>
+          <a class="side-link active" href="playlists.html"
+            ><span>☷</span>Мои плейлисты</a
+          >
+          <a class="side-link" href="favorites.html"><span>♡</span>Избранное</a>
+          <a class="side-link" href="profile.html"><span>⌁</span>Профиль</a>
+          <div class="side-divider"></div>
+          <a class="create-playlist" href="create-playlist.html"
+            >＋ Создать плейлист</a
+          >
+        </div>
+        <div class="sidebar-about">
+          <p>Твой голос. Твой мир.</p>
+          <span>Всё бесплатно.<br />Без подписок.</span
+          ><a href="login.html">Войти ↗</a
+          ><a href="register.html">Создать аккаунт</a>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <button
+            class="mobile-menu icon-button"
+            id="menu-toggle"
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+          <label class="search-box"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="site-search"
+              type="search"
+              placeholder="Трек, продюсер или виртуальный голос"
+              aria-label="Поиск по сайту"
+            /><kbd>Ctrl K</kbd></label
+          >
+          <div class="account-actions">
+            <a class="auth-header-link" href="login.html">Войти</a
+            ><a
+              class="auth-header-link auth-header-link-primary"
+              href="register.html"
+              >Регистрация</a
+            >
+          </div>
+        </header>
+        <div class="content directory-content library-content">
+          <header class="library-heading">
+            <div>
+              <h1>Мои плейлисты</h1>
+              <p>Собирай музыку под настроение, момент или маршрут.</p>
+            </div>
+            <a class="button button-primary" href="create-playlist.html"
+              ><span>＋</span>Новый плейлист</a
+            >
+          </header>
+          <section class="library-section">
+            <div class="directory-section-heading">
+              <h2>Твоя библиотека</h2>
+              <span>6 плейлистов</span>
+            </div>
+            <div class="playlist-grid">
+              <a
+                class="playlist-card playlist-card-favorites"
+                href="favorites.html"
+                ><div class="playlist-art">
+                  <span class="playlist-bars"
+                    ><i></i><i></i><i></i><i></i><i></i></span
+                  ><strong>ИЗБРАННОЕ</strong>
+                </div>
+                <div class="playlist-card-info">
+                  <h3>Избранное</h3>
+                  <p>24 трека · недавно</p>
+                  <span>↗</span>
+                </div></a
+              >
+              <a class="playlist-card playlist-card-night" href="playlist.html"
+                ><div class="playlist-art">
+                  <span class="playlist-bars"
+                    ><i></i><i></i><i></i><i></i><i></i></span
+                  ><strong>AFTER HOURS</strong>
+                </div>
+                <div class="playlist-card-info">
+                  <h3>Ночной Токио</h3>
+                  <p>18 треков · недавно</p>
+                  <span>↗</span>
+                </div></a
+              >
+              <a class="playlist-card playlist-card-repeat" href="playlist.html"
+                ><div class="playlist-art">
+                  <span class="playlist-bars"
+                    ><i></i><i></i><i></i><i></i><i></i></span
+                  ><strong>ON REPEAT</strong>
+                </div>
+                <div class="playlist-card-info">
+                  <h3>На повторе</h3>
+                  <p>12 треков · недавно</p>
+                  <span>↗</span>
+                </div></a
+              >
+              <a
+                class="playlist-card playlist-card-morning"
+                href="playlist.html"
+                ><div class="playlist-art">
+                  <span class="playlist-bars"
+                    ><i></i><i></i><i></i><i></i><i></i></span
+                  ><strong>SLOW START</strong>
+                </div>
+                <div class="playlist-card-info">
+                  <h3>Медленное утро</h3>
+                  <p>9 треков · недавно</p>
+                  <span>↗</span>
+                </div></a
+              >
+              <a class="playlist-card playlist-card-drive" href="playlist.html"
+                ><div class="playlist-art">
+                  <span class="playlist-bars"
+                    ><i></i><i></i><i></i><i></i><i></i></span
+                  ><strong>ROAD MIX</strong>
+                </div>
+                <div class="playlist-card-info">
+                  <h3>Дорога домой</h3>
+                  <p>16 треков · недавно</p>
+                  <span>↗</span>
+                </div></a
+              >
+              <a class="playlist-card playlist-card-new" href="playlist.html"
+                ><div class="playlist-art">
+                  <span class="playlist-bars"
+                    ><i></i><i></i><i></i><i></i><i></i></span
+                  ><strong>FRESH PICKS</strong>
+                </div>
+                <div class="playlist-card-info">
+                  <h3>Новый звук</h3>
+                  <p>7 треков · недавно</p>
+                  <span>↗</span>
+                </div></a
+              >
+            </div>
+          </section>
+          <section class="library-section recently-added">
+            <div class="directory-section-heading">
+              <h2>Недавно добавлено</h2>
+              <a class="view-all" href="catalog.html"
+                >Все треки <span>↗</span></a
+              >
+            </div>
+            <div class="recent-track-list">
+              <article class="recent-track">
+                <span class="recent-cover cover-pink">Gl<br />ass</span>
+                <div>
+                  <h3>Glass Horizon</h3>
+                  <p>Mira Kai</p>
+                </div>
+                <span class="recent-duration">3:42</span><strong>★ 4.8</strong
+                ><button
+                  class="recent-add-button"
+                  type="button"
+                  data-playlist-add="Glass Horizon"
+                  aria-label="Добавить Glass Horizon в плейлист"
+                >
+                  ＋
+                </button>
+              </article>
+              <article class="recent-track">
+                <span class="recent-cover cover-cyan">So<br />ft</span>
+                <div>
+                  <h3>Soft Reset</h3>
+                  <p>Mira Kai</p>
+                </div>
+                <span class="recent-duration">2:58</span><strong>★ 4.8</strong
+                ><button
+                  class="recent-add-button"
+                  type="button"
+                  data-playlist-add="Soft Reset"
+                  aria-label="Добавить Soft Reset в плейлист"
+                >
+                  ＋
+                </button>
+              </article>
+              <article class="recent-track">
+                <span class="recent-cover cover-violet">Ne<br />on</span>
+                <div>
+                  <h3>Neon Afterglow</h3>
+                  <p>Mira Kai</p>
+                </div>
+                <span class="recent-duration">4:08</span><strong>★ 4.9</strong
+                ><button
+                  class="recent-add-button"
+                  type="button"
+                  data-playlist-add="Neon Afterglow"
+                  aria-label="Добавить Neon Afterglow в плейлист"
+                >
+                  ＋
+                </button>
+              </article>
+            </div>
+          </section>
+          <footer class="site-footer directory-footer">
+            <a class="footer-brand" href="../"
+              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+              >voxsekai</a
+            ><span>© 2026 VoxSekai · Музыка начинается с тебя</span>
+            <nav>
+              <a href="../">О проекте</a><a href="../">Поддержка</a
+              ><a href="../">Правила сервиса</a
+              ><a href="../">Конфиденциальность</a>
+            </nav>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <a href="../">⌂<span>Главная</span></a
+      ><a href="catalog.html">♫<span>Треки</span></a
+      ><a href="playlists.html" class="active">☷<span>Моё</span></a
+      ><a href="profile.html">○<span>Профиль</span></a>
+    </nav>
+  </body>
+</html>
