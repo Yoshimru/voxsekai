@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <meta
+      name="description"
+      content="Создай аккаунт VoxSekai и собери свой музыкальный мир."
+    />
+    <title>Регистрация — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="auth-page auth-register">
+    <div class="auth-shell">
+      <header class="auth-header">
+        <a class="auth-brand" href="../" aria-label="VoxSekai — главная">
+          <span class="soundmark"><i></i><i></i><i></i><i></i></span>
+          <span class="auth-brand-copy"
+            ><strong>voxsekai</strong><small>MUSIC FOR YOUR WORLD</small></span
+          >
+        </a>
+        <div class="auth-switch-note">
+          <span>Уже есть аккаунт?</span>
+          <a class="auth-header-button" href="login.html" data-auth-switch
+            >Войти</a
+          >
+        </div>
+      </header>
+
+      <main class="auth-main">
+        <section class="auth-intro" aria-label="О VoxSekai">
+          <span class="auth-index">01</span>
+          <div class="auth-art" aria-hidden="true">
+            <div class="auth-art-orb auth-art-orb-large"></div>
+            <div class="auth-art-orb auth-art-orb-small"></div>
+            <div class="auth-equalizer">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <span class="auth-art-title">FIND YOUR SOUND</span>
+            <span class="auth-art-caption">A SOUND OF YOUR OWN</span>
+          </div>
+          <div class="auth-intro-copy">
+            <p class="auth-eyebrow">ТВОЁ СООБЩЕСТВО</p>
+            <h1>Собери свой<br />музыкальный мир</h1>
+            <p class="auth-intro-text">
+              Сохраняй любимые треки, создавай подборки и открывай новые
+              виртуальные голоса.
+            </p>
+            <ul class="auth-benefits">
+              <li><span>✓</span> Персональная музыкальная библиотека</li>
+              <li><span>✓</span> Плейлисты под любое настроение</li>
+              <li><span>✓</span> Подборки по твоим оценкам</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="auth-form-panel" aria-labelledby="auth-title">
+          <p class="auth-eyebrow">СОЗДАНИЕ АККАУНТА</p>
+          <h2 id="auth-title">Создай аккаунт</h2>
+          <p class="auth-form-lead">
+            Начни собирать коллекцию музыки, которая похожа на тебя.
+          </p>
+          <form class="auth-form" data-auth-form="register">
+            <label class="auth-field">
+              <span>Имя пользователя</span>
+              <input
+                type="text"
+                name="name"
+                autocomplete="username"
+                placeholder="Как к тебе обращаться"
+                required
+                minlength="2"
+              />
+            </label>
+            <label class="auth-field">
+              <span>E-mail</span>
+              <input
+                type="email"
+                name="email"
+                autocomplete="email"
+                placeholder="name@example.com"
+                required
+              />
+            </label>
+            <label class="auth-field">
+              <span>Пароль</span>
+              <span class="auth-password-wrap">
+                <input
+                  type="password"
+                  name="password"
+                  autocomplete="new-password"
+                  placeholder="Не менее 8 символов"
+                  required
+                  minlength="8"
+                />
+                <button
+                  class="password-toggle"
+                  type="button"
+                  aria-label="Показать пароль"
+                  aria-pressed="false"
+                >
+                  ◉
+                </button>
+              </span>
+            </label>
+            <label class="auth-checkbox auth-terms">
+              <input type="checkbox" name="terms" required />
+              <span
+                >Я соглашаюсь с <a href="../">правилами сервиса</a> и
+                <a href="../">политикой конфиденциальности</a>.</span
+              >
+            </label>
+            <button class="auth-submit" type="submit">
+              Создать аккаунт <span>↗</span>
+            </button>
+            <p
+              class="auth-message"
+              data-auth-message
+              role="status"
+              aria-live="polite"
+            ></p>
+          </form>
+          <div class="auth-divider"><span>ИЛИ ПРОДОЛЖИ ИССЛЕДОВАТЬ</span></div>
+          <a class="auth-continue" href="../">Сначала посмотреть каталог</a>
+          <p class="auth-form-footnote">
+            Пароль должен содержать не менее 8 символов.
+          </p>
+        </section>
+      </main>
+
+      <footer class="auth-footer">
+        <a class="auth-footer-brand" href="../">voxsekai</a>
+        <span>© 2026 VoxSekai · Музыкальное пространство</span>
+        <nav aria-label="Дополнительная навигация">
+          <a href="../">О проекте</a><a href="../">Правила сервиса</a
+          ><a href="../">Конфиденциальность</a><a href="../">Поддержка</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

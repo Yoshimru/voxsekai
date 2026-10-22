@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <meta
+      name="description"
+      content="Войди в VoxSekai и продолжай открывать виртуальную музыку."
+    />
+    <title>Вход — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="auth-page auth-login">
+    <div class="auth-shell">
+      <header class="auth-header">
+        <a class="auth-brand" href="../" aria-label="VoxSekai — главная">
+          <span class="soundmark"><i></i><i></i><i></i><i></i></span>
+          <span class="auth-brand-copy"
+            ><strong>voxsekai</strong><small>MUSIC FOR YOUR WORLD</small></span
+          >
+        </a>
+        <div class="auth-switch-note">
+          <span>Впервые здесь?</span>
+          <a class="auth-header-button" href="register.html" data-auth-switch
+            >Регистрация</a
+          >
+        </div>
+      </header>
+
+      <main class="auth-main">
+        <section class="auth-intro" aria-label="О VoxSekai">
+          <span class="auth-index">01</span>
+          <div class="auth-art" aria-hidden="true">
+            <div class="auth-art-orb auth-art-orb-large"></div>
+            <div class="auth-art-orb auth-art-orb-small"></div>
+            <div class="auth-equalizer">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <span class="auth-art-title">VOXSEKAI</span>
+            <span class="auth-art-caption">A SOUND OF YOUR OWN</span>
+          </div>
+          <div class="auth-intro-copy">
+            <p class="auth-eyebrow">ТВОЯ МУЗЫКА</p>
+            <h1>Вернись к своему<br />звучанию</h1>
+            <p class="auth-intro-text">
+              Продолжай открывать новые голоса, сохраняй избранное и возвращайся
+              к своим плейлистам.
+            </p>
+            <ul class="auth-benefits">
+              <li><span>✓</span> Твоя музыка — в одном месте</li>
+              <li><span>✓</span> Избранные треки и оценки</li>
+              <li><span>✓</span> Подборки под твой вкус</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="auth-form-panel" aria-labelledby="auth-title">
+          <p class="auth-eyebrow">РАДЫ ВИДЕТЬ ТЕБЯ СНОВА</p>
+          <h2 id="auth-title">С возвращением</h2>
+          <p class="auth-form-lead">
+            Войди, чтобы открыть свою музыкальную библиотеку.
+          </p>
+          <form class="auth-form" data-auth-form="login">
+            <label class="auth-field">
+              <span>E-mail</span>
+              <input
+                type="email"
+                name="email"
+                autocomplete="email"
+                placeholder="name@example.com"
+                required
+              />
+            </label>
+            <label class="auth-field">
+              <span>Пароль</span>
+              <span class="auth-password-wrap">
+                <input
+                  type="password"
+                  name="password"
+                  autocomplete="current-password"
+                  placeholder="Введи пароль"
+                  required
+                />
+                <button
+                  class="password-toggle"
+                  type="button"
+                  aria-label="Показать пароль"
+                  aria-pressed="false"
+                >
+                  ◉
+                </button>
+              </span>
+            </label>
+            <div class="auth-form-options">
+              <label class="auth-checkbox"
+                ><input type="checkbox" name="remember" /><span
+                  >Запомнить меня</span
+                ></label
+              >
+              <button
+                class="auth-text-button"
+                type="button"
+                data-auth-notice="Восстановление пароля станет доступно после подключения авторизации."
+              >
+                Забыли пароль?
+              </button>
+            </div>
+            <button class="auth-submit" type="submit">
+              Войти в VoxSekai <span>↗</span>
+            </button>
+            <p
+              class="auth-message"
+              data-auth-message
+              role="status"
+              aria-live="polite"
+            ></p>
+          </form>
+          <div class="auth-divider"><span>ИЛИ</span></div>
+          <a class="auth-continue" href="../">Продолжить без входа</a>
+          <p class="auth-form-footnote">
+            Нет аккаунта?
+            <a href="register.html" data-auth-switch>Создай его за минуту</a>
+          </p>
+        </section>
+      </main>
+
+      <footer class="auth-footer">
+        <a class="auth-footer-brand" href="../">voxsekai</a>
+        <span>© 2026 VoxSekai · Музыкальное пространство</span>
+        <nav aria-label="Дополнительная навигация">
+          <a href="../">О проекте</a><a href="../">Правила сервиса</a
+          ><a href="../">Конфиденциальность</a><a href="../">Поддержка</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>
