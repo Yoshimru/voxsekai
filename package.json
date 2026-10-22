@@ -1,0 +1,10 @@
+{
+  "name": "voxsekai-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VoxSekai frontend: HTML, CSS and vanilla JavaScript",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" }
+}

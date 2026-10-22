@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e1014"><meta name="description" content="VoxSekai — твой мир виртуальной музыки.">
+  <title>VoxSekai — Главная</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="/" aria-label="VoxSekai — главная"><span class="soundmark"><i></i><i></i><i></i><i></i></span><span>voxsekai</span></a>
+    <nav class="primary-nav" aria-label="Основная навигация">
+      <a class="nav-link active" href="/"><span class="nav-icon">⌂</span>Главная</a>
+      <a class="nav-link" href="/pages/catalog.html"><span class="nav-icon">◉</span>Каталог</a>
+      <a class="nav-link" href="/pages/artists.html"><span class="nav-icon">♬</span>Исполнители</a>
+      <a class="nav-link" href="/pages/tracks.html"><span class="nav-icon">♫</span>Треки</a>
+      <a class="nav-link" href="/pages/collections.html"><span class="nav-icon">▱</span>Подборки</a>
+      <a class="nav-link" href="/pages/events.html"><span class="nav-icon">▦</span>События</a>
+    </nav>
+    <div class="side-collection">
+      <p class="side-label">МОЯ МУЗЫКА</p>
+      <a class="side-link" href="/pages/playlists.html"><span>☷</span>Мои плейлисты</a>
+      <a class="side-link" href="/pages/favorites.html"><span>♡</span>Избранное</a>
+      <a class="side-link" href="/pages/profile.html"><span>⌁</span>Профиль</a>
+      <div class="side-divider"></div>
+      <a class="playlist-link" href="/pages/playlist.html">Ночной Токио</a>
+      <a class="playlist-link" href="/pages/playlist.html">На повторе</a>
+      <a class="create-playlist" href="/pages/create-playlist.html">＋ Создать плейлист</a>
+    </div>
+    <div class="sidebar-about"><p>Твой голос. Твой мир.</p><span>Всё бесплатно.<br>Без подписок.</span><a href="/pages/login.html">Вход / регистрация ↗</a></div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <button class="mobile-menu icon-button" id="menu-toggle" aria-label="Открыть меню">☰</button>
+      <label class="search-box"><span aria-hidden="true">⌕</span><input id="site-search" type="search" placeholder="Трек, продюсер или виртуальный голос" aria-label="Поиск"><kbd>Ctrl K</kbd></label>
+      <div class="account-actions"><button class="icon-button notification" aria-label="Уведомления">♧<span></span></button><button class="account-button" id="account-toggle"><span class="avatar">А</span><span>Аки</span><span class="chevron">⌄</span></button></div>
+    </header>
+
+    <div class="content">
+      <div class="page-heading"><h1>Твой мир звучит по-новому</h1><p>Главная <span>/</span> Для тебя</p></div>
+      <section class="hero" aria-label="Подборка недели">
+        <div class="hero-art" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="equalizer"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="art-figure"><div class="hair"></div><div class="face"></div><div class="neck"></div><div class="body"></div></div><div class="art-ring"></div></div>
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><div class="eyebrow"><span>✦</span> ВОКАЛОИДНЫЙ МИР · ВЫБОР РЕДАКЦИИ</div><p class="hero-kicker">ПОДБОРКА НЕДЕЛИ</p><h2>Голоса из<br>другого мира</h2><p class="hero-description">Открой виртуальных исполнителей, которые меняют звучание музыки. Твоя следующая любимая песня уже здесь.</p><div class="hero-actions"><a class="button button-primary" href="/pages/collections.html">Слушать подборку <span>↗</span></a><a class="text-link" href="/pages/catalog.html">Исследовать каталог</a></div></div>
+        <span class="hero-index">01 <i></i> 04</span>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading"><div><p class="eyebrow muted">СЕЙЧАС В ТРЕНДЕ</p><h2>Звучит повсюду</h2></div><a href="/pages/tracks.html" class="view-all">Все треки <span>→</span></a></div>
+        <div class="track-grid">
+          <article class="track-card"><div class="cover cover-cyan"><span class="cover-symbol">◉</span><span class="cover-caption">NEON<br>AFTERGLOW</span><button class="play-button" aria-label="Воспроизвести Neon Afterglow">▶</button></div><div class="track-meta"><div><h3>Neon Afterglow</h3><p>Hatsune Miku</p></div><button class="like-button" aria-label="Добавить Neon Afterglow в избранное">♡</button></div><div class="track-stats"><span>♫ Vocaloid</span><span>3:42</span></div></article>
+          <article class="track-card"><div class="cover cover-violet"><span class="cover-symbol">✳</span><span class="cover-caption">SYNTHETIC<br>DREAMS</span><button class="play-button" aria-label="Воспроизвести Synthetic Dreams">▶</button></div><div class="track-meta"><div><h3>Synthetic Dreams</h3><p>KIRA</p></div><button class="like-button" aria-label="Добавить Synthetic Dreams в избранное">♡</button></div><div class="track-stats"><span>♫ Synth-pop</span><span>4:08</span></div></article>
+          <article class="track-card"><div class="cover cover-orange"><span class="cover-symbol">✺</span><span class="cover-caption">BLUE<br>SIGNAL</span><button class="play-button" aria-label="Воспроизвести Blue Signal">▶</button></div><div class="track-meta"><div><h3>Blue Signal</h3><p>Yunosuke</p></div><button class="like-button" aria-label="Добавить Blue Signal в избранное">♡</button></div><div class="track-stats"><span>♫ Electronic</span><span>3:26</span></div></article>
+          <article class="track-card"><div class="cover cover-pink"><span class="cover-symbol">✧</span><span class="cover-caption">GLASS<br>HORIZON</span><button class="play-button" aria-label="Воспроизвести Glass Horizon">▶</button></div><div class="track-meta"><div><h3>Glass Horizon</h3><p>巡音ルカ</p></div><button class="like-button" aria-label="Добавить Glass Horizon в избранное">♡</button></div><div class="track-stats"><span>♫ Future bass</span><span>3:51</span></div></article>
+        </div>
+      </section>
+
+      <section class="section-block discovery">
+        <div class="section-heading"><div><p class="eyebrow muted">ПОД ТВОЁ НАСТРОЕНИЕ</p><h2>Найди своё звучание</h2></div><a href="/pages/collections.html" class="view-all">Все подборки <span>→</span></a></div>
+        <div class="mood-grid">
+          <a class="mood-card mood-night" href="/pages/collections.html"><span class="mood-number">01 / 06</span><span class="mood-icon">☾</span><strong>Ночной город</strong><small>Мелодии после полуночи</small><span class="mood-arrow">↗</span></a>
+          <a class="mood-card mood-energy" href="/pages/collections.html"><span class="mood-number">02 / 06</span><span class="mood-icon">ϟ</span><strong>На полной громкости</strong><small>Энергия без границ</small><span class="mood-arrow">↗</span></a>
+          <a class="mood-card mood-dream" href="/pages/collections.html"><span class="mood-number">03 / 06</span><span class="mood-icon">✧</span><strong>Сон наяву</strong><small>Музыка вне реальности</small><span class="mood-arrow">↗</span></a>
+        </div>
+      </section>
+
+      <section class="section-block artist-section">
+        <div class="section-heading"><div><p class="eyebrow muted">ОТКРОЙ НОВЫЕ ГОЛОСА</p><h2>Виртуальные исполнители</h2></div><a href="/pages/artists.html" class="view-all">Все исполнители <span>→</span></a></div>
+        <div class="artist-grid"><a class="artist-card" href="/pages/artist.html"><div class="artist-avatar artist-miku">初</div><div><h3>Hatsune Miku</h3><p>Вокалоид · 1 240 треков</p></div><span>↗</span></a><a class="artist-card" href="/pages/artist.html"><div class="artist-avatar artist-luka">巡</div><div><h3>Megurine Luka</h3><p>Вокалоид · 860 треков</p></div><span>↗</span></a><a class="artist-card" href="/pages/artist.html"><div class="artist-avatar artist-rin">鏡</div><div><h3>Kagamine Rin</h3><p>Вокалоид · 970 треков</p></div><span>↗</span></a></div>
+      </section>
+      <footer class="site-footer"><a class="footer-brand" href="/"><span class="soundmark"><i></i><i></i><i></i><i></i></span>voxsekai</a><span>© 2026 VoxSekai. Музыка объединяет миры.</span><nav><a href="/pages/about.html">О проекте</a><a href="/pages/support.html">Поддержка</a><a href="/pages/rules.html">Правила</a><a href="/pages/privacy.html">Конфиденциальность</a></nav></footer>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<nav class="mobile-nav" aria-label="Мобильная навигация"><a class="active" href="/">⌂<span>Главная</span></a><a href="/pages/catalog.html">◉<span>Каталог</span></a><a href="/pages/favorites.html">♡<span>Моё</span></a><a href="/pages/profile.html">○<span>Профиль</span></a></nav>
+</body></html>
