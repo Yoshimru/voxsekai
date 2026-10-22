@@ -207,7 +207,7 @@
     link.addEventListener("click", (event) => {
       const target = link.getAttribute("href");
       const isAvailablePage =
-        /\/pages\/(login|register|catalog|artists|collections)\.html$/.test(
+        /\/pages\/(login|register|catalog|artists|collections|events)\.html$/.test(
           target || "",
         );
       if (target && !target.endsWith("404.html") && !isAvailablePage) {

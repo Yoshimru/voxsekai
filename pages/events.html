@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title>События — VoxSekai</title>
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page events-page">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="../" aria-label="VoxSekai — главная"
+          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+          ><span>voxsekai</span></a
+        >
+        <nav class="primary-nav" aria-label="Основная навигация">
+          <a class="nav-link" href="../"
+            ><span class="nav-icon">⌂</span>Главная</a
+          >
+          <a class="nav-link" href="catalog.html"
+            ><span class="nav-icon">◉</span>Каталог</a
+          >
+          <a class="nav-link" href="artists.html"
+            ><span class="nav-icon">♬</span>Исполнители</a
+          >
+          <a class="nav-link" href="tracks.html"
+            ><span class="nav-icon">♫</span>Треки</a
+          >
+          <a class="nav-link" href="collections.html"
+            ><span class="nav-icon">▱</span>Подборки</a
+          >
+          <a class="nav-link active" href="events.html"
+            ><span class="nav-icon">▦</span>События</a
+          >
+        </nav>
+        <div class="side-collection">
+          <p class="side-label">МОЯ МУЗЫКА</p>
+          <a class="side-link" href="playlists.html"
+            ><span>☷</span>Мои плейлисты</a
+          >
+          <a class="side-link" href="favorites.html"><span>♡</span>Избранное</a>
+          <a class="side-link" href="profile.html"><span>⌁</span>Профиль</a>
+          <div class="side-divider"></div>
+          <a class="create-playlist" href="create-playlist.html"
+            >＋ Создать плейлист</a
+          >
+        </div>
+        <div class="sidebar-about">
+          <p>Твой голос. Твой мир.</p>
+          <span>Всё бесплатно.<br />Без подписок.</span
+          ><a href="login.html">Войти ↗</a
+          ><a href="register.html">Создать аккаунт</a>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <button
+            class="mobile-menu icon-button"
+            id="menu-toggle"
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+          <label class="search-box"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="site-search"
+              type="search"
+              placeholder="Трек, продюсер или виртуальный голос"
+              aria-label="Поиск по сайту"
+            /><kbd>Ctrl K</kbd></label
+          >
+          <div class="account-actions">
+            <a class="auth-header-link" href="login.html">Войти</a
+            ><a
+              class="auth-header-link auth-header-link-primary"
+              href="register.html"
+              >Регистрация</a
+            >
+          </div>
+        </header>
+        <div class="content directory-content events-content">
+          <header class="directory-heading">
+            <div>
+              <p class="directory-kicker">MEET / 01</p>
+              <h1>События VoxSekai</h1>
+              <p>Встречай любимые голоса онлайн и за пределами наушников.</p>
+            </div>
+          </header>
+          <section class="events-feature" aria-label="Ближайшее событие">
+            <img
+              src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1600&q=85"
+              alt=""
+            />
+            <div class="events-feature-shade"></div>
+            <div class="events-feature-copy">
+              <p class="directory-kicker">СЛЕДУЮЩЕЕ СОБЫТИЕ · 24 ОКТЯБРЯ</p>
+              <h2>Виртуальный мир — Live</h2>
+              <p>
+                Один вечер, любимые голоса и тысячи слушателей в одном ритме.
+              </p>
+              <a class="button button-primary" href="#upcoming-events"
+                >Смотреть программу <span>↘</span></a
+              >
+            </div>
+            <span class="events-feature-date"><b>24</b><small>ОКТ</small></span>
+          </section>
+          <section class="events-controls" aria-label="Поиск и фильтр событий">
+            <label class="directory-search"
+              ><span aria-hidden="true">⌕</span
+              ><input
+                id="page-search"
+                type="search"
+                placeholder="Название события, город или исполнитель"
+                aria-label="Поиск событий"
+            /></label>
+            <div class="genre-filter" aria-label="Тип события">
+              <button
+                class="genre-chip active"
+                type="button"
+                data-filter="all"
+                aria-pressed="true"
+              >
+                Все события
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="online"
+                aria-pressed="false"
+              >
+                Онлайн
+              </button>
+              <button
+                class="genre-chip"
+                type="button"
+                data-filter="offline"
+                aria-pressed="false"
+              >
+                Офлайн
+              </button>
+            </div>
+          </section>
+          <section class="events-list" id="upcoming-events">
+            <div class="directory-section-heading">
+              <h2>Скоро</h2>
+              <p><span data-results-count>6</span> событий · осень 2026</p>
+            </div>
+            <div class="event-card-grid" data-sort-list>
+              <article
+                class="event-card event-card-virtual"
+                data-genre-item
+                data-genre="online"
+                data-search-text="виртуальный мир live онлайн вокалоид"
+              >
+                <div class="event-card-art">
+                  <span>LIVE STREAM · 01</span><b>VS</b>
+                </div>
+                <div class="event-card-info">
+                  <p>ОНЛАЙН · 24 ОКТЯБРЯ</p>
+                  <h3>Виртуальный мир — Live</h3>
+                  <span>Начало в 20:00 · Трансляция VoxSekai</span>
+                </div>
+                <a class="event-card-action" href="../">Подробнее <b>↗</b></a>
+              </article>
+              <article
+                class="event-card event-card-tokyo"
+                data-genre-item
+                data-genre="offline"
+                data-search-text="vocaloid night tokyo москва офлайн"
+              >
+                <div class="event-card-art">
+                  <span>LIVE SHOW · 02</span><b>夜</b>
+                </div>
+                <div class="event-card-info">
+                  <p>МОСКВА · 31 ОКТЯБРЯ</p>
+                  <h3>Vocaloid night: Tokyo</h3>
+                  <span>Начало в 19:30 · Клуб «Сигнал»</span>
+                </div>
+                <a class="event-card-action" href="../">Подробнее <b>↗</b></a>
+              </article>
+              <article
+                class="event-card event-card-synth"
+                data-genre-item
+                data-genre="offline"
+                data-search-text="synthwave after dark санкт петербург офлайн"
+              >
+                <div class="event-card-art">
+                  <span>AFTER DARK · 03</span><b>≋</b>
+                </div>
+                <div class="event-card-info">
+                  <p>САНКТ-ПЕТЕРБУРГ · 08 НОЯБРЯ</p>
+                  <h3>Synthwave After Dark</h3>
+                  <span>Начало в 21:00 · Севкабель Порт</span>
+                </div>
+                <a class="event-card-action" href="../">Подробнее <b>↗</b></a>
+              </article>
+              <article
+                class="event-card event-card-studio"
+                data-genre-item
+                data-genre="online"
+                data-search-text="создай виртуальный голос мастер класс онлайн"
+              >
+                <div class="event-card-art">
+                  <span>WORKSHOP · 04</span><b>音</b>
+                </div>
+                <div class="event-card-info">
+                  <p>ОНЛАЙН · 12 НОЯБРЯ</p>
+                  <h3>Создай виртуальный голос</h3>
+                  <span>Начало в 18:00 · Воркшоп</span>
+                </div>
+                <a class="event-card-action" href="../">Подробнее <b>↗</b></a>
+              </article>
+              <article
+                class="event-card event-card-neon"
+                data-genre-item
+                data-genre="offline"
+                data-search-text="neon frequencies казань офлайн"
+              >
+                <div class="event-card-art">
+                  <span>CLUB NIGHT · 05</span><b>NF</b>
+                </div>
+                <div class="event-card-info">
+                  <p>КАЗАНЬ · 20 НОЯБРЯ</p>
+                  <h3>Neon Frequencies</h3>
+                  <span>Начало в 20:30 · Werk</span>
+                </div>
+                <a class="event-card-action" href="../">Подробнее <b>↗</b></a>
+              </article>
+              <article
+                class="event-card event-card-radio"
+                data-genre-item
+                data-genre="online"
+                data-search-text="ночное радио эфир онлайн подборка"
+              >
+                <div class="event-card-art">
+                  <span>RADIO · 06</span><b>◉</b>
+                </div>
+                <div class="event-card-info">
+                  <p>ОНЛАЙН · 28 НОЯБРЯ</p>
+                  <h3>Ночное радио VoxSekai</h3>
+                  <span>Начало в 22:00 · Прямой эфир</span>
+                </div>
+                <a class="event-card-action" href="../">Подробнее <b>↗</b></a>
+              </article>
+            </div>
+            <p class="directory-empty" hidden>События не найдены.</p>
+          </section>
+          <footer class="site-footer directory-footer">
+            <a class="footer-brand" href="../"
+              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+              >voxsekai</a
+            ><span>© 2026 VoxSekai · Музыка начинается с тебя</span>
+            <nav>
+              <a href="../">О проекте</a><a href="../">Поддержка</a
+              ><a href="../">Правила сервиса</a
+              ><a href="../">Конфиденциальность</a>
+            </nav>
+          </footer>
+        </div>
+      </main>
+    </div>
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <a href="../">⌂<span>Главная</span></a
+      ><a href="catalog.html">◉<span>Каталог</span></a
+      ><a href="favorites.html">♡<span>Моё</span></a
+      ><a href="profile.html">○<span>Профиль</span></a>
+    </nav>
+  </body>
+</html>
