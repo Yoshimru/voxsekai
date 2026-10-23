@@ -29,7 +29,7 @@
           <% const featuredCollection = collections.find((collection) => collection.featured); %>
           <section class="collection-feature" aria-label="Подборка недели">
             <div class="collection-feature-art">
-              <span class="collection-feature-bars">▥</span><strong><%= featuredCollection.tagline %></strong>
+              <span class="collection-feature-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong><%= featuredCollection.tagline %></strong>
             </div>
             <div class="collection-feature-copy">
               <p class="eyebrow">ПОДБОРКА НЕДЕЛИ</p>
@@ -50,7 +50,7 @@
             <div class="collection-mood-grid">
               <% collections.filter((collection) => !collection.featured).forEach((collection) => { %>
                 <a class="collection-mood-card <%= collection.cardClass %>" href="/collections/<%= collection.id %>">
-                  <div class="collection-mood-art"><span class="collection-feature-bars">▥</span><strong><%= collection.tagline %></strong></div>
+                  <div class="collection-mood-art"><span class="collection-feature-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong><%= collection.tagline %></strong></div>
                   <h3><%= collection.title %></h3>
                   <p><%= collection.description %> · <%= collection.trackCount %> трека</p>
                   <span class="collection-card-arrow">↗</span>

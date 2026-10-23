@@ -127,7 +127,8 @@
   background: #0d3b34;
   color: var(--mint);
 }
-.directory-genres.filters-open .genre-chip {
+.directory-genres.filters-open .genre-chip,
+.artist-genre-filter.filters-open .genre-chip {
   border-color: #3c5e56;
 }
 .catalog-feature {
@@ -177,10 +178,49 @@
 }
 .catalog-feature-wave,
 .collection-feature-bars {
+  --feature-wave-height: 42px;
+  --feature-wave-width: 38px;
+  width: var(--feature-wave-width);
+  height: var(--feature-wave-height);
   margin-bottom: auto;
-  color: #73e2c8;
-  font-size: 24px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--collection-accent, #73e2c8);
+}
+.catalog-feature-wave {
+  --feature-wave-height: 34px;
+  --feature-wave-width: 32px;
+}
+.catalog-feature-wave i,
+.collection-feature-bars i {
+  width: 4px;
+  height: var(--bar-height, 55%);
+  border-radius: 3px;
+  background: currentColor;
+  box-shadow: 0 0 12px color-mix(in srgb, currentColor 58%, transparent);
+  transform-origin: center;
+  animation: equalizer 0.85s ease-in-out infinite alternate;
+}
+.catalog-feature-wave i:nth-child(2),
+.collection-feature-bars i:nth-child(2) {
+  --bar-height: 82%;
+  animation-delay: -0.4s;
+}
+.catalog-feature-wave i:nth-child(3),
+.collection-feature-bars i:nth-child(3) {
+  --bar-height: 100%;
+  animation-delay: -0.2s;
+}
+.catalog-feature-wave i:nth-child(4),
+.collection-feature-bars i:nth-child(4) {
+  --bar-height: 68%;
+  animation-delay: -0.6s;
+}
+.catalog-feature-wave i:nth-child(5),
+.collection-feature-bars i:nth-child(5) {
+  --bar-height: 88%;
+  animation-delay: -0.3s;
 }
 .catalog-feature-copy .eyebrow {
   margin: 0 0 6px;
@@ -899,7 +939,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .track-row.is-playing-track::before,
-  .is-playing-track .track-playing-indicator i {
+  .is-playing-track .track-playing-indicator i,
+  .catalog-feature-wave i,
+  .collection-feature-bars i {
     animation: none;
   }
 }
@@ -1005,7 +1047,8 @@
   right: 8px;
 }
 .collection-feature-bars {
-  font-size: 42px;
+  --feature-wave-height: 42px;
+  --feature-wave-width: 38px;
 }
 .collection-feature-art strong {
   font-size: 11px;
@@ -1098,8 +1141,8 @@
   color: var(--collection-accent, #8be4ce);
 }
 .collection-mood-art .collection-feature-bars {
-  margin-bottom: auto;
-  font-size: 34px;
+  --feature-wave-height: 34px;
+  --feature-wave-width: 32px;
 }
 .collection-mood-art strong {
   color: #f1f3f4;

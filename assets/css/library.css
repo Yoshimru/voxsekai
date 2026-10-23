@@ -922,6 +922,10 @@
 .profile-genres,
 .profile-artists {
   min-width: 0;
+  padding: 15px;
+  border: 1px solid #2a3038;
+  border-radius: 8px;
+  background: #191d23;
 }
 .genre-meter {
   display: grid;
@@ -950,12 +954,6 @@
   font-size: 8px;
   text-align: right;
   font-weight: 500;
-}
-.profile-artists {
-  padding: 15px;
-  border: 1px solid #2a3038;
-  border-radius: 8px;
-  background: #191d23;
 }
 .profile-artists > a {
   min-height: 37px;
