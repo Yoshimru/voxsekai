@@ -20,7 +20,7 @@
           <%- include('../partials/playlist-seed', { playlists }) %>
           <header class="directory-heading">
             <div>
-              <h1>Создать плейлист</h1>
+              <h1 data-playlist-form-title>Создать плейлист</h1>
               <p>Настрой название, обложку, описание и состав коллекции.</p>
             </div>
           </header>
@@ -66,7 +66,7 @@
               ></p>
               <div class="editor-actions">
                 <button class="button button-primary" type="submit">
-                  Сохранить плейлист</button
+                  <span data-playlist-submit-label>Сохранить плейлист</span></button
                 ><a class="button button-secondary" href="/playlists"
                   >Отмена</a
                 >

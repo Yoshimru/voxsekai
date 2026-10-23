@@ -964,14 +964,11 @@
     const editButton = event.target.closest("[data-playlist-edit]");
     if (editButton) {
       const playlist = playlists.find((item) => item.id === editButton.dataset.playlistEdit);
-      const dialog = document.querySelector("[data-playlist-dialog]");
-      const form = document.querySelector("[data-playlist-edit-form]");
-      if (!playlist || !dialog || !form) return;
-      form.dataset.playlistId = playlist.id;
-      form.elements.title.value = playlist.title;
-      form.elements.description.value = playlist.description;
-      dialog.showModal();
-      form.elements.title.focus();
+      if (!playlist) {
+        notify("Не удалось найти этот плейлист.");
+        return;
+      }
+      window.location.assign(`/create-playlist?edit=${encodeURIComponent(playlist.id)}`);
       return;
     }
 
@@ -990,34 +987,6 @@
     }
   });
   window.addEventListener("popstate", syncPlaylistFromLocation);
-
-  const playlistDialog = document.querySelector("[data-playlist-dialog]");
-  const playlistEditForm = document.querySelector("[data-playlist-edit-form]");
-  playlistEditForm?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const id = playlistEditForm.dataset.playlistId;
-    const previousPlaylists = playlists;
-    playlists = playlists.map((playlist) =>
-      playlist.id === id
-        ? {
-            ...playlist,
-            title: playlistEditForm.elements.title.value.trim().slice(0, 48),
-            description: playlistEditForm.elements.description.value.trim().slice(0, 180),
-          }
-        : playlist,
-    );
-    if (savePlaylists()) {
-      renderPlaylists();
-      playlistDialog?.close();
-      notify("Изменения плейлиста сохранены");
-    } else {
-      playlists = previousPlaylists;
-      renderPlaylists();
-    }
-  });
-  document.querySelector("[data-playlist-dialog-cancel]")?.addEventListener("click", () => {
-    playlistDialog?.close();
-  });
 
   const genreButtons = document.querySelectorAll(".genre-chip");
   const genreItems = document.querySelectorAll(
@@ -1115,6 +1084,55 @@
   const selectedTrackIds = new Set();
   const selectedCount = document.querySelector("[data-selected-count]");
   const selectedTracks = document.querySelector("[data-selected-tracks]");
+  const playlistForm = document.querySelector("[data-playlist-form]");
+  const editPlaylistId = new URLSearchParams(window.location.search).get("edit");
+  const editingPlaylist = editPlaylistId
+    ? playlists.find((playlist) => playlist.id === editPlaylistId)
+    : null;
+
+  function renderSelectedTracks() {
+    if (selectedCount) selectedCount.textContent = `${selectedTrackIds.size} выбрано`;
+    if (selectedTracks) {
+      selectedTracks.textContent = selectedTrackIds.size
+        ? `В плейлисте: ${Array.from(selectedTrackIds, (id) => tracksById.get(id)?.displayTitle).filter(Boolean).join(", ")}`
+        : "Выбери треки, которые войдут в плейлист.";
+    }
+  }
+
+  if (playlistForm && editPlaylistId) {
+    const message = document.querySelector("[data-playlist-message]");
+    if (!editingPlaylist) {
+      if (message) {
+        message.textContent = "Этот плейлист не найден. Вернись в библиотеку и попробуй ещё раз.";
+        message.classList.add("is-visible");
+      }
+      playlistForm.querySelectorAll("input, textarea, button[type=submit], [data-add-track]").forEach((control) => {
+        control.disabled = true;
+      });
+    } else {
+      playlistForm.elements.title.value = editingPlaylist.title;
+      playlistForm.elements.description.value = editingPlaylist.description;
+      playlistForm.elements.public.checked = editingPlaylist.isPublic;
+      document.querySelector("[data-playlist-form-title]").textContent = "Изменить плейлист";
+      document.querySelector("[data-playlist-submit-label]").textContent = "Сохранить изменения";
+      document.querySelector(".add-tracks-panel .editor-panel-heading h2").textContent = "Треки плейлиста";
+
+      editingPlaylist.trackIds.forEach((trackId) => {
+        if (tracksById.has(trackId)) selectedTrackIds.add(trackId);
+      });
+      selectedTrackIds.forEach((trackId) => {
+        const button = document.querySelector(`[data-add-track="${CSS.escape(trackId)}"]`);
+        const track = tracksById.get(trackId);
+        if (!button || !track) return;
+        button.closest(".available-track")?.classList.add("is-added");
+        button.classList.add("is-selected");
+        button.textContent = "✓";
+        button.setAttribute("aria-label", `Убрать ${track.displayTitle}`);
+      });
+      renderSelectedTracks();
+    }
+  }
+
   document.querySelectorAll("[data-add-track]").forEach((button) => {
     button.addEventListener("click", () => {
       const trackId = button.dataset.addTrack;
@@ -1134,14 +1152,7 @@
         button.setAttribute("aria-label", `Убрать ${track.displayTitle}`);
       }
 
-      if (selectedCount) {
-        selectedCount.textContent = `${selectedTrackIds.size} выбрано`;
-      }
-      if (selectedTracks) {
-        selectedTracks.textContent = selectedTrackIds.size
-          ? `В плейлисте: ${Array.from(selectedTrackIds, (id) => tracksById.get(id)?.displayTitle).filter(Boolean).join(", ")}`
-          : "Выбери треки, которые войдут в плейлист.";
-      }
+      renderSelectedTracks();
     });
   });
 
@@ -1153,7 +1164,7 @@
     });
   });
 
-  document.querySelector("[data-playlist-form]")?.addEventListener("submit", (event) => {
+  playlistForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       const form = event.currentTarget;
       const title = form.elements.title.value.trim();
@@ -1170,23 +1181,34 @@
         message.classList.add("is-visible");
         return;
       }
-      const playlist = {
-        id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      const previousPlaylists = playlists;
+      const nextPlaylist = {
+        ...(editingPlaylist || {
+          id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          label: "MY MIX",
+          artworkClass: "playlist-card-custom",
+        }),
         title: title.slice(0, 48),
         description: form.elements.description.value.trim().slice(0, 180),
-        label: "MY MIX",
-        artworkClass: "playlist-card-custom",
         trackIds: Array.from(selectedTrackIds),
         isPublic: form.elements.public.checked,
       };
-      playlists = [...playlists, playlist];
+      playlists = editingPlaylist
+        ? playlists.map((playlist) =>
+            playlist.id === editingPlaylist.id ? nextPlaylist : playlist,
+          )
+        : [...playlists, nextPlaylist];
       if (!savePlaylists()) {
-        playlists = playlists.filter((item) => item.id !== playlist.id);
+        playlists = previousPlaylists;
         message.textContent = "Не удалось сохранить плейлист. Проверь доступное место в хранилище браузера.";
         message.classList.add("is-visible");
         return;
       }
-      window.location.assign("/playlists");
+      window.location.assign(
+        editingPlaylist
+          ? `/playlists?playlist=${encodeURIComponent(editingPlaylist.id)}`
+          : "/playlists",
+      );
     });
 
   const profileForm = document.querySelector("[data-profile-form]");

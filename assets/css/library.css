@@ -682,8 +682,27 @@
   margin-bottom: 10px;
 }
 .available-tracks {
+  max-height: 480px;
+  overflow-y: auto;
   display: grid;
+  align-content: start;
   gap: 7px;
+  padding-right: 5px;
+  overscroll-behavior: contain;
+  scrollbar-color: #3a514c #171b21;
+  scrollbar-width: thin;
+}
+.available-tracks::-webkit-scrollbar {
+  width: 7px;
+}
+.available-tracks::-webkit-scrollbar-track {
+  border-radius: 7px;
+  background: #171b21;
+}
+.available-tracks::-webkit-scrollbar-thumb {
+  border: 1px solid #171b21;
+  border-radius: 7px;
+  background: #3a514c;
 }
 .available-track {
   min-height: 54px;
@@ -744,6 +763,7 @@
 }
 .selected-track-note {
   margin: 12px 0 0;
+  overflow-wrap: anywhere;
   line-height: 1.5;
 }
 .editor-hint {

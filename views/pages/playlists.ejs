@@ -128,17 +128,6 @@
         </div>
       </main>
     </div>
-    <dialog class="playlist-edit-dialog" data-playlist-dialog>
-      <form data-playlist-edit-form>
-        <h2>Редактировать плейлист</h2>
-        <label class="editor-field"><span>Название</span><input name="title" maxlength="48" required /></label>
-        <label class="editor-field"><span>Описание</span><textarea name="description" rows="3" maxlength="180"></textarea></label>
-        <div class="editor-actions">
-          <button class="button button-primary" type="submit">Сохранить</button>
-          <button class="button button-secondary" type="button" data-playlist-dialog-cancel>Отмена</button>
-        </div>
-      </form>
-    </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <%- include('../partials/mobile-nav', { currentPath: '/playlists' }) %>
     <%- include('../partials/player') %>
