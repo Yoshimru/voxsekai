@@ -117,18 +117,32 @@
             </div>
             <div class="taste-layout">
               <div class="track-list" aria-label="Рекомендованные треки">
-                <article class="track-card track-row" data-genre="j-pop">
+                <article
+                  class="track-card track-row"
+                  data-genre="j-pop"
+                  data-track-id="world-is-mine"
+                  data-track-slug="world-is-mine"
+                  data-track-title="World is Mine"
+                  data-track-original-title="ワールドイズマイン"
+                  data-track-artist="Hatsune Miku"
+                  data-track-duration="252"
+                  data-track-genre="J-pop"
+                  data-track-artwork="artwork-sakura"
+                  data-track-glyph="初"
+                  data-track-audio=""
+                >
                   <div class="mini-cover mini-cover-sakura" aria-hidden="true">
                     <span>初</span>
                   </div>
                   <div class="track-row-info">
-                    <h3>ワールドイズマイン</h3>
+                    <h3><a href="/track/world-is-mine">ワールドイズマイン</a></h3>
                     <p>ryo (supercell) · Hatsune Miku</p>
                   </div>
                   <span class="track-row-tag">J-pop</span>
                   <span class="track-row-duration">4:12</span>
                   <button
                     class="play-button"
+                    data-player-play
                     aria-label="Воспроизвести World is Mine"
                   >
                     ▶
@@ -140,18 +154,32 @@
                     ♡
                   </button>
                 </article>
-                <article class="track-card track-row" data-genre="electronic">
+                <article
+                  class="track-card track-row"
+                  data-genre="electronic"
+                  data-track-id="god-ish"
+                  data-track-slug="god-ish"
+                  data-track-title="God-ish"
+                  data-track-original-title="神っぽいな"
+                  data-track-artist="Hatsune Miku"
+                  data-track-duration="204"
+                  data-track-genre="Электроника"
+                  data-track-artwork="artwork-night"
+                  data-track-glyph="神"
+                  data-track-audio=""
+                >
                   <div class="mini-cover mini-cover-night" aria-hidden="true">
                     <span>神</span>
                   </div>
                   <div class="track-row-info">
-                    <h3>神っぽいな</h3>
+                    <h3><a href="/track/god-ish">神っぽいな</a></h3>
                     <p>ピノキオピー · Hatsune Miku</p>
                   </div>
                   <span class="track-row-tag">Электроника</span>
                   <span class="track-row-duration">3:24</span>
                   <button
                     class="play-button"
+                    data-player-play
                     aria-label="Воспроизвести God-ish"
                   >
                     ▶
@@ -163,18 +191,32 @@
                     ♡
                   </button>
                 </article>
-                <article class="track-card track-row" data-genre="rock">
+                <article
+                  class="track-card track-row"
+                  data-genre="rock"
+                  data-track-id="rolling-girl"
+                  data-track-slug="rolling-girl"
+                  data-track-title="Rolling Girl"
+                  data-track-original-title="ローリンガール"
+                  data-track-artist="Hatsune Miku"
+                  data-track-duration="196"
+                  data-track-genre="Рок"
+                  data-track-artwork="artwork-mono"
+                  data-track-glyph="転"
+                  data-track-audio=""
+                >
                   <div class="mini-cover mini-cover-mono" aria-hidden="true">
                     <span>転</span>
                   </div>
                   <div class="track-row-info">
-                    <h3>ローリンガール</h3>
+                    <h3><a href="/track/rolling-girl">ローリンガール</a></h3>
                     <p>wowaka · Hatsune Miku</p>
                   </div>
                   <span class="track-row-tag">Рок</span>
                   <span class="track-row-duration">3:16</span>
                   <button
                     class="play-button"
+                    data-player-play
                     aria-label="Воспроизвести Rolling Girl"
                   >
                     ▶
@@ -186,18 +228,32 @@
                     ♡
                   </button>
                 </article>
-                <article class="track-card track-row" data-genre="dance">
+                <article
+                  class="track-card track-row"
+                  data-genre="dance"
+                  data-track-id="worlds-end-dancehall"
+                  data-track-slug="worlds-end-dancehall"
+                  data-track-title="World's End Dancehall"
+                  data-track-original-title="ワールズエンド・ダンスホール"
+                  data-track-artist="Hatsune Miku & Megurine Luka"
+                  data-track-duration="212"
+                  data-track-genre="Dance"
+                  data-track-artwork="artwork-peach"
+                  data-track-glyph="巡"
+                  data-track-audio=""
+                >
                   <div class="mini-cover mini-cover-peach" aria-hidden="true">
                     <span>巡</span>
                   </div>
                   <div class="track-row-info">
-                    <h3>ワールズエンド・ダンスホール</h3>
+                    <h3><a href="/track/worlds-end-dancehall">ワールズエンド・ダンスホール</a></h3>
                     <p>wowaka · Miku & Luka</p>
                   </div>
                   <span class="track-row-tag">Dance</span>
                   <span class="track-row-duration">3:32</span>
                   <button
                     class="play-button"
+                    data-player-play
                     aria-label="Воспроизвести World's End Dancehall"
                   >
                     ▶
@@ -408,5 +464,6 @@
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <%- include('partials/mobile-nav', { currentPath: '/' }) %>
+    <%- include('partials/player') %>
   </body>
 </html>

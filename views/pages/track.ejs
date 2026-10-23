@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <meta name="description" content="<%= track.description %>" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <script src="/assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page track-detail-page">
+    <div class="app-shell">
+      <%- include('../partials/sidebar', { currentPath: '/catalog' }) %>
+      <main class="main-area">
+        <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
+        <div class="content directory-content track-detail-content">
+          <a class="track-back-link" href="/catalog">← Назад в каталог</a>
+          <section class="track-detail-hero">
+            <div
+              class="track-detail-art <%= track.artworkClass %>"
+              aria-label="Обложка <%= track.displayTitle %>"
+            >
+              <span class="track-detail-glyph"><%= track.artworkGlyph %></span>
+              <span class="track-art-orbit track-art-orbit-one"></span>
+              <span class="track-art-orbit track-art-orbit-two"></span>
+              <span class="track-art-caption">VOXSEKAI · <%= track.genre %></span>
+            </div>
+            <div class="track-detail-copy">
+              <p class="directory-kicker">TRACK / <%= track.id.toUpperCase() %></p>
+              <p class="track-detail-type">ТРЕК · <%= track.genre.toUpperCase() %></p>
+              <h1><%= track.displayTitle %></h1>
+              <p class="track-original-title"><%= track.title %></p>
+              <a class="track-artist-link" href="/artists"><%= track.artistName %></a>
+              <p class="track-detail-description"><%= track.description %></p>
+              <div class="track-detail-meta">
+                <span>★ <%= track.rating %></span>
+                <span><%= Math.floor(track.duration / 60) %>:<%= String(track.duration % 60).padStart(2, '0') %></span>
+                <span><%= track.releaseYear %></span>
+              </div>
+              <div class="track-detail-actions">
+                <button
+                  class="button button-primary track-detail-play"
+                  type="button"
+                  data-player-play
+                  data-track-id="<%= track.id %>"
+                  data-track-slug="<%= track.id %>"
+                  data-track-title="<%= track.displayTitle %>"
+                  data-track-original-title="<%= track.title %>"
+                  data-track-artist="<%= track.artistName %>"
+                  data-track-duration="<%= track.duration %>"
+                  data-track-genre="<%= track.genre %>"
+                  data-track-artwork="<%= track.artworkClass %>"
+                  data-track-glyph="<%= track.artworkGlyph %>"
+                  data-track-audio=""
+                >
+                  <span aria-hidden="true">▶</span> Слушать
+                </button>
+                <button class="button button-secondary like-button" type="button" aria-label="Добавить в избранное">
+                  ♡ В избранное
+                </button>
+              </div>
+              <p class="track-backend-note">
+                <span></span> Карточка трека готова к подключению аудио и данных каталога
+              </p>
+            </div>
+          </section>
+
+          <section class="track-detail-information" aria-labelledby="track-info-heading">
+            <div>
+              <p class="eyebrow muted">О РЕЛИЗЕ</p>
+              <h2 id="track-info-heading">Информация о треке</h2>
+              <p><%= track.description %></p>
+            </div>
+            <dl class="track-information-list">
+              <div><dt>Исполнитель</dt><dd><%= track.artistName %></dd></div>
+              <div><dt>Альбом</dt><dd><%= track.album %></dd></div>
+              <div><dt>Жанр</dt><dd><%= track.genre %></dd></div>
+              <div><dt>Год релиза</dt><dd><%= track.releaseYear %></dd></div>
+              <div><dt>Длительность</dt><dd><%= Math.floor(track.duration / 60) %>:<%= String(track.duration % 60).padStart(2, '0') %></dd></div>
+            </dl>
+          </section>
+
+          <section class="track-related-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow muted">ПРОДОЛЖИ ОТКРЫВАТЬ</p>
+                <h2>Похожие треки</h2>
+              </div>
+              <a class="view-all" href="/catalog">Весь каталог <span>↗</span></a>
+            </div>
+            <div class="track-related-grid">
+              <% tracks.filter((item) => item.id !== track.id && item.genre === track.genre).slice(0, 3).forEach((item) => { %>
+              <a class="related-track-card" href="/track/<%= item.id %>">
+                <span class="related-track-art <%= item.artworkClass %>"><%= item.artworkGlyph %></span>
+                <span class="related-track-copy">
+                  <strong><%= item.displayTitle %></strong>
+                  <small><%= item.artistName %></small>
+                </span>
+                <span class="related-track-arrow">↗</span>
+              </a>
+              <% }); %>
+            </div>
+          </section>
+          <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
+        </div>
+      </main>
+    </div>
+    <%- include('../partials/mobile-nav', { currentPath: '/catalog' }) %>
+    <%- include('../partials/player') %>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("node:path");
+const tracks = require("./data/tracks");
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -47,11 +48,38 @@ const pages = {
 app.disable("x-powered-by");
 app.set("views", viewsDirectory);
 app.set("view engine", "ejs");
+app.locals.trackCatalog = tracks;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
 app.get("/index.html", (req, res) => res.redirect(301, "/"));
+
+app.get("/track/:slug", (req, res, next) => {
+  const track = tracks.find((item) => item.id === req.params.slug);
+  if (!track) {
+    return res.status(404).render(
+      "pages/404",
+      {
+        title:
+          "404 \u2014 \u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u0430 | VoxSekai",
+      },
+      (error, html) => {
+        if (error) return next(error);
+        res.type("html").send(html);
+      },
+    );
+  }
+
+  res.render(
+    "pages/track",
+    { title: `${track.displayTitle} — VoxSekai`, track, tracks },
+    (error, html) => {
+      if (error) return next(error);
+      res.type("html").send(html);
+    },
+  );
+});
 
 for (const [route, page] of Object.entries(pages)) {
   app.get(route, (req, res, next) => {
