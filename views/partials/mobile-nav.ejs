@@ -1,6 +1,6 @@
 <nav class="mobile-nav" aria-label="Мобильная навигация">
   <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/"
-    >⌂<span>Главная</span></a
+    ><svg class="mobile-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/><path d="M9 21v-7h6v7"/></svg><span>Главная</span></a
   >
   <a class="<%= currentPath === '/catalog' ? 'active' : '' %>" href="/catalog"
     >♫<span>Треки</span></a
@@ -12,6 +12,6 @@
     ><%= isPlaylistPage ? '☷' : '♡' %><span>Моё</span></a
   >
   <a class="<%= currentPath === '/profile' ? 'active' : '' %>" href="/profile"
-    >○<span>Профиль</span></a
+    ><svg class="mobile-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 21v-1.5A6.5 6.5 0 0 1 11 13h2a6.5 6.5 0 0 1 6.5 6.5V21z"/></svg><span>Профиль</span></a
   >
 </nav>

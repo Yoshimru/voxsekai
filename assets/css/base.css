@@ -232,9 +232,16 @@ button:active:not(:disabled) {
 }
 .nav-icon {
   width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
   text-align: center;
   font-size: 19px;
   line-height: 1;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .side-collection {
   padding: 0 14px;
@@ -287,9 +294,21 @@ button:active:not(:disabled) {
 .side-link span {
   font-size: 18px;
   width: 19px;
+  height: 19px;
+  display: inline-grid;
+  place-items: center;
   transition:
     color 0.18s ease,
     transform 0.18s ease;
+}
+.side-link svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .side-link:hover span,
 .side-link:focus-visible span {

@@ -5,7 +5,7 @@
   >
   <nav class="primary-nav" aria-label="Основная навигация">
     <a class="nav-link <%= currentPath === '/' ? 'active' : '' %>" href="/"
-      ><span class="nav-icon">⌂</span>Главная</a
+      ><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/><path d="M9 21v-7h6v7"/></svg>Главная</a
     >
     <a
       class="nav-link <%= currentPath === '/catalog' ? 'active' : '' %>"
@@ -15,17 +15,17 @@
     <a
       class="nav-link <%= currentPath === '/artists' ? 'active' : '' %>"
       href="/artists"
-      ><span class="nav-icon">♬</span>Исполнители</a
+      ><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A5.5 5.5 0 0 1 8 13h2a5.5 5.5 0 0 1 5.5 5.5V20z"/><path d="M16 4.8a3.5 3.5 0 0 1 0 6.4M18 13.4a5.5 5.5 0 0 1 3.5 5.1V20h-3"/></svg>Исполнители</a
     >
     <a
       class="nav-link <%= currentPath === '/collections' ? 'active' : '' %>"
       href="/collections"
-      ><span class="nav-icon">▱</span>Подборки</a
+      ><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="14" height="14" rx="2"/><path d="M7 8h7M7 11h7"/><path d="M7 20h11a2 2 0 0 0 2-2V7"/></svg>Подборки</a
     >
     <a
       class="nav-link <%= currentPath === '/events' ? 'active' : '' %>"
       href="/events"
-      ><span class="nav-icon">▦</span>События</a
+      ><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7.5 3v4M16.5 3v4M3.5 10h17M8 14h3v3H8z"/><path d="m16.5 13 .6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>События</a
     >
   </nav>
   <div class="side-collection">
@@ -39,7 +39,7 @@
     <a
       class="side-link <%= currentPath === '/profile' ? 'active' : '' %>"
       href="/profile"
-      ><span>⌁</span>Профиль</a
+      ><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 21v-1.5A6.5 6.5 0 0 1 11 13h2a6.5 6.5 0 0 1 6.5 6.5V21z"/></svg></span>Профиль</a
     >
     <div class="side-divider"></div>
     <a class="create-playlist" href="/create-playlist"
