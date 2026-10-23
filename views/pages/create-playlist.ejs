@@ -75,7 +75,7 @@
             <section class="playlist-editor-panel add-tracks-panel">
               <div class="editor-panel-heading">
                 <h2>Добавить треки</h2>
-                <span data-selected-count>0 выбрано</span>
+                <span data-selected-count aria-live="polite">0 выбрано</span>
               </div>
               <label class="directory-search"
                 ><span aria-hidden="true">⌕</span
@@ -85,18 +85,25 @@
                   aria-label="Поиск треков для плейлиста"
                   data-track-search
               /></label>
-              <div class="available-tracks">
-                <% tracks.forEach((track) => { %>
-                  <article class="available-track" data-track-id="<%= track.id %>" data-track-name="<%= track.displayTitle %>">
-                    <span class="available-cover <%= track.artworkClass %>"><%= track.artworkGlyph %></span>
-                    <span><strong><%= track.displayTitle %></strong><small><%= track.artist %></small></span>
-                    <button type="button" data-add-track="<%= track.id %>" aria-label="Добавить <%= track.displayTitle %>">＋</button>
-                  </article>
-                <% }) %>
+              <div class="track-picker-columns">
+                <section class="track-picker-column" aria-labelledby="available-tracks-heading">
+                  <h3 class="track-picker-heading" id="available-tracks-heading">Каталог</h3>
+                  <div class="available-tracks" data-available-tracks>
+                    <% tracks.forEach((track, index) => { %>
+                      <article class="available-track" data-track-id="<%= track.id %>" data-track-name="<%= track.displayTitle %>" data-track-order="<%= index %>">
+                        <span class="available-cover <%= track.artworkClass %>"><%= track.artworkGlyph %></span>
+                        <span><strong><%= track.displayTitle %></strong><small><%= track.artist %></small></span>
+                        <button type="button" data-add-track="<%= track.id %>" aria-label="Добавить <%= track.displayTitle %>">＋</button>
+                      </article>
+                    <% }) %>
+                  </div>
+                </section>
+                <section class="track-picker-column" aria-labelledby="selected-tracks-heading">
+                  <h3 class="track-picker-heading" id="selected-tracks-heading">В плейлисте</h3>
+                  <div class="selected-tracks" data-selected-track-list aria-live="polite"></div>
+                  <p class="selected-tracks-empty" data-selected-empty>Добавленные треки появятся здесь.</p>
+                </section>
               </div>
-              <p class="selected-track-note" data-selected-tracks>
-                Выбери треки, которые войдут в плейлист.
-              </p>
             </section>
           </form>
           <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>

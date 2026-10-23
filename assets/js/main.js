@@ -1083,19 +1083,76 @@
 
   const selectedTrackIds = new Set();
   const selectedCount = document.querySelector("[data-selected-count]");
-  const selectedTracks = document.querySelector("[data-selected-tracks]");
+  const availableTracks = document.querySelector("[data-available-tracks]");
+  const selectedTrackList = document.querySelector("[data-selected-track-list]");
+  const selectedTracksEmpty = document.querySelector("[data-selected-empty]");
   const playlistForm = document.querySelector("[data-playlist-form]");
   const editPlaylistId = new URLSearchParams(window.location.search).get("edit");
   const editingPlaylist = editPlaylistId
     ? playlists.find((playlist) => playlist.id === editPlaylistId)
     : null;
 
-  function renderSelectedTracks() {
+  function updateSelectedTracks() {
     if (selectedCount) selectedCount.textContent = `${selectedTrackIds.size} выбрано`;
-    if (selectedTracks) {
-      selectedTracks.textContent = selectedTrackIds.size
-        ? `В плейлисте: ${Array.from(selectedTrackIds, (id) => tracksById.get(id)?.displayTitle).filter(Boolean).join(", ")}`
-        : "Выбери треки, которые войдут в плейлист.";
+    if (selectedTracksEmpty) selectedTracksEmpty.hidden = selectedTrackIds.size > 0;
+  }
+
+  function movePlaylistTrack(trackId, isSelected, animate = true) {
+    const trackRow = playlistForm?.querySelector(
+      `[data-track-id="${CSS.escape(trackId)}"]`,
+    );
+    const destination = isSelected ? selectedTrackList : availableTracks;
+    const track = tracksById.get(trackId);
+    const button = trackRow?.querySelector("[data-add-track]");
+    if (!trackRow || !destination || !track || !button) return;
+
+    const start = trackRow.getBoundingClientRect();
+    trackRow.classList.toggle("is-added", isSelected);
+    button.classList.toggle("is-selected", isSelected);
+    button.textContent = isSelected ? "−" : "＋";
+    button.setAttribute(
+      "aria-label",
+      `${isSelected ? "Убрать" : "Добавить"} ${track.displayTitle}`,
+    );
+    destination.append(trackRow);
+
+    if (!isSelected) {
+      Array.from(destination.children)
+        .sort(
+          (first, second) =>
+            Number(first.dataset.trackOrder) - Number(second.dataset.trackOrder),
+        )
+        .forEach((row) => destination.append(row));
+    } else {
+      destination.scrollTop = destination.scrollHeight;
+    }
+
+    const end = trackRow.getBoundingClientRect();
+    const deltaX = start.left - end.left;
+    const deltaY = start.top - end.top;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (
+      animate &&
+      !reduceMotion &&
+      typeof trackRow.animate === "function" &&
+      (deltaX || deltaY)
+    ) {
+      trackRow.classList.add("is-moving");
+      const animation = trackRow.animate(
+        [
+          {
+            transform: `translate(${deltaX}px, ${deltaY}px)`,
+            opacity: 0.72,
+          },
+          { transform: "translate(0, 0)", opacity: 1 },
+        ],
+        { duration: 380, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      );
+      const clearMovingState = () => trackRow.classList.remove("is-moving");
+      animation.onfinish = clearMovingState;
+      animation.oncancel = clearMovingState;
     }
   }
 
@@ -1118,48 +1175,29 @@
       document.querySelector(".add-tracks-panel .editor-panel-heading h2").textContent = "Треки плейлиста";
 
       editingPlaylist.trackIds.forEach((trackId) => {
-        if (tracksById.has(trackId)) selectedTrackIds.add(trackId);
+        if (!tracksById.has(trackId)) return;
+        selectedTrackIds.add(trackId);
+        movePlaylistTrack(trackId, true, false);
       });
-      selectedTrackIds.forEach((trackId) => {
-        const button = document.querySelector(`[data-add-track="${CSS.escape(trackId)}"]`);
-        const track = tracksById.get(trackId);
-        if (!button || !track) return;
-        button.closest(".available-track")?.classList.add("is-added");
-        button.classList.add("is-selected");
-        button.textContent = "✓";
-        button.setAttribute("aria-label", `Убрать ${track.displayTitle}`);
-      });
-      renderSelectedTracks();
+      updateSelectedTracks();
     }
   }
 
   document.querySelectorAll("[data-add-track]").forEach((button) => {
     button.addEventListener("click", () => {
       const trackId = button.dataset.addTrack;
-      const track = tracksById.get(trackId);
-      if (!track) return;
-      if (selectedTrackIds.has(trackId)) {
-        selectedTrackIds.delete(trackId);
-        button.closest(".available-track")?.classList.remove("is-added");
-        button.classList.remove("is-selected");
-        button.textContent = "+";
-        button.setAttribute("aria-label", `Добавить ${track.displayTitle}`);
-      } else {
-        selectedTrackIds.add(trackId);
-        button.closest(".available-track")?.classList.add("is-added");
-        button.classList.add("is-selected");
-        button.textContent = "✓";
-        button.setAttribute("aria-label", `Убрать ${track.displayTitle}`);
-      }
-
-      renderSelectedTracks();
+      const isSelected = selectedTrackIds.has(trackId);
+      if (isSelected) selectedTrackIds.delete(trackId);
+      else selectedTrackIds.add(trackId);
+      movePlaylistTrack(trackId, !isSelected);
+      updateSelectedTracks();
     });
   });
 
   const trackSearch = document.querySelector("[data-track-search]");
   trackSearch?.addEventListener("input", () => {
     const query = trackSearch.value.trim().toLocaleLowerCase("ru");
-    document.querySelectorAll(".available-track").forEach((track) => {
+    availableTracks?.querySelectorAll(".available-track").forEach((track) => {
       track.hidden = !track.dataset.trackName.toLocaleLowerCase("ru").includes(query);
     });
   });
