@@ -55,6 +55,8 @@
   let playerState = readPlayerState();
   let lastPlayerTick = Date.now();
   let lastPlayerSave = 0;
+  let renderedPlayerVisible = false;
+  let volumeAnimationFrame = 0;
 
   function formatTime(seconds) {
     const time = Math.max(0, Math.floor(seconds));
@@ -64,7 +66,6 @@
   function savePlayerState() {
     if (!playerState) return;
     playerState.updatedAt = Date.now();
-    playerState.volume = playerAudio?.volume ?? playerState.volume;
     try {
       localStorage.setItem(playerStorageKey, JSON.stringify(playerState));
     } catch (error) {
@@ -81,6 +82,14 @@
     player.setAttribute("aria-hidden", String(!playerState.visible));
     document.body.classList.toggle("has-player", playerState.visible);
     document.body.classList.toggle("player-playing", playerState.isPlaying);
+    if (playerState.visible && !renderedPlayerVisible) {
+      player.classList.remove("is-entering");
+      void player.offsetWidth;
+      player.classList.add("is-entering");
+    } else if (!playerState.visible) {
+      player.classList.remove("is-entering");
+    }
+    renderedPlayerVisible = playerState.visible;
     playerElements.title.textContent = track.displayTitle;
     playerElements.artist.textContent = track.artist;
     playerElements.status.textContent = track.audioUrl
@@ -113,6 +122,21 @@
     playerElements.toggleButton.title = playerState.isPlaying
       ? "Пауза"
       : "Продолжить";
+  }
+
+  function animateVolume() {
+    if (!playerAudio || !playerState) {
+      volumeAnimationFrame = 0;
+      return;
+    }
+    const difference = playerState.volume - playerAudio.volume;
+    if (Math.abs(difference) < 0.004) {
+      playerAudio.volume = playerState.volume;
+      volumeAnimationFrame = 0;
+      return;
+    }
+    playerAudio.volume += difference * 0.1;
+    volumeAnimationFrame = window.requestAnimationFrame(animateVolume);
   }
 
   function persistAndRender() {
@@ -267,7 +291,13 @@
   playerElements.volume?.addEventListener("input", () => {
     if (!playerState) return;
     playerState.volume = Number(playerElements.volume.value);
-    if (playerAudio) playerAudio.volume = playerState.volume;
+    playerElements.volume.style.setProperty(
+      "--player-volume",
+      `${playerState.volume * 100}%`,
+    );
+    if (!volumeAnimationFrame) {
+      volumeAnimationFrame = window.requestAnimationFrame(animateVolume);
+    }
     savePlayerState();
   });
   playerAudio?.addEventListener("timeupdate", () => {

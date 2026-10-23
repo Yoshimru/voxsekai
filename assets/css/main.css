@@ -5247,9 +5247,10 @@ kbd {
 .global-player {
   position: fixed;
   z-index: 30;
-  right: 24px;
+  left: calc(50% + 108px);
+  width: min(1090px, calc(100vw - 264px));
   bottom: 18px;
-  left: max(236px, calc((100vw - 1040px) / 2));
+  transform: translateX(-50%);
   overflow: hidden;
   padding: 0 16px 11px;
   border: 1px solid #3b5b6b;
@@ -5258,13 +5259,12 @@ kbd {
     radial-gradient(ellipse at 50% 140%, #2d6b7370, transparent 48%),
     linear-gradient(110deg, #163447, #1b4258 52%, #173446);
   box-shadow: 0 18px 54px #0009, 0 0 32px #80e8cd12;
-  animation: player-arrive 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.global-player.is-entering {
+  animation: player-arrive 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .global-player[hidden] {
   display: none;
-}
-.has-player {
-  padding-bottom: 116px;
 }
 .player-progress {
   position: relative;
@@ -5483,11 +5483,11 @@ kbd {
 }
 .player-volume input {
   height: 3px;
-  background: linear-gradient(
-    to right,
-    var(--mint) var(--player-volume, 70%),
-    #b8d3d826 var(--player-volume, 70%)
-  );
+  background:
+    linear-gradient(var(--mint), var(--mint)) 0 / var(--player-volume, 70%) 100%
+      no-repeat,
+    #b8d3d826;
+  transition: background-size 0.18s ease;
 }
 .player-volume input::-webkit-slider-thumb {
   width: 8px;
@@ -5861,11 +5861,25 @@ kbd {
 @keyframes player-arrive {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.985);
+    transform: translate(-50%, 22px) scale(0.975);
+    box-shadow: 0 0 0 #80e8cd00;
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    box-shadow: 0 18px 54px #0009, 0 0 32px #80e8cd12;
+  }
+}
+@keyframes mobile-player-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+    box-shadow: 0 0 0 #80e8cd00;
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+    box-shadow: 0 18px 54px #0009, 0 0 32px #80e8cd12;
   }
 }
 @keyframes player-wave {
@@ -5926,7 +5940,8 @@ kbd {
 }
 @media (max-width: 1000px) {
   .global-player {
-    left: 220px;
+    left: calc(50% + 100px);
+    width: min(900px, calc(100vw - 240px));
   }
   .player-main {
     grid-template-columns: minmax(130px, 1fr) auto minmax(110px, 1fr);
@@ -5941,16 +5956,15 @@ kbd {
 @media (max-width: 760px) {
   .global-player {
     right: 10px;
-    bottom: 10px;
+    bottom: calc(74px + env(safe-area-inset-bottom));
     left: 10px;
+    width: auto;
+    transform: none;
     padding: 0 11px 8px;
     border-radius: 13px;
   }
-  .has-player {
-    padding-bottom: 140px;
-  }
-  .has-player .mobile-nav {
-    bottom: 102px;
+  .global-player.is-entering {
+    animation-name: mobile-player-arrive;
   }
   .player-progress {
     grid-template-columns: 30px minmax(0, 1fr) 30px;
@@ -6068,6 +6082,7 @@ kbd {
 }
 @media (prefers-reduced-motion: reduce) {
   .global-player,
+  .global-player.is-entering,
   .player-wave i,
   .player-progress::after,
   .track-detail-hero,
