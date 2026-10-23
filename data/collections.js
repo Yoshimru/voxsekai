@@ -1,0 +1,43 @@
+module.exports = [
+  {
+    id: "after-hours",
+    title: "После полуночи",
+    tagline: "AFTER HOURS",
+    description: "Мягкий синтвейв и электро-поп для ночных поездок и тихих мыслей.",
+    cardClass: "collection-mood-road",
+    featured: true,
+    trackIds: ["last-train-to-tokyo", "neon-afterglow", "afterimage", "soft-reset", "synthetic-bloom"],
+  },
+  {
+    id: "long-drive",
+    title: "Для долгой дороги",
+    tagline: "ДЛЯ ДОЛГОЙ ДОРОГИ",
+    description: "Ночной маршрут",
+    cardClass: "collection-mood-road",
+    trackIds: ["last-train-to-tokyo", "neon-afterglow", "afterimage"],
+  },
+  {
+    id: "new-sound",
+    title: "Новый звук",
+    tagline: "НОВЫЙ ЗВУК",
+    description: "Треки недели",
+    cardClass: "collection-mood-new",
+    trackIds: ["synthetic-bloom", "blue-signal", "glass-horizon"],
+  },
+  {
+    id: "soft-energy",
+    title: "Мягкая энергия",
+    tagline: "МЯГКАЯ ЭНЕРГИЯ",
+    description: "Для фокуса",
+    cardClass: "collection-mood-soft",
+    trackIds: ["soft-reset", "glass-horizon"],
+  },
+  {
+    id: "night-tokyo",
+    title: "Ночной Токио",
+    tagline: "ПОСЛЕ 22:00",
+    description: "После 22:00",
+    cardClass: "collection-mood-tokyo",
+    trackIds: ["world-is-mine", "plastic-moon", "last-train-to-tokyo"],
+  },
+];

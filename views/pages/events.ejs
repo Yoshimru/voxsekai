@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/directory.css" />
+    <link rel="stylesheet" href="/assets/css/events.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page events-page">
@@ -14,169 +18,41 @@
       <main class="main-area">
         <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
         <div class="content directory-content events-content">
-          <header class="directory-heading">
-            <div>
-              <p class="directory-kicker">MEET / 01</p>
-              <h1>События VoxSekai</h1>
-              <p>Встречай любимые голоса онлайн и за пределами наушников.</p>
-            </div>
-          </header>
-          <section class="events-feature" aria-label="Ближайшее событие">
-            <img
-              src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1600&q=85"
-              alt=""
-            />
-            <div class="events-feature-shade"></div>
-            <div class="events-feature-copy">
-              <p class="directory-kicker">СЛЕДУЮЩЕЕ СОБЫТИЕ · 24 ОКТЯБРЯ</p>
-              <h2>Виртуальный мир — Live</h2>
-              <p>
-                Один вечер, любимые голоса и тысячи слушателей в одном ритме.
-              </p>
-              <a class="button button-primary" href="#upcoming-events"
-                >Смотреть программу <span>↘</span></a
-              >
-            </div>
-            <span class="events-feature-date"><b>24</b><small>ОКТ</small></span>
-          </section>
+          <header class="directory-heading"><div><p class="directory-kicker">MEET / 01</p><h1>События VoxSekai</h1><p>Встречай любимые голоса онлайн и за пределами наушников.</p></div></header>
+          <% const featuredEvent = events[0]; %>
+          <% if (featuredEvent) { %>
+            <section class="events-feature" aria-label="Ближайшее событие">
+              <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1600&q=85" alt="" />
+              <div class="events-feature-shade"></div>
+              <div class="events-feature-copy">
+                <p class="directory-kicker">СЛЕДУЮЩЕЕ СОБЫТИЕ · <%= featuredEvent.dateLabel.toLocaleUpperCase('ru') %></p>
+                <h2><%= featuredEvent.title %></h2><p><%= featuredEvent.description %></p>
+                <a class="button button-primary" href="/events/<%= featuredEvent.id %>">Подробнее о событии <span>↗</span></a>
+              </div>
+              <span class="events-feature-date"><b><%= featuredEvent.day %></b><small><%= featuredEvent.month %></small></span>
+            </section>
+          <% } %>
           <section class="events-controls" aria-label="Поиск и фильтр событий">
-            <label class="directory-search"
-              ><span aria-hidden="true">⌕</span
-              ><input
-                id="page-search"
-                type="search"
-                placeholder="Название события, город или исполнитель"
-                aria-label="Поиск событий"
-            /></label>
+            <label class="directory-search"><span aria-hidden="true">⌕</span><input id="page-search" type="search" placeholder="Название события, город или исполнитель" aria-label="Поиск событий" /></label>
             <div class="genre-filter" aria-label="Тип события">
-              <button
-                class="genre-chip active"
-                type="button"
-                data-filter="all"
-                aria-pressed="true"
-              >
-                Все события
-              </button>
-              <button
-                class="genre-chip"
-                type="button"
-                data-filter="online"
-                aria-pressed="false"
-              >
-                Онлайн
-              </button>
-              <button
-                class="genre-chip"
-                type="button"
-                data-filter="offline"
-                aria-pressed="false"
-              >
-                Офлайн
-              </button>
+              <button class="genre-chip active" type="button" data-filter="all" aria-pressed="true">Все события</button>
+              <button class="genre-chip" type="button" data-filter="online" aria-pressed="false">Онлайн</button>
+              <button class="genre-chip" type="button" data-filter="offline" aria-pressed="false">Офлайн</button>
             </div>
           </section>
           <section class="events-list" id="upcoming-events">
-            <div class="directory-section-heading">
-              <h2>Скоро</h2>
-              <p><span data-results-count>6</span> событий · осень 2026</p>
-            </div>
+            <div class="directory-section-heading"><h2>Скоро</h2><p><span data-results-count><%= events.length %></span> событий</p></div>
             <div class="event-card-grid" data-sort-list>
-              <article
-                class="event-card event-card-virtual"
-                data-genre-item
-                data-genre="online"
-                data-search-text="виртуальный мир live онлайн вокалоид"
-              >
-                <div class="event-card-art">
-                  <span>LIVE STREAM · 01</span><b>VS</b>
-                </div>
-                <div class="event-card-info">
-                  <p>ОНЛАЙН · 24 ОКТЯБРЯ</p>
-                  <h3>Виртуальный мир — Live</h3>
-                  <span>Начало в 20:00 · Трансляция VoxSekai</span>
-                </div>
-                <a class="event-card-action" href="/">Подробнее <b>↗</b></a>
-              </article>
-              <article
-                class="event-card event-card-tokyo"
-                data-genre-item
-                data-genre="offline"
-                data-search-text="vocaloid night tokyo москва офлайн"
-              >
-                <div class="event-card-art">
-                  <span>LIVE SHOW · 02</span><b>夜</b>
-                </div>
-                <div class="event-card-info">
-                  <p>МОСКВА · 31 ОКТЯБРЯ</p>
-                  <h3>Vocaloid night: Tokyo</h3>
-                  <span>Начало в 19:30 · Клуб «Сигнал»</span>
-                </div>
-                <a class="event-card-action" href="/">Подробнее <b>↗</b></a>
-              </article>
-              <article
-                class="event-card event-card-synth"
-                data-genre-item
-                data-genre="offline"
-                data-search-text="synthwave after dark санкт петербург офлайн"
-              >
-                <div class="event-card-art">
-                  <span>AFTER DARK · 03</span><b>≋</b>
-                </div>
-                <div class="event-card-info">
-                  <p>САНКТ-ПЕТЕРБУРГ · 08 НОЯБРЯ</p>
-                  <h3>Synthwave After Dark</h3>
-                  <span>Начало в 21:00 · Севкабель Порт</span>
-                </div>
-                <a class="event-card-action" href="/">Подробнее <b>↗</b></a>
-              </article>
-              <article
-                class="event-card event-card-studio"
-                data-genre-item
-                data-genre="online"
-                data-search-text="создай виртуальный голос мастер класс онлайн"
-              >
-                <div class="event-card-art">
-                  <span>WORKSHOP · 04</span><b>音</b>
-                </div>
-                <div class="event-card-info">
-                  <p>ОНЛАЙН · 12 НОЯБРЯ</p>
-                  <h3>Создай виртуальный голос</h3>
-                  <span>Начало в 18:00 · Воркшоп</span>
-                </div>
-                <a class="event-card-action" href="/">Подробнее <b>↗</b></a>
-              </article>
-              <article
-                class="event-card event-card-neon"
-                data-genre-item
-                data-genre="offline"
-                data-search-text="neon frequencies казань офлайн"
-              >
-                <div class="event-card-art">
-                  <span>CLUB NIGHT · 05</span><b>NF</b>
-                </div>
-                <div class="event-card-info">
-                  <p>КАЗАНЬ · 20 НОЯБРЯ</p>
-                  <h3>Neon Frequencies</h3>
-                  <span>Начало в 20:30 · Werk</span>
-                </div>
-                <a class="event-card-action" href="/">Подробнее <b>↗</b></a>
-              </article>
-              <article
-                class="event-card event-card-radio"
-                data-genre-item
-                data-genre="online"
-                data-search-text="ночное радио эфир онлайн подборка"
-              >
-                <div class="event-card-art">
-                  <span>RADIO · 06</span><b>◉</b>
-                </div>
-                <div class="event-card-info">
-                  <p>ОНЛАЙН · 28 НОЯБРЯ</p>
-                  <h3>Ночное радио VoxSekai</h3>
-                  <span>Начало в 22:00 · Прямой эфир</span>
-                </div>
-                <a class="event-card-action" href="/">Подробнее <b>↗</b></a>
-              </article>
+              <% events.forEach((event) => { %>
+                <article class="event-card <%= event.artworkClass %>" data-genre-item data-genre="<%= event.type %>" data-search-text="<%= `${event.title} ${event.location} ${event.venue} ${event.category}`.toLocaleLowerCase('ru') %>">
+                  <div class="event-card-art"><span><%= event.tag %></span><b><%= event.artworkGlyph %></b></div>
+                  <div class="event-card-info">
+                    <p><%= event.location.toLocaleUpperCase('ru') %> · <%= event.dateLabel.toLocaleUpperCase('ru') %></p>
+                    <h3><%= event.title %></h3><span>Начало в <%= event.time %> · <%= event.venue %></span>
+                  </div>
+                  <a class="event-card-action" href="/events/<%= event.id %>">Подробнее <b>↗</b></a>
+                </article>
+              <% }) %>
             </div>
             <p class="directory-empty" hidden>События не найдены.</p>
           </section>

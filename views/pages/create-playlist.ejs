@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/library.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page playlist-editor-page">
@@ -14,6 +17,7 @@
       <main class="main-area">
         <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
         <div class="content directory-content playlist-editor-content">
+          <%- include('../partials/playlist-seed', { playlists }) %>
           <header class="directory-heading">
             <div>
               <h1>Создать плейлист</h1>
@@ -41,18 +45,8 @@
                 ></textarea>
               </label>
               <div class="editor-field">
-                <span>Обложка плейлиста</span
-                ><label class="cover-upload"
-                  ><input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    data-cover-input
-                  /><span class="upload-plus">＋</span
-                  ><span>Перетащи изображение или выбери файл</span
-                  ><small data-cover-hint
-                    >JPG, PNG, WEBP · до 5 МБ</small
-                  ></label
-                >
+                <span>Обложка плейлиста</span>
+                <p class="editor-hint">Цветовая обложка создаётся автоматически и может быть заменена на серверную после подключения хранилища.</p>
               </div>
               <label class="public-toggle"
                 ><span
@@ -92,78 +86,13 @@
                   data-track-search
               /></label>
               <div class="available-tracks">
-                <article
-                  class="available-track"
-                  data-track-name="Neon Afterglow"
-                >
-                  <span class="available-cover cover-cyan">Ne<br />on</span
-                  ><span
-                    ><strong>Neon Afterglow</strong
-                    ><small>Mira Kai</small></span
-                  ><button
-                    type="button"
-                    data-add-track="Neon Afterglow"
-                    aria-label="Добавить Neon Afterglow"
-                  >
-                    ＋
-                  </button>
-                </article>
-                <article
-                  class="available-track"
-                  data-track-name="Synthetic Bloom"
-                >
-                  <span class="available-cover cover-violet">Sy<br />nth</span
-                  ><span
-                    ><strong>Synthetic Bloom</strong
-                    ><small>Mira Kai</small></span
-                  ><button
-                    type="button"
-                    data-add-track="Synthetic Bloom"
-                    aria-label="Добавить Synthetic Bloom"
-                  >
-                    ＋
-                  </button>
-                </article>
-                <article class="available-track" data-track-name="Blue Signal">
-                  <span class="available-cover cover-pink">Blue<br />Sign</span
-                  ><span><strong>Blue Signal</strong><small>KAIRO</small></span
-                  ><button
-                    type="button"
-                    data-add-track="Blue Signal"
-                    aria-label="Добавить Blue Signal"
-                  >
-                    ＋
-                  </button>
-                </article>
-                <article class="available-track" data-track-name="Plastic Moon">
-                  <span class="available-cover cover-orange"
-                    >Plastic<br />Moon</span
-                  ><span
-                    ><strong>Plastic Moon</strong><small>Yuna 404</small></span
-                  ><button
-                    type="button"
-                    data-add-track="Plastic Moon"
-                    aria-label="Добавить Plastic Moon"
-                  >
-                    ＋
-                  </button>
-                </article>
-                <article
-                  class="available-track"
-                  data-track-name="Glass Horizon"
-                >
-                  <span class="available-cover cover-cyan"
-                    >Glass<br />Horizon</span
-                  ><span
-                    ><strong>Glass Horizon</strong><small>Mira Kai</small></span
-                  ><button
-                    type="button"
-                    data-add-track="Glass Horizon"
-                    aria-label="Добавить Glass Horizon"
-                  >
-                    ＋
-                  </button>
-                </article>
+                <% tracks.forEach((track) => { %>
+                  <article class="available-track" data-track-id="<%= track.id %>" data-track-name="<%= track.displayTitle %>">
+                    <span class="available-cover <%= track.artworkClass %>"><%= track.artworkGlyph %></span>
+                    <span><strong><%= track.displayTitle %></strong><small><%= track.artist %></small></span>
+                    <button type="button" data-add-track="<%= track.id %>" aria-label="Добавить <%= track.displayTitle %>">＋</button>
+                  </article>
+                <% }) %>
               </div>
               <p class="selected-track-note" data-selected-tracks>
                 Выбери треки, которые войдут в плейлист.

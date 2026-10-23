@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/error.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="error-page">
+    <div class="crt-interference" aria-hidden="true"></div>
     <div class="app-shell">
       <%- include('../partials/sidebar', { currentPath: '/404' }) %>
       <main class="main-area">
@@ -24,11 +28,18 @@
                 <div class="vinyl-grooves"></div>
                 <div class="vinyl-label"><span>VS</span></div>
                 <div class="vinyl-hole"></div>
-                <div class="signal-line"></div>
               </div>
               <span class="lost-tag">NO SIGNAL</span>
             </div>
             <span class="digit digit-right">4</span>
+          </div>
+          <div class="error-waveform" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
           </div>
           <div class="error-message">
             <h1>Кажется, этот трек<br />не найден</h1>

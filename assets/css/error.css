@@ -1,0 +1,286 @@
+/* 404 */
+.error-content {
+  min-height: calc(100vh - 192px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px 28px 44px;
+}
+.error-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.error-label span {
+  width: 6px;
+  height: 6px;
+  background: var(--mint);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--mint);
+}
+.error-art {
+  height: 258px;
+  width: min(650px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 25px 0 14px;
+}
+.digit {
+  font-size: 220px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -15px;
+  color: #f3f5f7;
+  text-shadow: 0 0 35px #80e8cd12;
+  z-index: 1;
+}
+.digit-left {
+  margin-right: -6px;
+}
+.digit-right {
+  margin-left: -6px;
+}
+.vinyl-wrap {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 224px;
+  width: 224px;
+  height: 224px;
+  z-index: 2;
+}
+.vinyl-wrap::before,
+.vinyl-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid #80e8cd70;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: reverb-pulse 2.8s ease-out infinite;
+}
+.vinyl-wrap::after {
+  animation-delay: 1.4s;
+}
+.vinyl {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    #181c23 0 3px,
+    #252a33 4px 5px,
+    #15181e 6px 8px
+  );
+  border: 1px solid #38404a;
+  box-shadow:
+    0 0 0 18px #80e8cd0a,
+    0 0 45px #80e8cd24;
+  z-index: 2;
+  animation: slow-spin 24s linear infinite;
+}
+.vinyl-grooves {
+  position: absolute;
+  inset: 25px;
+  border: 1px solid #ffffff14;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 12px #ffffff05,
+    0 0 0 26px #ffffff04;
+}
+.vinyl-label {
+  position: absolute;
+  inset: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 25%, #9af2dc, #277f79 70%, #164a4b);
+  color: #102622;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.vinyl-hole {
+  position: absolute;
+  left: calc(50% - 5px);
+  top: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  background: #11151b;
+  border: 1px solid #b7f5e8;
+  border-radius: 50%;
+}
+.lost-tag {
+  position: absolute;
+  right: -16px;
+  top: 24px;
+  z-index: 2;
+  padding: 6px 8px;
+  background: #20252e;
+  border: 1px solid #424b56;
+  border-radius: 4px;
+  color: #c0c6d1;
+  font-size: 8px;
+  letter-spacing: 1px;
+  transform: rotate(8deg);
+}
+.error-message {
+  max-width: 620px;
+}
+.error-message h1 {
+  font-size: 34px;
+  line-height: 1.2;
+  letter-spacing: -1.2px;
+  font-weight: 600;
+  margin: 0 0 14px;
+}
+.error-message p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 480px;
+  margin: 0 auto;
+}
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+.error-help {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 24px;
+}
+.error-help a {
+  color: var(--mint);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.error-footer {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.search-link {
+  cursor: pointer;
+}
+.search-placeholder {
+  font-size: 13px;
+  flex: 1;
+}
+.error-page .sidebar {
+  min-height: 100vh;
+}
+@keyframes slow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes reverb-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+.crt-interference {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, #ffffff0b 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #fb53da0b, transparent 32%, #57f4e90b 68%, transparent);
+  opacity: 0.32;
+  pointer-events: none;
+}
+.crt-interference::before,
+.crt-interference::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+.crt-interference::before {
+  inset: -50%;
+  background:
+    repeating-radial-gradient(ellipse at 52% 48%, #ffffff1c 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, transparent 0 12vh, #74f4e51a 12.1vh 12.35vh, transparent 12.5vh 26vh),
+    linear-gradient(90deg, transparent 0 43%, #ff4bda29 47%, #79f7eb30 50%, transparent 55%);
+  background-size: 6px 6px, 100% 100%, 100% 100%;
+  animation: crt-static 0.14s steps(2, end) infinite;
+  opacity: 0.48;
+  mix-blend-mode: screen;
+}
+.crt-interference::after {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 8%, #ff59d31c 8.1% 8.5%, transparent 8.6% 74%, #6ef6e62b 74.1% 74.5%, transparent 74.6%),
+    repeating-linear-gradient(0deg, transparent 0 9vh, #f45cdc20 9.1vh 9.5vh, transparent 9.6vh 21vh, #75f6e71c 21.1vh 21.35vh, transparent 21.5vh 34vh);
+  animation: crt-roll 3.8s linear infinite;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+}
+.error-content {
+  position: relative;
+  z-index: 21;
+}
+.error-waveform {
+  width: min(440px, 78vw);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: -2px auto 20px;
+  opacity: 0.8;
+}
+.error-waveform span {
+  flex: 1;
+  max-width: 6px;
+  width: 3px;
+  height: 20%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #b9ffed, #41ae9c);
+  box-shadow: 0 0 8px #80e8cd8c;
+  animation: error-equalizer 0.75s ease-in-out infinite alternate;
+}
+.error-waveform span:nth-child(4n) { height: 70%; animation-delay: -0.42s; }
+.error-waveform span:nth-child(4n + 1) { height: 35%; animation-delay: -0.17s; }
+.error-waveform span:nth-child(4n + 2) { height: 90%; animation-delay: -0.58s; }
+.error-waveform span:nth-child(7n) { height: 55%; animation-delay: -0.31s; }
+@keyframes error-equalizer {
+  to { transform: scaleY(0.25); opacity: 0.55; }
+}
+@keyframes crt-static {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(1.4%, -0.8%); }
+  50% { transform: translate(-1.2%, 1.6%); }
+  75% { transform: translate(0.6%, 0.9%); }
+  100% { transform: translate(-0.5%, -0.7%); }
+}
+@keyframes crt-roll {
+  0% { transform: translateY(-35vh) skewY(-1deg); }
+  45% { transform: translateY(35vh) skewY(1deg); }
+  47% { transform: translateY(37vh) skewY(-2deg); }
+  100% { transform: translateY(135vh) skewY(1deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crt-interference::before,
+  .crt-interference::after,
+  .error-waveform span {
+    animation: none;
+  }
+}

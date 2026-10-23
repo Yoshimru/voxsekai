@@ -1,0 +1,14 @@
+<div hidden data-playlist-seed>
+  <% playlists.forEach((playlist) => { %>
+    <span
+      data-playlist-item
+      data-playlist-id="<%= playlist.id %>"
+      data-playlist-title="<%= playlist.title %>"
+      data-playlist-description="<%= playlist.description %>"
+      data-playlist-label="<%= playlist.label %>"
+      data-playlist-track-ids="<%= playlist.trackIds.join(',') %>"
+      data-playlist-public="<%= playlist.isPublic %>"
+      class="<%= playlist.artworkClass %>"
+    ></span>
+  <% }) %>
+</div>

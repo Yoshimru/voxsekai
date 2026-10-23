@@ -17,6 +17,9 @@
     : [];
   const tracksById = new Map(trackCatalog.map((track) => [track.id, track]));
   const playerStorageKey = "voxsekai.player.v1";
+  const favoritesStorageKey = "voxsekai.favorites.v1";
+  const playlistsStorageKey = "voxsekai.playlists.v1";
+  const profileStorageKey = "voxsekai.profile.v1";
   const playerElements = {
     title: player?.querySelector("[data-player-title]"),
     artist: player?.querySelector("[data-player-artist]"),
@@ -27,7 +30,6 @@
     duration: player?.querySelector("[data-player-duration]"),
     seek: player?.querySelector("[data-player-seek]"),
     volume: player?.querySelector("[data-player-volume]"),
-    toggleIcon: player?.querySelector("[data-player-toggle-icon]"),
     toggleButton: player?.querySelector('[data-player-action="toggle"]'),
   };
 
@@ -58,6 +60,32 @@
   let renderedPlayerVisible = false;
   let volumeAnimationFrame = 0;
 
+  function syncTrackPlaybackControls() {
+    const currentTrackId = playerState?.trackId;
+    const isPlaying = playerState?.isPlaying === true;
+    document.querySelectorAll("[data-player-play]").forEach((button) => {
+      const trackId = button.dataset.trackId || button.closest("[data-track-id]")?.dataset.trackId;
+      const isCurrentTrack = Boolean(currentTrackId && trackId === currentTrackId);
+      const isCurrentPlaying = isCurrentTrack && isPlaying;
+      button.classList.toggle("is-playing", isCurrentPlaying);
+      button.setAttribute("aria-pressed", String(isCurrentPlaying));
+      button.setAttribute(
+        "aria-label",
+        isCurrentPlaying
+          ? `Пауза ${tracksById.get(trackId)?.displayTitle || "трека"}`
+          : `${isCurrentTrack ? "Продолжить" : "Воспроизвести"} ${tracksById.get(trackId)?.displayTitle || "трек"}`,
+      );
+      button.title = isCurrentPlaying ? "Пауза" : "Воспроизвести";
+    });
+
+    document.querySelectorAll(".track-row[data-track-id], .catalog-track[data-track-id]").forEach((card) => {
+      const isCurrentTrack = card.dataset.trackId === currentTrackId;
+      card.classList.toggle("is-current-track", isCurrentTrack);
+      card.classList.toggle("is-playing-track", isCurrentTrack && isPlaying);
+      card.setAttribute("data-playback-state", isCurrentTrack ? (isPlaying ? "playing" : "paused") : "idle");
+    });
+  }
+
   function formatTime(seconds) {
     const time = Math.max(0, Math.floor(seconds));
     return `${Math.floor(time / 60)}:${String(time % 60).padStart(2, "0")}`;
@@ -74,6 +102,7 @@
   }
 
   function renderPlayer() {
+    syncTrackPlaybackControls();
     if (!player || !playerState) return;
     const track = tracksById.get(playerState.trackId);
     if (!track) return;
@@ -97,6 +126,10 @@
       : "Демо · аудио не подключено";
     playerElements.glyph.textContent = track.artworkGlyph;
     playerElements.artwork.className = `player-artwork ${track.artworkClass}`;
+    const colors = track.artworkColors || ["#248c9f", "#41569c", "#173f51"];
+    player.style.setProperty("--player-color-one", colors[0]);
+    player.style.setProperty("--player-color-two", colors[1]);
+    player.style.setProperty("--player-color-three", colors[2]);
     player.querySelectorAll("[data-player-details]").forEach((link) => {
       link.href = `/track/${track.id}`;
     });
@@ -114,7 +147,10 @@
       "--player-volume",
       `${playerState.volume * 100}%`,
     );
-    playerElements.toggleIcon.textContent = playerState.isPlaying ? "Ⅱ" : "▶";
+    playerElements.toggleButton.classList.toggle(
+      "is-playing",
+      playerState.isPlaying,
+    );
     playerElements.toggleButton.setAttribute(
       "aria-label",
       playerState.isPlaying ? "Пауза" : "Продолжить",
@@ -145,25 +181,27 @@
     savePlayerState();
   }
 
-  function queueFromCurrentPage() {
+  function queueFromCurrentPage(sourceButton) {
+    const queueContainer = sourceButton?.closest("[data-player-queue]");
     const visibleTrackIds = Array.from(
-      document.querySelectorAll(
-        ".track-row[data-track-id], .catalog-track[data-track-id]",
-      ),
+      queueContainer
+        ? queueContainer.querySelectorAll("[data-track-id]")
+        : document.querySelectorAll(
+            ".track-row[data-track-id], .catalog-track[data-track-id]",
+          ),
     )
       .map((card) => card.dataset.trackId)
       .filter((id) => tracksById.has(id));
     return Array.from(new Set(visibleTrackIds));
   }
 
-  function startTrack(trackId) {
+  function startTrack(trackId, queue = queueFromCurrentPage()) {
     const track = tracksById.get(trackId);
     if (!track) {
       notify("Не удалось загрузить данные этого трека.");
       return;
     }
 
-    const queue = queueFromCurrentPage();
     if (!queue.includes(trackId)) queue.unshift(trackId);
     playerState = {
       trackId,
@@ -202,7 +240,31 @@
     const nextIndex =
       (currentIndex + offset + playerState.queue.length) %
       playerState.queue.length;
-    startTrack(playerState.queue[nextIndex]);
+    startTrack(playerState.queue[nextIndex], playerState.queue);
+  }
+
+  function togglePlayback() {
+    if (!playerState) return;
+    if (playerState.isPlaying) {
+      playerState.position = playerAudio?.src
+        ? playerAudio.currentTime
+        : playerState.position;
+      playerState.isPlaying = false;
+      playerAudio?.pause();
+    } else {
+      playerState.isPlaying = true;
+      const track = tracksById.get(playerState.trackId);
+      if (track?.audioUrl && playerAudio) {
+        playerAudio.play().catch((error) => {
+          playerState.isPlaying = false;
+          notify("Не удалось продолжить воспроизведение.");
+          console.error(error);
+          persistAndRender();
+        });
+      }
+    }
+    lastPlayerTick = Date.now();
+    persistAndRender();
   }
 
   if (player && playerState) {
@@ -240,32 +302,15 @@
     if (playButton) {
       const trackCard = playButton.closest("[data-track-id]");
       const trackId = playButton.dataset.trackId || trackCard?.dataset.trackId;
-      if (trackId) startTrack(trackId);
+      if (trackId === playerState?.trackId) togglePlayback();
+      else if (trackId) startTrack(trackId, queueFromCurrentPage(playButton));
     }
 
     const action = event.target.closest("[data-player-action]")?.dataset
       .playerAction;
     if (!action || !playerState) return;
     if (action === "toggle") {
-      if (playerState.isPlaying) {
-        playerState.position = playerAudio?.src
-          ? playerAudio.currentTime
-          : playerState.position;
-        playerState.isPlaying = false;
-        playerAudio?.pause();
-      } else {
-        playerState.isPlaying = true;
-        const track = tracksById.get(playerState.trackId);
-        if (track?.audioUrl && playerAudio) {
-          playerAudio.play().catch((error) => {
-            playerState.isPlaying = false;
-            notify("Не удалось продолжить воспроизведение.");
-            console.error(error);
-          });
-        }
-      }
-      lastPlayerTick = Date.now();
-      persistAndRender();
+      togglePlayback();
     } else if (action === "next") {
       playQueueOffset(1);
     } else if (action === "previous") {
@@ -333,30 +378,645 @@
     }, 250);
   }
 
-  document.querySelectorAll(".like-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      const liked = button.classList.toggle("liked");
+  function readFavorites() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(favoritesStorageKey) || "[]");
+      if (!Array.isArray(stored)) {
+        console.warn("В хранилище избранного ожидался список идентификаторов треков.");
+        return [];
+      }
+      const validIds = stored.filter(
+        (id) => typeof id === "string" && tracksById.has(id),
+      );
+      if (validIds.length !== stored.length) {
+        console.warn("Некоторые записи избранного больше не соответствуют каталогу треков.");
+      }
+      return [...new Set(validIds)];
+    } catch (error) {
+      console.warn("Не удалось прочитать избранное.", error);
+      return [];
+    }
+  }
+
+  function readProfile() {
+    const defaults = {
+      displayName: "Аки",
+      bio: "Музыка всегда рядом, трек за треком.",
+    };
+    try {
+      const saved = JSON.parse(localStorage.getItem(profileStorageKey) || "null");
+      if (!saved || typeof saved !== "object") return defaults;
+      return {
+        displayName:
+          typeof saved.displayName === "string" && saved.displayName.trim()
+            ? saved.displayName.trim().slice(0, 32)
+            : defaults.displayName,
+        bio: typeof saved.bio === "string" ? saved.bio.trim().slice(0, 120) : defaults.bio,
+      };
+    } catch (error) {
+      console.warn("Не удалось прочитать профиль.", error);
+      return defaults;
+    }
+  }
+
+  function readPlaylists() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(playlistsStorageKey) || "null");
+      if (saved === null) {
+        return Array.from(
+          document.querySelectorAll("[data-playlist-item]"),
+          (card) => ({
+            id: card.dataset.playlistId,
+            title: card.dataset.playlistTitle,
+            description: card.dataset.playlistDescription || "",
+            label: card.dataset.playlistLabel || "MY MIX",
+            artworkClass: card.classList.contains("playlist-card-custom")
+              ? "playlist-card-custom"
+              : Array.from(card.classList).find((name) => name.startsWith("playlist-card-")) || "playlist-card-custom",
+            trackIds: (card.dataset.playlistTrackIds || "")
+              .split(",")
+              .filter((id) => tracksById.has(id)),
+            isPublic: card.dataset.playlistPublic === "true",
+          }),
+        );
+      }
+      if (!Array.isArray(saved)) {
+        console.warn("В хранилище плейлистов ожидался список.");
+        return [];
+      }
+      return saved
+        .filter(
+          (playlist) =>
+            playlist &&
+            typeof playlist.id === "string" &&
+            typeof playlist.title === "string" &&
+            playlist.title.trim(),
+        )
+        .map((playlist) => ({
+          id: playlist.id.slice(0, 80),
+          title: playlist.title.trim().slice(0, 48),
+          description:
+            typeof playlist.description === "string"
+              ? playlist.description.slice(0, 180)
+              : "",
+          label:
+            typeof playlist.label === "string" ? playlist.label.slice(0, 20) : "MY MIX",
+          artworkClass:
+            typeof playlist.artworkClass === "string" &&
+            /^playlist-card-(night|repeat|morning|drive|new|custom)$/.test(
+              playlist.artworkClass,
+            )
+              ? playlist.artworkClass
+              : "playlist-card-custom",
+          trackIds: Array.isArray(playlist.trackIds)
+            ? [...new Set(playlist.trackIds.filter((id) => tracksById.has(id)))]
+            : [],
+          isPublic: playlist.isPublic === true,
+        }));
+    } catch (error) {
+      console.warn("Не удалось прочитать плейлисты.", error);
+      return [];
+    }
+  }
+
+  let profileState = readProfile();
+  let playlists = readPlaylists();
+  let activePlaylistId = null;
+  const profileFavoriteCards = new Map(
+    Array.from(document.querySelectorAll("[data-profile-favorite]"), (card) => [
+      card.dataset.profileFavorite,
+      card,
+    ]),
+  );
+
+  let favoriteIds = readFavorites();
+  const pluralCount = (count, one, few, many) => {
+    const lastTwo = count % 100;
+    const last = count % 10;
+    if (lastTwo >= 11 && lastTwo <= 14) return `${count} ${many}`;
+    if (last === 1) return `${count} ${one}`;
+    if (last >= 2 && last <= 4) return `${count} ${few}`;
+    return `${count} ${many}`;
+  };
+
+  function renderProfile() {
+    const nameElement = document.querySelector("[data-profile-name]");
+    const bioElement = document.querySelector("[data-profile-bio]");
+    const avatarElement = document.querySelector("[data-profile-avatar]");
+    if (nameElement) nameElement.textContent = profileState.displayName;
+    if (bioElement) bioElement.textContent = profileState.bio || "Музыка всегда рядом.";
+    if (avatarElement) {
+      avatarElement.textContent = Array.from(profileState.displayName)[0] || "А";
+    }
+
+    const favoriteTracks = favoriteIds
+      .map((id) => tracksById.get(id))
+      .filter(Boolean);
+    const genreCounts = new Map();
+    const artistCounts = new Map();
+    favoriteTracks.forEach((track) => {
+      genreCounts.set(track.genre, (genreCounts.get(track.genre) || 0) + 1);
+      const artist = track.artistName || track.artist;
+      artistCounts.set(artist, (artistCounts.get(artist) || 0) + 1);
+    });
+    const stats = {
+      favorites: favoriteIds.length,
+      playlists: playlists.length,
+      genres: genreCounts.size,
+      catalog: trackCatalog.length,
+    };
+    Object.entries(stats).forEach(([key, value]) => {
+      const element = document.querySelector(`[data-profile-stat="${key}"]`);
+      if (element) element.textContent = String(value);
+    });
+
+    const genreList = document.querySelector("[data-profile-genres]");
+    if (genreList) {
+      genreList.replaceChildren();
+      const genres = Array.from(genreCounts.entries()).sort((a, b) => b[1] - a[1]);
+      if (!genres.length) {
+        const empty = document.createElement("p");
+        empty.className = "profile-empty-note";
+        empty.textContent = "Добавляй треки в избранное, чтобы увидеть свои жанры.";
+        genreList.append(empty);
+      }
+      genres.slice(0, 4).forEach(([genre, count]) => {
+        const percent = Math.round((count / favoriteTracks.length) * 100);
+        const meter = document.createElement("div");
+        meter.className = "genre-meter";
+        const label = document.createElement("span");
+        label.textContent = genre;
+        const bar = document.createElement("i");
+        const fill = document.createElement("b");
+        fill.style.setProperty("--meter", `${percent}%`);
+        bar.append(fill);
+        const value = document.createElement("strong");
+        value.textContent = `${percent}%`;
+        meter.append(label, bar, value);
+        genreList.append(meter);
+      });
+    }
+
+    const artistList = document.querySelector("[data-profile-artists]");
+    if (artistList) {
+      artistList.replaceChildren();
+      const artists = Array.from(artistCounts.entries()).sort((a, b) => b[1] - a[1]);
+      if (!artists.length) {
+        const empty = document.createElement("p");
+        empty.className = "profile-empty-note";
+        empty.textContent = "Здесь появятся исполнители из твоего избранного.";
+        artistList.append(empty);
+      }
+      artists.slice(0, 4).forEach(([artist, count], index) => {
+        const link = document.createElement("a");
+        link.href = "/artists";
+        const dot = document.createElement("span");
+        dot.className = `profile-artist-dot profile-artist-dot-${index % 4}`;
+        dot.textContent = Array.from(artist)[0] || "♪";
+        const name = document.createElement("strong");
+        name.textContent = artist;
+        const percent = document.createElement("b");
+        percent.textContent = `${Math.round((count / favoriteTracks.length) * 100)}%`;
+        link.append(dot, name, percent);
+        artistList.append(link);
+      });
+    }
+
+    profileFavoriteCards.forEach((card) => {
+      card.hidden = true;
+    });
+    favoriteIds
+      .slice()
+      .reverse()
+      .slice(0, 4)
+      .forEach((id) => {
+        const card = profileFavoriteCards.get(id);
+        if (!card) return;
+        card.hidden = false;
+        card.parentElement.append(card);
+      });
+  }
+
+  function savePlaylists() {
+    try {
+      localStorage.setItem(playlistsStorageKey, JSON.stringify(playlists));
+      return true;
+    } catch (error) {
+      console.warn("Не удалось сохранить плейлисты.", error);
+      notify("Не удалось сохранить плейлист в этом браузере.");
+      return false;
+    }
+  }
+
+  function createPlaylistTrackRow(track) {
+    const row = document.createElement("article");
+    row.className = "track-card track-row";
+    row.dataset.trackId = track.id;
+    row.dataset.favoriteItem = track.id;
+    row.dataset.genreItem = "";
+    row.dataset.genre = track.filterGenre || "all";
+    row.dataset.searchText =
+      `${track.displayTitle} ${track.title} ${track.artist} ${track.genre}`.toLocaleLowerCase("ru");
+    row.dataset.trackSlug = track.id;
+    row.dataset.trackTitle = track.displayTitle;
+    row.dataset.trackOriginalTitle = track.title;
+    row.dataset.trackArtist = track.artist;
+    row.dataset.trackDuration = String(track.duration);
+    row.dataset.trackGenre = track.genre;
+    row.dataset.trackArtwork = track.artworkClass;
+    row.dataset.trackGlyph = track.artworkGlyph;
+    row.dataset.trackAudio = track.audioUrl || "";
+
+    const cover = document.createElement("a");
+    cover.className = `mini-cover ${track.artworkClass}`;
+    cover.href = `/track/${track.id}`;
+    cover.setAttribute("aria-label", `Подробнее о треке ${track.displayTitle}`);
+    const glyph = document.createElement("span");
+    glyph.textContent = track.artworkGlyph;
+    const indicator = document.createElement("span");
+    indicator.className = "track-playing-indicator";
+    indicator.setAttribute("aria-hidden", "true");
+    for (let index = 0; index < 5; index += 1) {
+      indicator.append(document.createElement("i"));
+    }
+    cover.append(glyph, indicator);
+
+    const info = document.createElement("div");
+    info.className = "track-row-info";
+    const heading = document.createElement("h3");
+    const titleLink = document.createElement("a");
+    titleLink.href = `/track/${track.id}`;
+    titleLink.textContent = track.displayTitle;
+    heading.append(titleLink);
+    const artist = document.createElement("p");
+    artist.textContent = track.artist;
+    info.append(heading, artist);
+
+    const genre = document.createElement("span");
+    genre.className = "track-row-tag";
+    genre.textContent = track.genre;
+    const duration = document.createElement("span");
+    duration.className = "track-row-duration";
+    duration.textContent = formatTime(track.duration);
+
+    const play = document.createElement("button");
+    play.className = "play-button";
+    play.type = "button";
+    play.dataset.playerPlay = "";
+    play.setAttribute("aria-label", `Воспроизвести ${track.displayTitle}`);
+    play.setAttribute("aria-pressed", "false");
+    play.innerHTML = '<span class="track-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path data-toggle-play d="M8.2 5.8a1 1 0 0 1 1.5-.86l9.1 6.2a1.03 1.03 0 0 1 0 1.72l-9.1 6.2a1 1 0 0 1-1.5-.86z"/><g data-toggle-pause><rect x="6.5" y="5" width="4.5" height="14" rx="1.4"/><rect x="13" y="5" width="4.5" height="14" rx="1.4"/></g></svg></span>';
+    const favorite = document.createElement("button");
+    favorite.className = "like-button";
+    favorite.type = "button";
+    favorite.dataset.favoriteTrack = track.id;
+    favorite.setAttribute("aria-label", `Добавить ${track.displayTitle} в избранное`);
+    favorite.setAttribute("aria-pressed", "false");
+    favorite.textContent = "♡";
+    row.append(cover, info, genre, duration, play, favorite);
+    return row;
+  }
+
+  function renderPlaylistDetail(playlistId) {
+    const detail = document.querySelector("[data-playlist-detail]");
+    if (!detail) return;
+    const content = detail.closest(".directory-content");
+    const playlist = playlists.find((item) => item.id === playlistId);
+    const isOpen = Boolean(playlist);
+    detail.hidden = !isOpen;
+    content?.classList.toggle("artist-detail-content", isOpen);
+    const heading = document.querySelector("[data-playlist-heading]");
+    if (heading) heading.hidden = isOpen;
+    document.querySelectorAll("[data-playlist-listing]").forEach((section) => {
+      section.hidden = isOpen;
+    });
+    if (!playlist) {
+      activePlaylistId = null;
+      return;
+    }
+
+    activePlaylistId = playlist.id;
+    const hero = detail.querySelector("[data-playlist-detail-hero]");
+    hero.className = `artist-detail-hero playlist-detail-hero ${playlist.artworkClass}`;
+    detail.querySelector("[data-playlist-detail-label]").textContent =
+      `${playlist.isPublic ? "ОТКРЫТЫЙ" : "ЛИЧНЫЙ"} ПЛЕЙЛИСТ · ${playlist.label}`;
+    detail.querySelector("[data-playlist-detail-glyph]").textContent =
+      playlist.label === "FAVORITES" ? "♡" : "♫";
+    detail.querySelector("[data-playlist-detail-title]").textContent = playlist.title;
+    detail.querySelector("[data-playlist-detail-description]").textContent =
+      playlist.description;
+    const trackCount = pluralCount(
+      playlist.trackIds.length,
+      "трек",
+      "трека",
+      "треков",
+    );
+    detail.querySelector("[data-playlist-detail-count]").textContent =
+      `${trackCount} в твоей библиотеке`;
+    detail.querySelector("[data-playlist-track-count]").textContent = trackCount;
+    const list = detail.querySelector("[data-playlist-detail-tracks]");
+    const tracks = playlist.trackIds
+      .map((id) => tracksById.get(id))
+      .filter(Boolean);
+    list.replaceChildren(...tracks.map(createPlaylistTrackRow));
+    const emptyState = detail.querySelector("[data-playlist-detail-empty]");
+    if (emptyState) emptyState.hidden = tracks.length > 0;
+    syncTrackPlaybackControls();
+    renderFavorites();
+  }
+
+  function openPlaylist(playlistId, updateHistory = false) {
+    const playlist = playlists.find((item) => item.id === playlistId);
+    if (!playlist) {
+      notify("Этот плейлист не найден.");
+      return;
+    }
+    if (updateHistory) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("playlist", playlist.id);
+      window.history.pushState({}, "", url);
+    }
+    renderPlaylistDetail(playlist.id);
+  }
+
+  function closePlaylist(updateHistory = false) {
+    activePlaylistId = null;
+    if (updateHistory) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("playlist");
+      window.history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+    renderPlaylistDetail(null);
+  }
+
+  function syncPlaylistFromLocation() {
+    const playlistId = new URL(window.location.href).searchParams.get("playlist");
+    if (playlistId) openPlaylist(playlistId);
+    else closePlaylist();
+  }
+
+  function renderPlaylists() {
+    const list = document.querySelector("[data-playlist-list]");
+    if (list) {
+      list.replaceChildren();
+      playlists.forEach((playlist) => {
+        const card = document.createElement("article");
+        card.className = `playlist-card ${playlist.artworkClass}`;
+        card.dataset.playlistItem = "";
+        card.dataset.playlistId = playlist.id;
+        const art = document.createElement("div");
+        art.className = "playlist-art";
+        const bars = document.createElement("span");
+        bars.className = "playlist-bars";
+        for (let index = 0; index < 5; index += 1) bars.append(document.createElement("i"));
+        const label = document.createElement("strong");
+        label.textContent = playlist.label || "MY MIX";
+        art.append(bars, label);
+        const link = document.createElement("a");
+        link.className = "playlist-card-link";
+        link.href = `/playlists?playlist=${encodeURIComponent(playlist.id)}`;
+        link.dataset.playlistOpen = playlist.id;
+        link.append(art);
+        const info = document.createElement("div");
+        info.className = "playlist-card-info";
+        const title = document.createElement("h3");
+        title.textContent = playlist.title;
+        const description = document.createElement("p");
+        description.textContent = `${pluralCount(playlist.trackIds.length, "трек", "трека", "треков")} · ${playlist.isPublic ? "публичный" : "личный"}`;
+        const details = document.createElement("small");
+        details.textContent = playlist.description;
+        info.append(title, description);
+        if (playlist.description) info.append(details);
+        const arrow = document.createElement("span");
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "↗";
+        info.append(arrow);
+        link.append(info);
+        const actions = document.createElement("div");
+        actions.className = "playlist-card-actions";
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.dataset.playlistEdit = playlist.id;
+        edit.textContent = "Изменить";
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.dataset.playlistDelete = playlist.id;
+        remove.textContent = "Удалить";
+        actions.append(edit, remove);
+        card.dataset.playlistTitle = playlist.title;
+        card.dataset.playlistDescription = playlist.description;
+        card.dataset.playlistLabel = playlist.label;
+        card.dataset.playlistTrackIds = playlist.trackIds.join(",");
+        card.dataset.playlistPublic = String(playlist.isPublic);
+        card.append(link, actions);
+        list.append(card);
+      });
+      const counter = document.querySelector("[data-playlist-count]");
+      if (counter) counter.textContent = pluralCount(playlists.length, "плейлист", "плейлиста", "плейлистов");
+    }
+    const recentAddButtons = document.querySelectorAll("[data-playlist-add]");
+    recentAddButtons.forEach((button) => {
+      const track = tracksById.get(button.dataset.playlistAdd);
+      const isAdded = Boolean(
+        playlists[0]?.trackIds.includes(button.dataset.playlistAdd),
+      );
+      button.classList.toggle("is-added", isAdded);
+      button.textContent = isAdded ? "✓" : "＋";
+      if (track) {
+        button.setAttribute(
+          "aria-label",
+          `${isAdded ? "Убрать" : "Добавить"} ${track.displayTitle} ${isAdded ? "из" : "в"} плейлист`,
+        );
+      }
+    });
+    const favoriteCount = document.querySelector("[data-favorite-count]");
+    if (favoriteCount) {
+      favoriteCount.textContent = pluralCount(favoriteIds.length, "трек", "трека", "треков");
+    }
+    if (activePlaylistId && !playlists.some((playlist) => playlist.id === activePlaylistId)) {
+      activePlaylistId = null;
+    }
+    renderPlaylistDetail(activePlaylistId);
+    renderProfile();
+  }
+
+  function renderFavorites() {
+    document.querySelectorAll("[data-favorite-track]").forEach((button) => {
+      const liked = favoriteIds.includes(button.dataset.favoriteTrack);
+      button.classList.toggle("liked", liked);
       button.textContent = liked ? "♥" : "♡";
       button.setAttribute("aria-pressed", String(liked));
-      notify(liked ? "Добавлено в избранное" : "Удалено из избранного");
-    });
-  });
-
-  document.querySelectorAll("[data-playlist-add]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const added = button.classList.toggle("is-added");
-      const trackName = button.dataset.playlistAdd;
-      button.textContent = added ? "✓" : "＋";
       button.setAttribute(
         "aria-label",
-        `${added ? "Убрать" : "Добавить"} ${trackName} ${added ? "из" : "в"} плейлист`,
-      );
-      notify(
-        added
-          ? `«${trackName}» добавлен в плейлист`
-          : `«${trackName}» удалён из плейлиста`,
+        `${liked ? "Удалить" : "Добавить"} ${tracksById.get(button.dataset.favoriteTrack)?.displayTitle || "трек"} ${liked ? "из избранного" : "в избранное"}`,
       );
     });
+    document.querySelectorAll("[data-favorites-list] [data-favorite-item]").forEach((item) => {
+      item.hidden = !favoriteIds.includes(item.dataset.favoriteItem);
+    });
+    const count = document.querySelector("[data-favorite-count]");
+    if (count) {
+      const value = favoriteIds.length;
+      const lastTwoDigits = value % 100;
+      const lastDigit = value % 10;
+      const word =
+        lastTwoDigits >= 11 && lastTwoDigits <= 14
+          ? "треков"
+          : lastDigit === 1
+            ? "трек"
+            : lastDigit >= 2 && lastDigit <= 4
+              ? "трека"
+              : "треков";
+      count.textContent = `${value} ${word}`;
+    }
+    const emptyState = document.querySelector("[data-favorites-empty]");
+    if (emptyState) emptyState.hidden = favoriteIds.length > 0;
+    renderProfile();
+  }
+
+  document.querySelectorAll("[data-favorite-track]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.favoriteTrack;
+      favoriteIds = favoriteIds.includes(id)
+        ? favoriteIds.filter((favoriteId) => favoriteId !== id)
+        : [...favoriteIds, id];
+      try {
+        localStorage.setItem(favoritesStorageKey, JSON.stringify(favoriteIds));
+      } catch (error) {
+        console.warn("Не удалось сохранить избранное.", error);
+        notify("Не удалось сохранить избранное в этом браузере.");
+        favoriteIds = readFavorites();
+        renderFavorites();
+        return;
+      }
+      renderFavorites();
+      notify(favoriteIds.includes(id) ? "Добавлено в избранное" : "Удалено из избранного");
+    });
+  });
+  renderFavorites();
+  renderPlaylists();
+  syncPlaylistFromLocation();
+  window.addEventListener("storage", (event) => {
+    if (event.key === favoritesStorageKey) {
+      favoriteIds = readFavorites();
+      renderFavorites();
+      renderPlaylists();
+    } else if (event.key === playlistsStorageKey) {
+      playlists = readPlaylists();
+      renderPlaylists();
+    } else if (event.key === profileStorageKey) {
+      profileState = readProfile();
+      renderProfile();
+    } else if (event.key === playerStorageKey) {
+      playerState = readPlayerState();
+      renderPlayer();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const openLink = event.target.closest("[data-playlist-open]");
+    if (openLink) {
+      event.preventDefault();
+      openPlaylist(openLink.dataset.playlistOpen, true);
+      return;
+    }
+
+    const closeButton = event.target.closest("[data-playlist-close]");
+    if (closeButton) {
+      closePlaylist(true);
+      return;
+    }
+
+    const recentAdd = event.target.closest("[data-playlist-add]");
+    if (recentAdd) {
+      const trackId = recentAdd.dataset.playlistAdd;
+      const track = tracksById.get(trackId);
+      const playlist = playlists[0];
+      if (!track || !playlist) {
+        notify("Сначала создай плейлист, чтобы добавлять в него треки.");
+        return;
+      }
+      const hasTrack = playlist.trackIds.includes(trackId);
+      playlists = playlists.map((item) =>
+        item.id === playlist.id
+          ? {
+              ...item,
+              trackIds: hasTrack
+                ? item.trackIds.filter((id) => id !== trackId)
+                : [...item.trackIds, trackId],
+            }
+          : item,
+      );
+      if (savePlaylists()) {
+        renderPlaylists();
+        notify(
+          hasTrack
+            ? `«${track.displayTitle}» удалён из «${playlist.title}»`
+            : `«${track.displayTitle}» добавлен в «${playlist.title}»`,
+        );
+      } else {
+        playlists = readPlaylists();
+        renderPlaylists();
+      }
+      return;
+    }
+
+    const editButton = event.target.closest("[data-playlist-edit]");
+    if (editButton) {
+      const playlist = playlists.find((item) => item.id === editButton.dataset.playlistEdit);
+      const dialog = document.querySelector("[data-playlist-dialog]");
+      const form = document.querySelector("[data-playlist-edit-form]");
+      if (!playlist || !dialog || !form) return;
+      form.dataset.playlistId = playlist.id;
+      form.elements.title.value = playlist.title;
+      form.elements.description.value = playlist.description;
+      dialog.showModal();
+      form.elements.title.focus();
+      return;
+    }
+
+    const deleteButton = event.target.closest("[data-playlist-delete]");
+    if (!deleteButton) return;
+    const playlist = playlists.find((item) => item.id === deleteButton.dataset.playlistDelete);
+    if (!playlist || !window.confirm(`Удалить плейлист «${playlist.title}»?`)) return;
+    const previousPlaylists = playlists;
+    playlists = playlists.filter((item) => item.id !== playlist.id);
+    if (savePlaylists()) {
+      renderPlaylists();
+      notify(`Плейлист «${playlist.title}» удалён`);
+    } else {
+      playlists = previousPlaylists;
+      renderPlaylists();
+    }
+  });
+  window.addEventListener("popstate", syncPlaylistFromLocation);
+
+  const playlistDialog = document.querySelector("[data-playlist-dialog]");
+  const playlistEditForm = document.querySelector("[data-playlist-edit-form]");
+  playlistEditForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const id = playlistEditForm.dataset.playlistId;
+    const previousPlaylists = playlists;
+    playlists = playlists.map((playlist) =>
+      playlist.id === id
+        ? {
+            ...playlist,
+            title: playlistEditForm.elements.title.value.trim().slice(0, 48),
+            description: playlistEditForm.elements.description.value.trim().slice(0, 180),
+          }
+        : playlist,
+    );
+    if (savePlaylists()) {
+      renderPlaylists();
+      playlistDialog?.close();
+      notify("Изменения плейлиста сохранены");
+    } else {
+      playlists = previousPlaylists;
+      renderPlaylists();
+    }
+  });
+  document.querySelector("[data-playlist-dialog-cancel]")?.addEventListener("click", () => {
+    playlistDialog?.close();
   });
 
   const genreButtons = document.querySelectorAll(".genre-chip");
@@ -431,11 +1091,17 @@
   document.querySelectorAll("[data-filter-toggle]").forEach((button) => {
     button.addEventListener("click", () => {
       const expanded = button.getAttribute("aria-expanded") !== "true";
+      const panel = document.getElementById(button.getAttribute("aria-controls"));
       button.setAttribute("aria-expanded", String(expanded));
+      button.setAttribute(
+        "aria-label",
+        expanded ? "Скрыть фильтры" : "Показать фильтры",
+      );
       button.classList.toggle("is-active", expanded);
-      document
-        .querySelector(".directory-genres")
-        ?.classList.toggle("filters-open", expanded);
+      if (panel) {
+        panel.hidden = !expanded;
+        panel.classList.toggle("filters-open", expanded);
+      }
     });
   });
 
@@ -446,32 +1112,34 @@
       notify("Показаны все исполнители каталога");
     });
 
-  const selectedTrackNames = new Set();
+  const selectedTrackIds = new Set();
   const selectedCount = document.querySelector("[data-selected-count]");
   const selectedTracks = document.querySelector("[data-selected-tracks]");
   document.querySelectorAll("[data-add-track]").forEach((button) => {
     button.addEventListener("click", () => {
-      const trackName = button.dataset.addTrack;
-      if (selectedTrackNames.has(trackName)) {
-        selectedTrackNames.delete(trackName);
+      const trackId = button.dataset.addTrack;
+      const track = tracksById.get(trackId);
+      if (!track) return;
+      if (selectedTrackIds.has(trackId)) {
+        selectedTrackIds.delete(trackId);
         button.closest(".available-track")?.classList.remove("is-added");
         button.classList.remove("is-selected");
         button.textContent = "+";
-        button.setAttribute("aria-label", `Добавить ${trackName}`);
+        button.setAttribute("aria-label", `Добавить ${track.displayTitle}`);
       } else {
-        selectedTrackNames.add(trackName);
+        selectedTrackIds.add(trackId);
         button.closest(".available-track")?.classList.add("is-added");
         button.classList.add("is-selected");
         button.textContent = "✓";
-        button.setAttribute("aria-label", `Убрать ${trackName}`);
+        button.setAttribute("aria-label", `Убрать ${track.displayTitle}`);
       }
 
       if (selectedCount) {
-        selectedCount.textContent = `${selectedTrackNames.size} выбрано`;
+        selectedCount.textContent = `${selectedTrackIds.size} выбрано`;
       }
       if (selectedTracks) {
-        selectedTracks.textContent = selectedTrackNames.size
-          ? `В плейлисте: ${Array.from(selectedTrackNames).join(", ")}`
+        selectedTracks.textContent = selectedTrackIds.size
+          ? `В плейлисте: ${Array.from(selectedTrackIds, (id) => tracksById.get(id)?.displayTitle).filter(Boolean).join(", ")}`
           : "Выбери треки, которые войдут в плейлист.";
       }
     });
@@ -481,54 +1149,82 @@
   trackSearch?.addEventListener("input", () => {
     const query = trackSearch.value.trim().toLocaleLowerCase("ru");
     document.querySelectorAll(".available-track").forEach((track) => {
-      track.hidden = !track.dataset.trackName
-        .toLocaleLowerCase("ru")
-        .includes(query);
+      track.hidden = !track.dataset.trackName.toLocaleLowerCase("ru").includes(query);
     });
   });
 
-  document
-    .querySelector("[data-cover-input]")
-    ?.addEventListener("change", (event) => {
-      const file = event.currentTarget.files?.[0];
-      const upload = event.currentTarget.closest(".cover-upload");
-      const hint = upload?.querySelector("[data-cover-hint]");
-      if (!file || !hint) return;
-
-      if (file.size > 5 * 1024 * 1024) {
-        hint.textContent = "Файл должен быть меньше 5 МБ.";
-        event.currentTarget.value = "";
-        return;
-      }
-      hint.textContent = file.name;
-    });
-
-  document
-    .querySelector("[data-playlist-form]")
-    ?.addEventListener("submit", (event) => {
+  document.querySelector("[data-playlist-form]")?.addEventListener("submit", (event) => {
       event.preventDefault();
-      const title = document.querySelector("#playlist-name")?.value.trim();
+      const form = event.currentTarget;
+      const title = form.elements.title.value.trim();
       const message = document.querySelector("[data-playlist-message]");
       if (!message) return;
-      if (!selectedTrackNames.size) {
+      if (!selectedTrackIds.size) {
         message.textContent = "Добавь хотя бы один трек в плейлист.";
         message.classList.add("is-visible");
         return;
       }
 
-      message.textContent = `«${title}» готов к сохранению после подключения хранилища плейлистов.`;
-      message.classList.add("is-visible");
+      if (!title) {
+        message.textContent = "Укажи название плейлиста.";
+        message.classList.add("is-visible");
+        return;
+      }
+      const playlist = {
+        id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        title: title.slice(0, 48),
+        description: form.elements.description.value.trim().slice(0, 180),
+        label: "MY MIX",
+        artworkClass: "playlist-card-custom",
+        trackIds: Array.from(selectedTrackIds),
+        isPublic: form.elements.public.checked,
+      };
+      playlists = [...playlists, playlist];
+      if (!savePlaylists()) {
+        playlists = playlists.filter((item) => item.id !== playlist.id);
+        message.textContent = "Не удалось сохранить плейлист. Проверь доступное место в хранилище браузера.";
+        message.classList.add("is-visible");
+        return;
+      }
+      window.location.assign("/playlists");
     });
 
-  document
-    .querySelector("[data-profile-notice]")
-    ?.addEventListener("click", () => {
+  const profileForm = document.querySelector("[data-profile-form]");
+  document.querySelector("[data-profile-edit]")?.addEventListener("click", () => {
+    if (!profileForm) return;
+    profileForm.elements.displayName.value = profileState.displayName;
+    profileForm.elements.bio.value = profileState.bio;
+    profileForm.hidden = false;
+    profileForm.elements.displayName.focus();
+  });
+  document.querySelector("[data-profile-cancel]")?.addEventListener("click", () => {
+    if (profileForm) profileForm.hidden = true;
+  });
+  profileForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const nextProfile = {
+      displayName: profileForm.elements.displayName.value.trim().slice(0, 32),
+      bio: profileForm.elements.bio.value.trim().slice(0, 120),
+    };
+    if (!nextProfile.displayName) {
+      profileForm.elements.displayName.focus();
+      return;
+    }
+    try {
+      localStorage.setItem(profileStorageKey, JSON.stringify(nextProfile));
+      profileState = nextProfile;
+      renderProfile();
+      profileForm.hidden = true;
       const message = document.querySelector("[data-profile-message]");
-      if (!message) return;
-      message.textContent =
-        "Редактирование профиля станет доступно после входа в аккаунт.";
-      message.classList.add("is-visible");
-    });
+      if (message) {
+        message.textContent = "Профиль сохранён в этом браузере.";
+        message.classList.add("is-visible");
+      }
+    } catch (error) {
+      console.warn("Не удалось сохранить профиль.", error);
+      notify("Не удалось сохранить профиль в этом браузере.");
+    }
+  });
 
   document.querySelectorAll("[data-auth-switch]").forEach((link) => {
     link.addEventListener("click", (event) => {

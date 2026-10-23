@@ -5,9 +5,9 @@
   <a class="<%= currentPath === '/catalog' ? 'active' : '' %>" href="/catalog"
     >♫<span>Треки</span></a
   >
-  <% const isPlaylistPage = currentPath === '/playlists' || currentPath === '/create-playlist'; %>
+  <% const isPlaylistPage = currentPath === '/playlists' || currentPath === '/create-playlist'; const isFavoritesPage = currentPath === '/favorites'; %>
   <a
-    class="<%= isPlaylistPage ? 'active' : '' %>"
+    class="<%= isPlaylistPage || isFavoritesPage ? 'active' : '' %>"
     href="<%= isPlaylistPage ? '/playlists' : '/favorites' %>"
     ><%= isPlaylistPage ? '☷' : '♡' %><span>Моё</span></a
   >

@@ -1,0 +1,27 @@
+<article
+  class="catalog-track"
+  data-track-id="<%= track.id %>"
+  data-favorite-item="<%= track.id %>"
+  data-genre-item
+  data-genre="<%= track.filterGenre %>"
+  data-search-text="<%= `${track.displayTitle} ${track.title} ${track.artist} ${track.genre}`.toLocaleLowerCase('ru') %>"
+  data-rating="<%= track.rating %>"
+>
+  <a class="catalog-cover <%= track.artworkClass %>" href="/track/<%= track.id %>" aria-label="Подробнее о треке <%= track.displayTitle %>">
+    <span><%= track.displayTitle %></span><i><%= track.artworkGlyph %></i>
+  </a>
+  <div class="catalog-track-main">
+    <p><%= track.genre.toLocaleUpperCase('ru') %></p>
+    <h3><a href="/track/<%= track.id %>"><%= track.displayTitle %></a></h3>
+    <small><%= track.artistName %></small>
+  </div>
+  <div class="catalog-track-footer">
+    <span>★ <%= track.rating %></span>
+    <span><%= Math.floor(track.duration / 60) %>:<%= String(track.duration % 60).padStart(2, '0') %></span>
+    <button class="player-control catalog-play" type="button" data-player-play aria-label="Воспроизвести <%= track.displayTitle %>" aria-pressed="false">
+      <span class="track-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path data-toggle-play d="M8.2 5.8a1 1 0 0 1 1.5-.86l9.1 6.2a1.03 1.03 0 0 1 0 1.72l-9.1 6.2a1 1 0 0 1-1.5-.86z"/><g data-toggle-pause><rect x="6.5" y="5" width="4.5" height="14" rx="1.4"/><rect x="13" y="5" width="4.5" height="14" rx="1.4"/></g></svg></span>
+    </button>
+    <button class="like-button" type="button" data-favorite-track="<%= track.id %>" aria-label="Добавить <%= track.displayTitle %> в избранное" aria-pressed="false">♡</button>
+    <a class="catalog-more" href="/track/<%= track.id %>">Подробнее</a>
+  </div>
+</article>

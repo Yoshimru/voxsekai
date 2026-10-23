@@ -6,7 +6,11 @@
     <meta name="theme-color" content="#0e1014" />
     <meta name="description" content="<%= track.description %>" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/directory.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
+    <link rel="stylesheet" href="/assets/css/track.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page track-detail-page">
@@ -54,9 +58,9 @@
                   data-track-glyph="<%= track.artworkGlyph %>"
                   data-track-audio=""
                 >
-                  <span aria-hidden="true">▶</span> Слушать
+                  <span class="track-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path data-toggle-play d="M8.2 5.8a1 1 0 0 1 1.5-.86l9.1 6.2a1.03 1.03 0 0 1 0 1.72l-9.1 6.2a1 1 0 0 1-1.5-.86z"/><g data-toggle-pause><rect x="6.5" y="5" width="4.5" height="14" rx="1.4"/><rect x="13" y="5" width="4.5" height="14" rx="1.4"/></g></svg></span> Слушать
                 </button>
-                <button class="button button-secondary like-button" type="button" aria-label="Добавить в избранное">
+                <button class="button button-secondary like-button" type="button" data-favorite-track="<%= track.id %>" aria-label="Добавить в избранное" aria-pressed="false">
                   ♡
                 </button>
               </div>

@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/directory.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page collections-page">
@@ -23,19 +26,17 @@
               </p>
             </div>
           </header>
+          <% const featuredCollection = collections.find((collection) => collection.featured); %>
           <section class="collection-feature" aria-label="Подборка недели">
             <div class="collection-feature-art">
-              <span class="collection-feature-bars">▥</span
-              ><strong>AFTER HOURS</strong>
+              <span class="collection-feature-bars">▥</span><strong><%= featuredCollection.tagline %></strong>
             </div>
             <div class="collection-feature-copy">
               <p class="eyebrow">ПОДБОРКА НЕДЕЛИ</p>
-              <h2>После полуночи</h2>
-              <p>
-                Мягкий синтвейв и электро-поп для ночных поездок и тихих мыслей.
-              </p>
-              <a class="button button-primary" href="/catalog"
-                >Посмотреть треки <span>↗</span></a
+              <h2><%= featuredCollection.title %></h2>
+              <p><%= featuredCollection.description %></p>
+              <a class="button button-primary" href="/collections/<%= featuredCollection.id %>"
+                >Посмотреть <%= featuredCollection.trackCount %> треков <span>↗</span></a
               >
             </div>
           </section>
@@ -47,50 +48,14 @@
               >
             </div>
             <div class="collection-mood-grid">
-              <a
-                class="collection-mood-card collection-mood-road"
-                href="/catalog"
-                ><div class="collection-mood-art">
-                  <span class="collection-feature-bars">▥</span
-                  ><strong>ДЛЯ ДОЛГОЙ ДОРОГИ</strong>
-                </div>
-                <h3>Для долгой дороги</h3>
-                <p>74 трека · Ночной маршрут</p>
-                <span class="collection-card-arrow">↗</span></a
-              >
-              <a
-                class="collection-mood-card collection-mood-new"
-                href="/catalog"
-                ><div class="collection-mood-art">
-                  <span class="collection-feature-bars">▥</span
-                  ><strong>НОВЫЙ ЗВУК</strong>
-                </div>
-                <h3>Новый звук</h3>
-                <p>Треки недели · 18 треков</p>
-                <span class="collection-card-arrow">↗</span></a
-              >
-              <a
-                class="collection-mood-card collection-mood-soft"
-                href="/catalog"
-                ><div class="collection-mood-art">
-                  <span class="collection-feature-bars">▥</span
-                  ><strong>МЯГКАЯ ЭНЕРГИЯ</strong>
-                </div>
-                <h3>Мягкая энергия</h3>
-                <p>Для фокуса · 26 треков</p>
-                <span class="collection-card-arrow">↗</span></a
-              >
-              <a
-                class="collection-mood-card collection-mood-tokyo"
-                href="/catalog"
-                ><div class="collection-mood-art">
-                  <span class="collection-feature-bars">▥</span
-                  ><strong>ПОСЛЕ 22:00</strong>
-                </div>
-                <h3>Ночной Токио</h3>
-                <p>После 22:00 · 42 трека</p>
-                <span class="collection-card-arrow">↗</span></a
-              >
+              <% collections.filter((collection) => !collection.featured).forEach((collection) => { %>
+                <a class="collection-mood-card <%= collection.cardClass %>" href="/collections/<%= collection.id %>">
+                  <div class="collection-mood-art"><span class="collection-feature-bars">▥</span><strong><%= collection.tagline %></strong></div>
+                  <h3><%= collection.title %></h3>
+                  <p><%= collection.description %> · <%= collection.trackCount %> трека</p>
+                  <span class="collection-card-arrow">↗</span>
+                </a>
+              <% }) %>
             </div>
           </section>
           <section class="recommendation-banner" id="recommendations">

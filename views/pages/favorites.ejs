@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/directory.css" />
+    <link rel="stylesheet" href="/assets/css/library.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
+    <script src="/assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page favorites-page">
+    <div class="app-shell">
+      <%- include('../partials/sidebar', { currentPath: '/favorites' }) %>
+      <main class="main-area">
+        <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
+        <div class="content directory-content favorites-content">
+          <header class="directory-heading"><div><p class="directory-kicker">MY MUSIC / 02</p><h1>Избранное</h1><p>Треки, которые хочется сохранить рядом.</p></div></header>
+          <section class="catalog-tracks favorite-tracks">
+            <div class="directory-section-heading"><h2>Твои любимые треки</h2><p data-favorite-count>0 треков</p></div>
+            <div class="catalog-track-grid" data-favorites-list>
+              <% tracks.forEach((track) => { %>
+                <%- include('../partials/track-card', { track }) %>
+              <% }) %>
+            </div>
+            <div class="favorites-empty" data-favorites-empty hidden>
+              <span aria-hidden="true">♡</span><h2>Здесь пока тихо</h2>
+              <p>Добавляй треки в избранное нажатием на сердечко — они появятся здесь.</p>
+              <a class="button button-primary" href="/catalog">Найти музыку <span>↗</span></a>
+            </div>
+          </section>
+          <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <%- include('../partials/mobile-nav', { currentPath: '/favorites' }) %>
+    <%- include('../partials/player') %>
+  </body>
+</html>

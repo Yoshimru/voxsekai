@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/library.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page profile-page">
@@ -14,6 +17,7 @@
       <main class="main-area">
         <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
         <div class="content directory-content profile-content">
+          <%- include('../partials/playlist-seed', { playlists }) %>
           <header class="directory-heading">
             <div>
               <h1>Твой профиль</h1>
@@ -21,96 +25,71 @@
             </div>
           </header>
           <section class="profile-overview">
-            <div class="profile-avatar">А</div>
+            <div class="profile-avatar" data-profile-avatar aria-hidden="true">А</div>
             <div class="profile-identity">
-              <h2>Аки</h2>
-              <p>Музыка всегда рядом, трек за треком.</p>
-              <small>Участник с сентября 2026</small>
+              <h2 data-profile-name>Аки</h2>
+              <p data-profile-bio>Музыка всегда рядом, трек за треком.</p>
+              <small>Локальный профиль · данные сохраняются в этом браузере</small>
             </div>
-            <button class="profile-edit" type="button" data-profile-notice>
+            <button class="profile-edit" type="button" data-profile-edit>
               Редактировать профиль
             </button>
           </section>
+          <form class="profile-edit-form" data-profile-form hidden>
+            <label class="editor-field">
+              <span>Имя</span>
+              <input name="displayName" maxlength="32" required />
+            </label>
+            <label class="editor-field">
+              <span>О себе</span>
+              <textarea name="bio" rows="2" maxlength="120"></textarea>
+            </label>
+            <div class="editor-actions">
+              <button class="button button-primary" type="submit">Сохранить</button>
+              <button class="button button-secondary" type="button" data-profile-cancel>Отмена</button>
+            </div>
+          </form>
           <section class="profile-statistics">
-            <h2>Статистика музыкальных вкусов</h2>
+            <h2>Твоя музыкальная коллекция</h2>
             <div class="profile-stat-grid">
-              <article><strong>34</strong><span>Оценённых трека</span></article>
-              <article><strong>18</strong><span>В избранном</span></article>
-              <article><strong>6</strong><span>Плейлистов</span></article>
-              <article><strong>4</strong><span>Любимых жанра</span></article>
+              <article><strong data-profile-stat="favorites">0</strong><span>В избранном</span></article>
+              <article><strong data-profile-stat="playlists">0</strong><span>Плейлистов</span></article>
+              <article><strong data-profile-stat="genres">0</strong><span>Любимых жанров</span></article>
+              <article><strong data-profile-stat="catalog"><%= tracks.length %></strong><span>Треков в каталоге</span></article>
             </div>
           </section>
           <section class="profile-insights">
             <div class="profile-genres">
               <h2>Любимые жанры</h2>
-              <div class="genre-meter">
-                <span>Электропоп</span><i><b style="--meter: 82%"></b></i
-                ><strong>82%</strong>
-              </div>
-              <div class="genre-meter">
-                <span>Синтвейв</span><i><b style="--meter: 66%"></b></i
-                ><strong>66%</strong>
-              </div>
-              <div class="genre-meter">
-                <span>J-pop</span><i><b style="--meter: 51%"></b></i
-                ><strong>51%</strong>
-              </div>
-              <div class="genre-meter">
-                <span>Эмбиент</span><i><b style="--meter: 34%"></b></i
-                ><strong>34%</strong>
+              <div class="profile-dynamic-list" data-profile-genres>
+                <p class="profile-empty-note">Добавляй треки в избранное, чтобы увидеть свои жанры.</p>
               </div>
             </div>
             <div class="profile-artists">
               <h2>Любимые исполнители</h2>
-              <a href="/artist"
-                ><span class="profile-artist-dot dot-mira">M</span
-                ><strong>Mira Kai</strong><b>34%</b></a
-              ><a href="/artist"
-                ><span class="profile-artist-dot dot-aoine">A</span
-                ><strong>Aoine</strong><b>22%</b></a
-              ><a href="/artist"
-                ><span class="profile-artist-dot dot-yuna">Y</span
-                ><strong>Yuna 404</strong><b>18%</b></a
-              >
+              <div class="profile-dynamic-list" data-profile-artists>
+                <p class="profile-empty-note">Здесь появятся исполнители из твоего избранного.</p>
+              </div>
             </div>
           </section>
           <section class="profile-ratings">
             <div class="directory-section-heading">
-              <h2>Последние оценки</h2>
-              <a class="view-all" href="/favorites"
-                >Избранное <span>↗</span></a
-              >
+              <h2>Недавно в избранном</h2>
+              <a class="view-all" href="/favorites">Избранное <span>↗</span></a>
             </div>
-            <div class="profile-rating-grid">
-              <article>
-                <div>
-                  <h3>Neon Afterglow</h3>
-                  <p>Mira Kai</p>
-                </div>
-                <strong>★ 5.0</strong>
-              </article>
-              <article>
-                <div>
-                  <h3>Synthetic Bloom</h3>
-                  <p>Mira Kai</p>
-                </div>
-                <strong>★ 4.8</strong>
-              </article>
-              <article>
-                <div>
-                  <h3>Blue Signal</h3>
-                  <p>KAIRO</p>
-                </div>
-                <strong>★ 4.5</strong>
-              </article>
+            <div class="profile-rating-grid" data-profile-favorites>
+              <% tracks.forEach((track) => { %>
+                <article data-profile-favorite="<%= track.id %>" hidden>
+                  <div>
+                    <h3><%= track.displayTitle %></h3>
+                    <p><%= track.artist %></p>
+                  </div>
+                  <strong>★ <%= track.rating %></strong>
+                </article>
+              <% }) %>
             </div>
           </section>
-          <p
-            class="profile-message"
-            data-profile-message
-            role="status"
-            aria-live="polite"
-          ></p>
+          <p class="profile-message" data-profile-message role="status" aria-live="polite"></p>
           <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
         </div>
       </main>

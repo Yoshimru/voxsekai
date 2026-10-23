@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <meta name="description" content="<%= collection.description %>" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/directory.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
+    <script src="/assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page collection-detail-page">
+    <div class="app-shell">
+      <%- include('../partials/sidebar', { currentPath: '/collections' }) %>
+      <main class="main-area">
+        <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
+        <div class="content directory-content artist-detail-content">
+          <a class="track-back-link" href="/collections">← Все подборки</a>
+          <section class="artist-detail-hero <%= collection.cardClass %>">
+            <div class="artist-detail-art collection-detail-art">
+              <span class="performer-bars"><i></i><i></i><i></i><i></i><i></i></span>
+              <b aria-hidden="true">▥</b>
+            </div>
+            <div class="artist-detail-copy">
+              <p class="directory-kicker">ПОДБОРКА · <%= collection.tagline %></p>
+              <h1><%= collection.title %></h1>
+              <p><%= collection.description %></p>
+              <span><%= tracks.length %> треков в подборке VoxSekai</span>
+            </div>
+          </section>
+          <section class="artist-track-section" aria-labelledby="collection-tracks-heading">
+            <div class="directory-section-heading">
+              <h2 id="collection-tracks-heading">Треки в подборке</h2>
+              <p><%= tracks.length %> <%= tracks.length === 1 ? 'трек' : 'треков' %></p>
+            </div>
+            <% if (tracks.length) { %>
+              <div class="recent-track-list" data-player-queue>
+                <% tracks.forEach((track) => { %>
+                  <%- include('../partials/track-row', { track }) %>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="artist-empty-state">
+                <span aria-hidden="true">♫</span>
+                <h3>В подборке пока нет треков</h3>
+                <p>Здесь появятся подходящие релизы из каталога.</p>
+                <a class="button button-secondary" href="/catalog">Перейти в каталог</a>
+              </div>
+            <% } %>
+          </section>
+          <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <%- include('../partials/mobile-nav', { currentPath: '/collections' }) %>
+    <%- include('../partials/player') %>
+  </body>
+</html>

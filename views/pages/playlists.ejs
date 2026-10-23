@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/directory.css" />
+    <link rel="stylesheet" href="/assets/css/library.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page playlists-page">
@@ -14,161 +18,127 @@
       <main class="main-area">
         <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
         <div class="content directory-content library-content">
-          <header class="library-heading">
+          <header class="library-heading" data-playlist-heading>
             <div>
               <h1>Мои плейлисты</h1>
               <p>Собирай музыку под настроение, момент или маршрут.</p>
             </div>
-            <a class="button button-primary" href="/create-playlist"
-              ><span>＋</span>Новый плейлист</a
-            >
+            <div class="library-heading-actions">
+              <a class="button button-secondary" href="/public-playlists">Открытые плейлисты</a>
+              <a class="button button-primary" href="/create-playlist"><span>＋</span>Новый плейлист</a>
+            </div>
           </header>
-          <section class="library-section">
+          <section class="playlist-detail-view" data-playlist-detail hidden aria-labelledby="playlist-detail-title">
+            <button class="playlist-detail-back" type="button" data-playlist-close>← Все плейлисты</button>
+            <section class="artist-detail-hero playlist-detail-hero" data-playlist-detail-hero>
+              <div class="artist-detail-art playlist-detail-art">
+                <span class="performer-bars"><i></i><i></i><i></i><i></i><i></i></span>
+                <b aria-hidden="true" data-playlist-detail-glyph>♫</b>
+              </div>
+              <div class="artist-detail-copy">
+                <p class="directory-kicker" data-playlist-detail-label></p>
+                <h1 id="playlist-detail-title" data-playlist-detail-title></h1>
+                <p data-playlist-detail-description></p>
+                <span data-playlist-detail-count></span>
+              </div>
+            </section>
+            <section class="artist-track-section" aria-labelledby="playlist-tracks-heading">
+              <div class="directory-section-heading">
+                <h2 id="playlist-tracks-heading">Треки плейлиста</h2>
+                <p data-playlist-track-count></p>
+              </div>
+              <div class="recent-track-list" data-playlist-detail-tracks data-player-queue></div>
+              <div class="artist-empty-state" data-playlist-detail-empty hidden>
+                <h3>В плейлисте пока нет треков</h3>
+                <p>Добавь музыку из каталога или недавно добавленных треков.</p>
+                <a class="button button-secondary" href="/catalog">Перейти в каталог</a>
+              </div>
+            </section>
+          </section>
+          <section class="library-section" data-playlist-listing>
             <div class="directory-section-heading">
               <h2>Твоя библиотека</h2>
-              <span>6 плейлистов</span>
+              <span data-playlist-count><%= playlists.length %> плейлистов</span>
             </div>
             <div class="playlist-grid">
-              <a
-                class="playlist-card playlist-card-favorites"
-                href="/favorites"
-                ><div class="playlist-art">
-                  <span class="playlist-bars"
-                    ><i></i><i></i><i></i><i></i><i></i></span
-                  ><strong>ИЗБРАННОЕ</strong>
-                </div>
-                <div class="playlist-card-info">
-                  <h3>Избранное</h3>
-                  <p>24 трека · недавно</p>
-                  <span>↗</span>
-                </div></a
-              >
-              <a class="playlist-card playlist-card-night" href="/playlist"
-                ><div class="playlist-art">
-                  <span class="playlist-bars"
-                    ><i></i><i></i><i></i><i></i><i></i></span
-                  ><strong>AFTER HOURS</strong>
-                </div>
-                <div class="playlist-card-info">
-                  <h3>Ночной Токио</h3>
-                  <p>18 треков · недавно</p>
-                  <span>↗</span>
-                </div></a
-              >
-              <a class="playlist-card playlist-card-repeat" href="/playlist"
-                ><div class="playlist-art">
-                  <span class="playlist-bars"
-                    ><i></i><i></i><i></i><i></i><i></i></span
-                  ><strong>ON REPEAT</strong>
-                </div>
-                <div class="playlist-card-info">
-                  <h3>На повторе</h3>
-                  <p>12 треков · недавно</p>
-                  <span>↗</span>
-                </div></a
-              >
-              <a
-                class="playlist-card playlist-card-morning"
-                href="/playlist"
-                ><div class="playlist-art">
-                  <span class="playlist-bars"
-                    ><i></i><i></i><i></i><i></i><i></i></span
-                  ><strong>SLOW START</strong>
-                </div>
-                <div class="playlist-card-info">
-                  <h3>Медленное утро</h3>
-                  <p>9 треков · недавно</p>
-                  <span>↗</span>
-                </div></a
-              >
-              <a class="playlist-card playlist-card-drive" href="/playlist"
-                ><div class="playlist-art">
-                  <span class="playlist-bars"
-                    ><i></i><i></i><i></i><i></i><i></i></span
-                  ><strong>ROAD MIX</strong>
-                </div>
-                <div class="playlist-card-info">
-                  <h3>Дорога домой</h3>
-                  <p>16 треков · недавно</p>
-                  <span>↗</span>
-                </div></a
-              >
-              <a class="playlist-card playlist-card-new" href="/playlist"
-                ><div class="playlist-art">
-                  <span class="playlist-bars"
-                    ><i></i><i></i><i></i><i></i><i></i></span
-                  ><strong>FRESH PICKS</strong>
-                </div>
-                <div class="playlist-card-info">
-                  <h3>Новый звук</h3>
-                  <p>7 треков · недавно</p>
-                  <span>↗</span>
-                </div></a
-              >
+              <article class="playlist-card playlist-card-favorites">
+                <a class="playlist-card-link" href="/favorites" aria-label="Открыть избранное">
+                  <div class="playlist-art">
+                    <span class="playlist-bars"><i></i><i></i><i></i><i></i><i></i></span>
+                    <strong>ИЗБРАННОЕ</strong>
+                  </div>
+                  <div class="playlist-card-info">
+                    <h3>Избранное</h3>
+                    <p><span data-favorite-count>0 треков</span> · всегда под рукой</p>
+                    <span aria-hidden="true">↗</span>
+                  </div>
+                </a>
+              </article>
+              <div class="playlist-items" data-playlist-list>
+                <% playlists.forEach((playlist) => { %>
+                  <article
+                    class="playlist-card <%= playlist.artworkClass %>"
+                    data-playlist-item
+                    data-playlist-id="<%= playlist.id %>"
+                    data-playlist-title="<%= playlist.title %>"
+                    data-playlist-description="<%= playlist.description %>"
+                    data-playlist-label="<%= playlist.label %>"
+                    data-playlist-track-ids="<%= playlist.trackIds.join(',') %>"
+                    data-playlist-public="<%= playlist.isPublic %>"
+                  >
+                    <a class="playlist-card-link" href="/playlists?playlist=<%= playlist.id %>" data-playlist-open="<%= playlist.id %>">
+                      <div class="playlist-art">
+                        <span class="playlist-bars"><i></i><i></i><i></i><i></i><i></i></span>
+                        <strong><%= playlist.label %></strong>
+                      </div>
+                      <div class="playlist-card-info">
+                        <h3><%= playlist.title %></h3>
+                        <p><%= playlist.trackCount %> треков · <%= playlist.isPublic ? 'публичный' : 'личный' %></p>
+                        <small><%= playlist.description %></small>
+                        <span aria-hidden="true">↗</span>
+                      </div>
+                    </a>
+                    <div class="playlist-card-actions">
+                      <button type="button" data-playlist-edit="<%= playlist.id %>">Изменить</button>
+                      <button type="button" data-playlist-delete="<%= playlist.id %>">Удалить</button>
+                    </div>
+                  </article>
+                <% }) %>
+              </div>
             </div>
           </section>
-          <section class="library-section recently-added">
+          <section class="library-section recently-added" data-playlist-listing>
             <div class="directory-section-heading">
               <h2>Недавно добавлено</h2>
-              <a class="view-all" href="/catalog"
-                >Все треки <span>↗</span></a
-              >
+              <a class="view-all" href="/catalog">Все треки <span>↗</span></a>
             </div>
             <div class="recent-track-list">
-              <article class="recent-track">
-                <span class="recent-cover cover-pink">Gl<br />ass</span>
-                <div>
-                  <h3>Glass Horizon</h3>
-                  <p>Mira Kai</p>
-                </div>
-                <span class="recent-duration">3:42</span><strong>★ 4.8</strong
-                ><button
-                  class="recent-add-button"
-                  type="button"
-                  data-playlist-add="Glass Horizon"
-                  aria-label="Добавить Glass Horizon в плейлист"
-                >
-                  ＋
-                </button>
-              </article>
-              <article class="recent-track">
-                <span class="recent-cover cover-cyan">So<br />ft</span>
-                <div>
-                  <h3>Soft Reset</h3>
-                  <p>Mira Kai</p>
-                </div>
-                <span class="recent-duration">2:58</span><strong>★ 4.8</strong
-                ><button
-                  class="recent-add-button"
-                  type="button"
-                  data-playlist-add="Soft Reset"
-                  aria-label="Добавить Soft Reset в плейлист"
-                >
-                  ＋
-                </button>
-              </article>
-              <article class="recent-track">
-                <span class="recent-cover cover-violet">Ne<br />on</span>
-                <div>
-                  <h3>Neon Afterglow</h3>
-                  <p>Mira Kai</p>
-                </div>
-                <span class="recent-duration">4:08</span><strong>★ 4.9</strong
-                ><button
-                  class="recent-add-button"
-                  type="button"
-                  data-playlist-add="Neon Afterglow"
-                  aria-label="Добавить Neon Afterglow в плейлист"
-                >
-                  ＋
-                </button>
-              </article>
+              <% tracks.slice(-3).reverse().forEach((track) => { %>
+                <article class="recent-track">
+                  <span class="recent-cover <%= track.artworkClass %>"><%= track.artworkGlyph %></span>
+                  <div><h3><%= track.displayTitle %></h3><p><%= track.artist %></p></div>
+                  <span class="recent-duration"><%= Math.floor(track.duration / 60) %>:<%= String(track.duration % 60).padStart(2, '0') %></span>
+                  <strong>★ <%= track.rating %></strong>
+                  <button class="recent-add-button" type="button" data-playlist-add="<%= track.id %>" aria-label="Добавить <%= track.displayTitle %> в плейлист">＋</button>
+                </article>
+              <% }) %>
             </div>
           </section>
           <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
         </div>
       </main>
     </div>
+    <dialog class="playlist-edit-dialog" data-playlist-dialog>
+      <form data-playlist-edit-form>
+        <h2>Редактировать плейлист</h2>
+        <label class="editor-field"><span>Название</span><input name="title" maxlength="48" required /></label>
+        <label class="editor-field"><span>Описание</span><textarea name="description" rows="3" maxlength="180"></textarea></label>
+        <div class="editor-actions">
+          <button class="button button-primary" type="submit">Сохранить</button>
+          <button class="button button-secondary" type="button" data-playlist-dialog-cancel>Отмена</button>
+        </div>
+      </form>
+    </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <%- include('../partials/mobile-nav', { currentPath: '/playlists' }) %>
     <%- include('../partials/player') %>

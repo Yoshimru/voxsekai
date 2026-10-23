@@ -35,7 +35,7 @@
       href="/playlists"
       ><span>☷</span>Мои плейлисты</a
     >
-    <a class="side-link" href="/favorites"><span>♡</span>Избранное</a>
+    <a class="side-link <%= currentPath === '/favorites' ? 'active' : '' %>" href="/favorites"><span>♡</span>Избранное</a>
     <a
       class="side-link <%= currentPath === '/profile' ? 'active' : '' %>"
       href="/profile"

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/library.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
+    <script src="/assets/js/main.js" defer></script>
+  </head>
+  <body class="directory-page public-playlists-page">
+    <div class="app-shell">
+      <%- include('../partials/sidebar', { currentPath: '/playlists' }) %>
+      <main class="main-area">
+        <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
+        <div class="content directory-content library-content">
+          <header class="library-heading">
+            <div>
+              <p class="directory-kicker">VOXSEKAI · СООБЩЕСТВО</p>
+              <h1>Открытые плейлисты</h1>
+              <p>Подборки, которыми можно делиться и слушать вместе.</p>
+            </div>
+            <a class="button button-secondary" href="/playlists">Моя библиотека</a>
+          </header>
+          <section class="library-section" aria-label="Публичные плейлисты">
+            <div class="directory-section-heading">
+              <h2>Доступно всем</h2>
+              <span><%= playlists.length %> плейлистов</span>
+            </div>
+            <% if (playlists.length) { %>
+              <div class="playlist-grid">
+                <% playlists.forEach((playlist) => { %>
+                  <article class="playlist-card <%= playlist.artworkClass %>">
+                    <a class="playlist-card-link" href="/playlists/<%= playlist.id %>" aria-label="Открыть плейлист «<%= playlist.title %>»">
+                      <div class="playlist-art">
+                        <span class="playlist-bars"><i></i><i></i><i></i><i></i><i></i></span>
+                        <strong><%= playlist.label %></strong>
+                      </div>
+                      <div class="playlist-card-info">
+                        <h3><%= playlist.title %></h3>
+                        <p><%= playlist.trackCount %> треков · открытый</p>
+                        <small><%= playlist.description %></small>
+                        <span aria-hidden="true">↗</span>
+                      </div>
+                    </a>
+                  </article>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="artist-empty-state"><h3>Пока нет открытых плейлистов</h3><p>Загляни сюда позже — новые подборки появятся здесь.</p></div>
+            <% } %>
+          </section>
+          <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <%- include('../partials/mobile-nav', { currentPath: '/playlists' }) %>
+    <%- include('../partials/player') %>
+  </body>
+</html>

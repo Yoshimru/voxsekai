@@ -16,6 +16,11 @@
       value="0"
       aria-label="Позиция воспроизведения"
     />
+    <span class="player-progress-wave" aria-hidden="true">
+      <% for (let index = 0; index < 36; index += 1) { %>
+        <i style="--wave-height: <%= 18 + ((index * 41) % 76) %>%; --wave-delay: -<%= ((index * 7) % 60) / 100 %>s"></i>
+      <% } %>
+    </span>
     <span class="player-time" data-player-duration>0:00</span>
   </div>
   <div class="player-main">
@@ -39,7 +44,9 @@
         aria-label="Предыдущий трек"
         title="Предыдущий трек"
       >
-        |◀
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 5h2v14H6zM19 6.5v11a.8.8 0 0 1-1.24.67l-8.4-5.5a.8.8 0 0 1 0-1.34l8.4-5.5A.8.8 0 0 1 19 6.5z" />
+        </svg>
       </button>
       <button
         class="player-control player-toggle"
@@ -48,7 +55,15 @@
         aria-label="Пауза"
         title="Пауза"
       >
-        <span data-player-toggle-icon>Ⅱ</span>
+        <span class="player-toggle-icon" aria-hidden="true" data-player-toggle-icon>
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path data-toggle-play d="M8.2 5.8a1 1 0 0 1 1.5-.86l9.1 6.2a1.03 1.03 0 0 1 0 1.72l-9.1 6.2a1 1 0 0 1-1.5-.86z" />
+            <g data-toggle-pause>
+              <rect x="6.5" y="5" width="4.5" height="14" rx="1.4" />
+              <rect x="13" y="5" width="4.5" height="14" rx="1.4" />
+            </g>
+          </svg>
+        </span>
       </button>
       <button
         class="player-control"
@@ -57,11 +72,10 @@
         aria-label="Следующий трек"
         title="Следующий трек"
       >
-        ▶|
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M16 5h2v14h-2zM5 6.5v11a.8.8 0 0 0 1.24.67l8.4-5.5a.8.8 0 0 0 0-1.34l-8.4-5.5A.8.8 0 0 0 5 6.5z" />
+        </svg>
       </button>
-      <span class="player-wave" aria-hidden="true">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </span>
     </div>
     <div class="player-extras">
       <a
@@ -73,7 +87,6 @@
         >ⓘ</a
       >
       <label class="player-volume" aria-label="Громкость">
-        <span aria-hidden="true">◖</span>
         <input
           data-player-volume
           type="range"

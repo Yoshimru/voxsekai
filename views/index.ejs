@@ -4,458 +4,83 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
-    <meta
-      name="description"
-      content="VoxSekai — твой мир виртуальной музыки."
-    />
+    <meta name="description" content="VoxSekai — твой мир виртуальной музыки." />
     <title><%= title %></title>
-    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/base.css" />
+    <link rel="stylesheet" href="/assets/css/shared-layout.css" />
+    <link rel="stylesheet" href="/assets/css/home.css" />
+    <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
   <body>
     <div class="app-shell">
       <%- include('partials/sidebar', { currentPath: '/' }) %>
-
       <main class="main-area">
         <%- include('partials/topbar', { searchLabel: 'Поиск', showMenuToggle: true }) %>
-
         <div class="content home-content">
-          <div class="page-heading">
-            <h1>Твой мир звучит по-новому</h1>
-            <p>Главная <span>/</span> Для тебя</p>
-          </div>
-
+          <div class="page-heading"><h1>Твой мир звучит по-новому</h1><p>Главная <span>/</span> Для тебя</p></div>
           <section class="hero-feature" aria-label="Персональная подборка">
-            <img
-              class="hero-feature-image"
-              src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1800&q=85"
-              alt=""
-            />
+            <img class="hero-feature-image" src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1800&q=85" alt="" />
             <div class="hero-feature-shade"></div>
             <div class="hero-feature-copy">
               <p class="eyebrow"><span>✦</span> ВЫБОР РЕДАКЦИИ · VOXSEKAI</p>
               <p class="hero-feature-kicker">ПЕРСОНАЛЬНАЯ ПОДБОРКА</p>
               <h2>За пределами<br />реального голоса</h2>
-              <p class="hero-feature-description">
-                Музыка, в которой живут новые миры. Начни с любимого голоса и
-                найди звучание, которого ещё не слышал.
-              </p>
-              <div class="hero-feature-actions">
-                <a class="button button-primary" href="/collections">
-                  Открыть подборку <span>↗</span>
-                </a>
-                <span class="hero-feature-meta">24 трека · 1 ч 38 мин</span>
-              </div>
+              <p class="hero-feature-description">Музыка, в которой живут новые миры. Начни с любимого голоса и найди звучание, которого ещё не слышал.</p>
+              <div class="hero-feature-actions"><a class="button button-primary" href="/collections">Открыть подборку <span>↗</span></a><span class="hero-feature-meta"><%= tracks.length %> треков в каталоге</span></div>
             </div>
             <span class="hero-feature-count">01 <i></i> 04</span>
           </section>
-
           <section class="genre-filter" aria-label="Фильтр по жанру">
-            <button
-              class="genre-chip active"
-              type="button"
-              data-filter="all"
-              aria-pressed="true"
-            >
-              Все жанры
-            </button>
-            <button
-              class="genre-chip"
-              type="button"
-              data-filter="j-pop"
-              aria-pressed="false"
-            >
-              J-pop
-            </button>
-            <button
-              class="genre-chip"
-              type="button"
-              data-filter="electronic"
-              aria-pressed="false"
-            >
-              Электроника
-            </button>
-            <button
-              class="genre-chip"
-              type="button"
-              data-filter="rock"
-              aria-pressed="false"
-            >
-              Рок
-            </button>
-            <button
-              class="genre-chip"
-              type="button"
-              data-filter="dance"
-              aria-pressed="false"
-            >
-              Dance
-            </button>
-            <button
-              class="genre-chip"
-              type="button"
-              data-filter="experimental"
-              aria-pressed="false"
-            >
-              Экспериментальная
-            </button>
+            <button class="genre-chip active" type="button" data-filter="all" aria-pressed="true">Все жанры</button>
+            <button class="genre-chip" type="button" data-filter="j-pop" aria-pressed="false">J-pop</button>
+            <button class="genre-chip" type="button" data-filter="electronic" aria-pressed="false">Электроника</button>
+            <button class="genre-chip" type="button" data-filter="rock" aria-pressed="false">Рок</button>
+            <button class="genre-chip" type="button" data-filter="dance" aria-pressed="false">Dance</button>
+            <button class="genre-chip" type="button" data-filter="ambient" aria-pressed="false">Эмбиент</button>
             <span class="genre-filter-note">Обновлено сегодня</span>
           </section>
-
           <section class="section-block taste-section">
             <div class="section-heading">
-              <div>
-                <p class="eyebrow muted">ПОДБОРКА ДЛЯ ТЕБЯ</p>
-                <h2>Попадание в твой вкус</h2>
-                <p class="section-subtitle">
-                  Треки, которые могут стать твоими любимыми
-                </p>
-              </div>
-              <a href="/catalog" class="view-all">
-                Все рекомендации <span>↗</span>
-              </a>
+              <div><p class="eyebrow muted">ПОДБОРКА ДЛЯ ТЕБЯ</p><h2>Попадание в твой вкус</h2><p class="section-subtitle">Треки, которые могут стать твоими любимыми</p></div>
+              <a href="/catalog" class="view-all">Все рекомендации <span>↗</span></a>
             </div>
             <div class="taste-layout">
-              <div class="track-list" aria-label="Рекомендованные треки">
-                <article
-                  class="track-card track-row"
-                  data-genre="j-pop"
-                  data-track-id="world-is-mine"
-                  data-track-slug="world-is-mine"
-                  data-track-title="World is Mine"
-                  data-track-original-title="ワールドイズマイン"
-                  data-track-artist="Hatsune Miku"
-                  data-track-duration="252"
-                  data-track-genre="J-pop"
-                  data-track-artwork="artwork-sakura"
-                  data-track-glyph="初"
-                  data-track-audio=""
-                >
-                  <div class="mini-cover mini-cover-sakura" aria-hidden="true">
-                    <span>初</span>
-                  </div>
-                  <div class="track-row-info">
-                    <h3><a href="/track/world-is-mine">ワールドイズマイン</a></h3>
-                    <p>ryo (supercell) · Hatsune Miku</p>
-                  </div>
-                  <span class="track-row-tag">J-pop</span>
-                  <span class="track-row-duration">4:12</span>
-                  <button
-                    class="play-button"
-                    data-player-play
-                    aria-label="Воспроизвести World is Mine"
-                  >
-                    ▶
-                  </button>
-                  <button
-                    class="like-button"
-                    aria-label="Добавить World is Mine в избранное"
-                  >
-                    ♡
-                  </button>
-                </article>
-                <article
-                  class="track-card track-row"
-                  data-genre="electronic"
-                  data-track-id="god-ish"
-                  data-track-slug="god-ish"
-                  data-track-title="God-ish"
-                  data-track-original-title="神っぽいな"
-                  data-track-artist="Hatsune Miku"
-                  data-track-duration="204"
-                  data-track-genre="Электроника"
-                  data-track-artwork="artwork-night"
-                  data-track-glyph="神"
-                  data-track-audio=""
-                >
-                  <div class="mini-cover mini-cover-night" aria-hidden="true">
-                    <span>神</span>
-                  </div>
-                  <div class="track-row-info">
-                    <h3><a href="/track/god-ish">神っぽいな</a></h3>
-                    <p>ピノキオピー · Hatsune Miku</p>
-                  </div>
-                  <span class="track-row-tag">Электроника</span>
-                  <span class="track-row-duration">3:24</span>
-                  <button
-                    class="play-button"
-                    data-player-play
-                    aria-label="Воспроизвести God-ish"
-                  >
-                    ▶
-                  </button>
-                  <button
-                    class="like-button"
-                    aria-label="Добавить God-ish в избранное"
-                  >
-                    ♡
-                  </button>
-                </article>
-                <article
-                  class="track-card track-row"
-                  data-genre="rock"
-                  data-track-id="rolling-girl"
-                  data-track-slug="rolling-girl"
-                  data-track-title="Rolling Girl"
-                  data-track-original-title="ローリンガール"
-                  data-track-artist="Hatsune Miku"
-                  data-track-duration="196"
-                  data-track-genre="Рок"
-                  data-track-artwork="artwork-mono"
-                  data-track-glyph="転"
-                  data-track-audio=""
-                >
-                  <div class="mini-cover mini-cover-mono" aria-hidden="true">
-                    <span>転</span>
-                  </div>
-                  <div class="track-row-info">
-                    <h3><a href="/track/rolling-girl">ローリンガール</a></h3>
-                    <p>wowaka · Hatsune Miku</p>
-                  </div>
-                  <span class="track-row-tag">Рок</span>
-                  <span class="track-row-duration">3:16</span>
-                  <button
-                    class="play-button"
-                    data-player-play
-                    aria-label="Воспроизвести Rolling Girl"
-                  >
-                    ▶
-                  </button>
-                  <button
-                    class="like-button"
-                    aria-label="Добавить Rolling Girl в избранное"
-                  >
-                    ♡
-                  </button>
-                </article>
-                <article
-                  class="track-card track-row"
-                  data-genre="dance"
-                  data-track-id="worlds-end-dancehall"
-                  data-track-slug="worlds-end-dancehall"
-                  data-track-title="World's End Dancehall"
-                  data-track-original-title="ワールズエンド・ダンスホール"
-                  data-track-artist="Hatsune Miku & Megurine Luka"
-                  data-track-duration="212"
-                  data-track-genre="Dance"
-                  data-track-artwork="artwork-peach"
-                  data-track-glyph="巡"
-                  data-track-audio=""
-                >
-                  <div class="mini-cover mini-cover-peach" aria-hidden="true">
-                    <span>巡</span>
-                  </div>
-                  <div class="track-row-info">
-                    <h3><a href="/track/worlds-end-dancehall">ワールズエンド・ダンスホール</a></h3>
-                    <p>wowaka · Miku & Luka</p>
-                  </div>
-                  <span class="track-row-tag">Dance</span>
-                  <span class="track-row-duration">3:32</span>
-                  <button
-                    class="play-button"
-                    data-player-play
-                    aria-label="Воспроизвести World's End Dancehall"
-                  >
-                    ▶
-                  </button>
-                  <button
-                    class="like-button"
-                    aria-label="Добавить World's End Dancehall в избранное"
-                  >
-                    ♡
-                  </button>
-                </article>
+              <div class="track-list recommendation-track-list" aria-label="Рекомендованные треки">
+                <% tracks.forEach((track) => { %>
+                  <%- include('partials/track-row', { track }) %>
+                <% }) %>
               </div>
               <aside class="taste-card" aria-label="Жанр недели">
-                <div class="taste-card-heading">
-                  <span class="taste-card-mark">≋</span>
-                  <span>ТВОЙ ЖАНР НЕДЕЛИ</span>
-                </div>
-                <h3>Электроника<br />с характером</h3>
-                <p>Тебе особенно близко</p>
-                <div class="taste-meter">
-                  <span style="--level: 86%"></span>
-                </div>
-                <div class="taste-meter-label">
-                  <span>Электроника</span><b>86%</b>
-                </div>
-                <div class="taste-meter">
-                  <span style="--level: 64%"></span>
-                </div>
-                <div class="taste-meter-label">
-                  <span>J-pop</span><b>64%</b>
-                </div>
-                <div class="taste-meter">
-                  <span style="--level: 42%"></span>
-                </div>
-                <div class="taste-meter-label">
-                  <span>Альтернатива</span><b>42%</b>
-                </div>
-                <a href="/catalog" class="taste-card-link">
-                  Найти похожее <span>↗</span>
-                </a>
+                <div class="taste-card-heading"><span class="taste-card-mark">≋</span><span>ТВОЙ ЖАНР НЕДЕЛИ</span></div>
+                <h3>Электроника<br />с характером</h3><p>Тебе особенно близко</p>
+                <div class="taste-meter"><span style="--level: 86%"></span></div>
+                <div class="taste-meter-label"><span>Электроника</span><b>86%</b></div>
+                <a class="view-all" href="/catalog">Исследовать жанр <span>↗</span></a>
               </aside>
             </div>
           </section>
-
-          <section class="section-block mood-section">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow muted">СОБРАНО ПО НАСТРОЕНИЮ</p>
-                <h2>Под настроение</h2>
-              </div>
-              <a href="/collections" class="view-all">
-                Все подборки <span>↗</span>
-              </a>
-            </div>
-            <div class="mood-grid mood-grid-featured">
-              <a
-                class="mood-card mood-card-photo mood-night"
-                href="/collections"
-              >
-                <span class="mood-card-kicker">НОЧНОЙ ГОРОД</span>
-                <strong>Ночной Токио</strong>
-                <small>24 трека · Электроника</small>
-              </a>
-              <a
-                class="mood-card mood-card-photo mood-origin"
-                href="/collections"
-              >
-                <span class="mood-card-kicker">ИСТОКИ</span>
-                <strong>С чего всё началось</strong>
-                <small>32 трека · Классика</small>
-              </a>
-              <a
-                class="mood-card mood-card-photo mood-energy"
-                href="/collections"
-              >
-                <span class="mood-card-kicker">БОЛЬШЕ ЭНЕРГИИ</span>
-                <strong>На максимуме</strong>
-                <small>18 треков · Dance</small>
-              </a>
-              <a
-                class="mood-card mood-card-photo mood-quiet"
-                href="/collections"
-              >
-                <span class="mood-card-kicker">ТИШЕ, ЧЕМ ОБЫЧНО</span>
-                <strong>Тише, чем обычно</strong>
-                <small>21 трек · Ambient</small>
-              </a>
-            </div>
-          </section>
-
-          <section class="section-block artist-section">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow muted">ГОЛОСА, КОТОРЫЕ ТЫ ЛЮБИШЬ</p>
-                <h2>У каждого голоса — свой мир</h2>
-              </div>
-              <a href="/artists" class="view-all">
-                Все исполнители <span>↗</span>
-              </a>
-            </div>
-            <div class="artist-grid artist-grid-featured">
-              <a class="artist-card" href="/artist">
-                <div class="artist-avatar artist-miku">初</div>
-                <div>
-                  <h3>Hatsune Miku</h3>
-                  <p>Вокалоид · 1 240 треков</p>
-                </div>
-                <span>↗</span>
-              </a>
-              <a class="artist-card" href="/artist">
-                <div class="artist-avatar artist-rin">鏡</div>
-                <div>
-                  <h3>Kagamine Rin & Len</h3>
-                  <p>Вокалоид · 970 треков</p>
-                </div>
-                <span>↗</span>
-              </a>
-              <a class="artist-card" href="/artist">
-                <div class="artist-avatar artist-luka">巡</div>
-                <div>
-                  <h3>Megurine Luka</h3>
-                  <p>Вокалоид · 860 треков</p>
-                </div>
-                <span>↗</span>
-              </a>
-              <a class="artist-card" href="/artist">
-                <div class="artist-avatar artist-kaito">KA</div>
-                <div>
-                  <h3>KAITO</h3>
-                  <p>Вокалоид · 640 треков</p>
-                </div>
-                <span>↗</span>
-              </a>
-            </div>
-          </section>
-
           <section class="home-lower-grid">
             <div class="section-block home-collection-section">
-              <div class="section-heading">
-                <div>
-                  <p class="eyebrow muted">ТВОЯ МУЗЫКА</p>
-                  <h2>Твоя коллекция</h2>
-                </div>
-                <a href="/playlists" class="view-all"
-                  >Мои плейлисты <span>↗</span></a
-                >
-              </div>
+              <div class="section-heading"><div><p class="eyebrow muted">ТВОЯ МУЗЫКА</p><h2>Твоя коллекция</h2></div><a href="/playlists" class="view-all">Мои плейлисты <span>↗</span></a></div>
               <div class="collection-grid">
-                <a
-                  class="collection-tile collection-favorites"
-                  href="/favorites"
-                >
-                  <span class="collection-icon">♡</span
-                  ><span class="collection-arrow">↗</span>
-                  <strong>Самое любимое</strong
-                  ><small>24 трека · Твои лайки</small>
-                </a>
-                <a
-                  class="collection-tile collection-repeat"
-                  href="/playlist"
-                >
-                  <span class="collection-icon collection-wave">≋</span
-                  ><span class="collection-arrow">↗</span>
-                  <strong>На повторе</strong
-                  ><small>18 треков · Последний микс</small>
-                </a>
+                <a class="collection-tile collection-favorites" href="/favorites"><span class="collection-icon">♡</span><span class="collection-arrow">↗</span><strong>Самое любимое</strong><small>Твои сохранённые треки</small></a>
+                <a class="collection-tile collection-repeat" href="/playlists"><span class="collection-icon collection-wave">≋</span><span class="collection-arrow">↗</span><strong>На повторе</strong><small>Недавно прослушанное</small></a>
               </div>
-              <a href="/create-playlist" class="create-collection"
-                >＋ Создать новую подборку</a
-              >
+              <a href="/create-playlist" class="create-collection">＋ Создать новую подборку</a>
             </div>
             <div class="section-block event-section">
-              <div class="section-heading">
-                <div>
-                  <p class="eyebrow muted">ВСТРЕЧАЕМСЯ ВЖИВУЮ</p>
-                  <h2>За пределами наушников</h2>
-                </div>
-                <a href="/events" class="view-all"
-                  >Все события <span>↗</span></a
-                >
-              </div>
+              <div class="section-heading"><div><p class="eyebrow muted">ВСТРЕЧАЕМСЯ ВЖИВУЮ</p><h2>За пределами наушников</h2></div><a href="/events" class="view-all">Все события <span>↗</span></a></div>
               <div class="event-list">
-                <a class="event-row" href="/events">
-                  <span class="event-date"><b>24</b><small>ОКТ</small></span>
-                  <span class="event-info"
-                    ><strong>Виртуальный мир — Live</strong
-                    ><small>Онлайн · Начало в 20:00</small></span
-                  >
-                  <span class="event-status">СКОРО</span>
-                </a>
-                <a class="event-row" href="/events">
-                  <span class="event-date"><b>31</b><small>ОКТ</small></span>
-                  <span class="event-info"
-                    ><strong>Vocaloid night: Tokyo</strong
-                    ><small>Москва · Начало в 19:30</small></span
-                  >
-                  <span class="event-status">СКОРО</span>
-                </a>
+                <% events.slice(0, 2).forEach((event) => { %>
+                  <a class="event-row" href="/events/<%= event.id %>">
+                    <span class="event-date"><b><%= event.day %></b><small><%= event.month %></small></span>
+                    <span class="event-info"><strong><%= event.title %></strong><small><%= event.location %> · Начало в <%= event.time %></small></span>
+                    <span class="event-status">СКОРО</span>
+                  </a>
+                <% }) %>
               </div>
-              <p class="event-note">
-                Добавь событие в календарь, чтобы не пропустить.
-              </p>
+              <p class="event-note">Добавь событие в календарь, чтобы не пропустить.</p>
             </div>
           </section>
           <%- include('partials/footer', { footerClass: '', footerText: '© 2026 VoxSekai. Музыка объединяет миры.' }) %>
