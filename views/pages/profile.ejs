@@ -4,82 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0e1014" />
-    <title>Профиль — VoxSekai</title>
-    <link rel="stylesheet" href="../assets/css/main.css" />
-    <script src="../assets/js/main.js" defer></script>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <script src="/assets/js/main.js" defer></script>
   </head>
   <body class="directory-page profile-page">
     <div class="app-shell">
-      <aside class="sidebar">
-        <a class="brand" href="../" aria-label="VoxSekai — главная"
-          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
-          ><span>voxsekai</span></a
-        >
-        <nav class="primary-nav" aria-label="Основная навигация">
-          <a class="nav-link" href="../"
-            ><span class="nav-icon">⌂</span>Главная</a
-          >
-          <a class="nav-link" href="catalog.html"
-            ><span class="nav-icon">♫</span>Треки</a
-          >
-          <a class="nav-link" href="artists.html"
-            ><span class="nav-icon">♬</span>Исполнители</a
-          >
-          <a class="nav-link" href="collections.html"
-            ><span class="nav-icon">▱</span>Подборки</a
-          >
-          <a class="nav-link" href="events.html"
-            ><span class="nav-icon">▦</span>События</a
-          >
-        </nav>
-        <div class="side-collection">
-          <p class="side-label">МОЯ МУЗЫКА</p>
-          <a class="side-link" href="playlists.html"
-            ><span>☷</span>Мои плейлисты</a
-          >
-          <a class="side-link" href="favorites.html"><span>♡</span>Избранное</a>
-          <a class="side-link active" href="profile.html"
-            ><span>⌁</span>Профиль</a
-          >
-          <div class="side-divider"></div>
-          <a class="create-playlist" href="create-playlist.html"
-            >＋ Создать плейлист</a
-          >
-        </div>
-        <div class="sidebar-about">
-          <p>Твой голос. Твой мир.</p>
-          <span>Всё бесплатно.<br />Без подписок.</span
-          ><a href="login.html">Войти ↗</a
-          ><a href="register.html">Создать аккаунт</a>
-        </div>
-      </aside>
+      <%- include('../partials/sidebar', { currentPath: '/profile' }) %>
       <main class="main-area">
-        <header class="topbar">
-          <button
-            class="mobile-menu icon-button"
-            id="menu-toggle"
-            aria-label="Открыть меню"
-          >
-            ☰
-          </button>
-          <label class="search-box"
-            ><span aria-hidden="true">⌕</span
-            ><input
-              id="site-search"
-              type="search"
-              placeholder="Трек, продюсер или виртуальный голос"
-              aria-label="Поиск по сайту"
-            /><kbd>Ctrl K</kbd></label
-          >
-          <div class="account-actions">
-            <a class="auth-header-link" href="login.html">Войти</a
-            ><a
-              class="auth-header-link auth-header-link-primary"
-              href="register.html"
-              >Регистрация</a
-            >
-          </div>
-        </header>
+        <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
         <div class="content directory-content profile-content">
           <header class="directory-heading">
             <div>
@@ -129,13 +62,13 @@
             </div>
             <div class="profile-artists">
               <h2>Любимые исполнители</h2>
-              <a href="artist.html"
+              <a href="/artist"
                 ><span class="profile-artist-dot dot-mira">M</span
                 ><strong>Mira Kai</strong><b>34%</b></a
-              ><a href="artist.html"
+              ><a href="/artist"
                 ><span class="profile-artist-dot dot-aoine">A</span
                 ><strong>Aoine</strong><b>22%</b></a
-              ><a href="artist.html"
+              ><a href="/artist"
                 ><span class="profile-artist-dot dot-yuna">Y</span
                 ><strong>Yuna 404</strong><b>18%</b></a
               >
@@ -144,7 +77,7 @@
           <section class="profile-ratings">
             <div class="directory-section-heading">
               <h2>Последние оценки</h2>
-              <a class="view-all" href="favorites.html"
+              <a class="view-all" href="/favorites"
                 >Избранное <span>↗</span></a
               >
             </div>
@@ -178,25 +111,10 @@
             role="status"
             aria-live="polite"
           ></p>
-          <footer class="site-footer directory-footer">
-            <a class="footer-brand" href="../"
-              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
-              >voxsekai</a
-            ><span>© 2026 VoxSekai · Музыка начинается с тебя</span>
-            <nav>
-              <a href="../">О проекте</a><a href="../">Поддержка</a
-              ><a href="../">Правила сервиса</a
-              ><a href="../">Конфиденциальность</a>
-            </nav>
-          </footer>
+          <%- include('../partials/footer', { footerClass: 'directory-footer', footerText: '© 2026 VoxSekai · Музыка начинается с тебя' }) %>
         </div>
       </main>
     </div>
-    <nav class="mobile-nav" aria-label="Мобильная навигация">
-      <a href="../">⌂<span>Главная</span></a
-      ><a href="catalog.html">♫<span>Треки</span></a
-      ><a href="playlists.html">☷<span>Моё</span></a
-      ><a href="profile.html" class="active">○<span>Профиль</span></a>
-    </nav>
+    <%- include('../partials/mobile-nav', { currentPath: '/profile' }) %>
   </body>
 </html>

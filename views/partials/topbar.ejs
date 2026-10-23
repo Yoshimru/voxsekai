@@ -1,0 +1,29 @@
+<header class="topbar">
+  <% if (showMenuToggle !== false) { %>
+  <button
+    class="mobile-menu icon-button"
+    id="menu-toggle"
+    aria-label="Открыть меню"
+  >
+    ☰
+  </button>
+  <% } %>
+  <label class="search-box">
+    <span aria-hidden="true">⌕</span>
+    <input
+      id="site-search"
+      type="search"
+      placeholder="Трек, продюсер или виртуальный голос"
+      aria-label="<%= searchLabel || 'Поиск по сайту' %>"
+    />
+    <kbd>Ctrl K</kbd>
+  </label>
+  <div class="account-actions">
+    <a class="auth-header-link" href="/login">Войти</a>
+    <a
+      class="auth-header-link auth-header-link-primary"
+      href="/register"
+      >Регистрация</a
+    >
+  </div>
+</header>

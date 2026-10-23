@@ -2,9 +2,13 @@
   "name": "voxsekai-frontend",
   "version": "1.0.0",
   "private": true,
-  "description": "VoxSekai frontend: HTML, CSS and vanilla JavaScript",
+  "description": "VoxSekai server-rendered frontend with EJS",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2"
   },
   "engines": {
     "node": ">=18"

@@ -8,85 +8,16 @@
       name="description"
       content="VoxSekai — твой мир виртуальной музыки."
     />
-    <title>VoxSekai — Главная</title>
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <script src="assets/js/main.js" defer></script>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <script src="/assets/js/main.js" defer></script>
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar" id="sidebar">
-        <a class="brand" href="/" aria-label="VoxSekai — главная"
-          ><span class="soundmark"><i></i><i></i><i></i><i></i></span
-          ><span>voxsekai</span></a
-        >
-        <nav class="primary-nav" aria-label="Основная навигация">
-          <a class="nav-link active" href="/"
-            ><span class="nav-icon">⌂</span>Главная</a
-          >
-          <a class="nav-link" href="/pages/catalog.html"
-            ><span class="nav-icon">♫</span>Треки</a
-          >
-          <a class="nav-link" href="/pages/artists.html"
-            ><span class="nav-icon">♬</span>Исполнители</a
-          >
-          <a class="nav-link" href="/pages/collections.html"
-            ><span class="nav-icon">▱</span>Подборки</a
-          >
-          <a class="nav-link" href="/pages/events.html"
-            ><span class="nav-icon">▦</span>События</a
-          >
-        </nav>
-        <div class="side-collection">
-          <p class="side-label">МОЯ МУЗЫКА</p>
-          <a class="side-link" href="/pages/playlists.html"
-            ><span>☷</span>Мои плейлисты</a
-          >
-          <a class="side-link" href="/pages/favorites.html"
-            ><span>♡</span>Избранное</a
-          >
-          <a class="side-link" href="/pages/profile.html"
-            ><span>⌁</span>Профиль</a
-          >
-          <div class="side-divider"></div>
-          <a class="create-playlist" href="/pages/create-playlist.html"
-            >＋ Создать плейлист</a
-          >
-        </div>
-        <div class="sidebar-about">
-          <p>Твой голос. Твой мир.</p>
-          <span>Всё бесплатно.<br />Без подписок.</span
-          ><a href="/pages/login.html">Войти ↗</a>
-          <a href="/pages/register.html">Создать аккаунт</a>
-        </div>
-      </aside>
+      <%- include('partials/sidebar', { currentPath: '/' }) %>
 
       <main class="main-area">
-        <header class="topbar">
-          <button
-            class="mobile-menu icon-button"
-            id="menu-toggle"
-            aria-label="Открыть меню"
-          >
-            ☰
-          </button>
-          <label class="search-box"
-            ><span aria-hidden="true">⌕</span
-            ><input
-              id="site-search"
-              type="search"
-              placeholder="Трек, продюсер или виртуальный голос"
-              aria-label="Поиск"
-            /><kbd>Ctrl K</kbd></label
-          >
-          <div class="account-actions">
-            <a class="auth-header-link" href="/pages/login.html">Войти</a>
-            <a
-              class="auth-header-link auth-header-link-primary"
-              href="/pages/register.html"
-              >Регистрация</a
-            >
-          </div>
-        </header>
+        <%- include('partials/topbar', { searchLabel: 'Поиск', showMenuToggle: true }) %>
 
         <div class="content home-content">
           <div class="page-heading">
@@ -110,7 +41,7 @@
                 найди звучание, которого ещё не слышал.
               </p>
               <div class="hero-feature-actions">
-                <a class="button button-primary" href="/pages/collections.html">
+                <a class="button button-primary" href="/collections">
                   Открыть подборку <span>↗</span>
                 </a>
                 <span class="hero-feature-meta">24 трека · 1 ч 38 мин</span>
@@ -180,7 +111,7 @@
                   Треки, которые могут стать твоими любимыми
                 </p>
               </div>
-              <a href="/pages/catalog.html" class="view-all">
+              <a href="/catalog" class="view-all">
                 Все рекомендации <span>↗</span>
               </a>
             </div>
@@ -304,7 +235,7 @@
                 <div class="taste-meter-label">
                   <span>Альтернатива</span><b>42%</b>
                 </div>
-                <a href="/pages/catalog.html" class="taste-card-link">
+                <a href="/catalog" class="taste-card-link">
                   Найти похожее <span>↗</span>
                 </a>
               </aside>
@@ -317,14 +248,14 @@
                 <p class="eyebrow muted">СОБРАНО ПО НАСТРОЕНИЮ</p>
                 <h2>Под настроение</h2>
               </div>
-              <a href="/pages/collections.html" class="view-all">
+              <a href="/collections" class="view-all">
                 Все подборки <span>↗</span>
               </a>
             </div>
             <div class="mood-grid mood-grid-featured">
               <a
                 class="mood-card mood-card-photo mood-night"
-                href="/pages/collections.html"
+                href="/collections"
               >
                 <span class="mood-card-kicker">НОЧНОЙ ГОРОД</span>
                 <strong>Ночной Токио</strong>
@@ -332,7 +263,7 @@
               </a>
               <a
                 class="mood-card mood-card-photo mood-origin"
-                href="/pages/collections.html"
+                href="/collections"
               >
                 <span class="mood-card-kicker">ИСТОКИ</span>
                 <strong>С чего всё началось</strong>
@@ -340,7 +271,7 @@
               </a>
               <a
                 class="mood-card mood-card-photo mood-energy"
-                href="/pages/collections.html"
+                href="/collections"
               >
                 <span class="mood-card-kicker">БОЛЬШЕ ЭНЕРГИИ</span>
                 <strong>На максимуме</strong>
@@ -348,7 +279,7 @@
               </a>
               <a
                 class="mood-card mood-card-photo mood-quiet"
-                href="/pages/collections.html"
+                href="/collections"
               >
                 <span class="mood-card-kicker">ТИШЕ, ЧЕМ ОБЫЧНО</span>
                 <strong>Тише, чем обычно</strong>
@@ -363,12 +294,12 @@
                 <p class="eyebrow muted">ГОЛОСА, КОТОРЫЕ ТЫ ЛЮБИШЬ</p>
                 <h2>У каждого голоса — свой мир</h2>
               </div>
-              <a href="/pages/artists.html" class="view-all">
+              <a href="/artists" class="view-all">
                 Все исполнители <span>↗</span>
               </a>
             </div>
             <div class="artist-grid artist-grid-featured">
-              <a class="artist-card" href="/pages/artist.html">
+              <a class="artist-card" href="/artist">
                 <div class="artist-avatar artist-miku">初</div>
                 <div>
                   <h3>Hatsune Miku</h3>
@@ -376,7 +307,7 @@
                 </div>
                 <span>↗</span>
               </a>
-              <a class="artist-card" href="/pages/artist.html">
+              <a class="artist-card" href="/artist">
                 <div class="artist-avatar artist-rin">鏡</div>
                 <div>
                   <h3>Kagamine Rin & Len</h3>
@@ -384,7 +315,7 @@
                 </div>
                 <span>↗</span>
               </a>
-              <a class="artist-card" href="/pages/artist.html">
+              <a class="artist-card" href="/artist">
                 <div class="artist-avatar artist-luka">巡</div>
                 <div>
                   <h3>Megurine Luka</h3>
@@ -392,7 +323,7 @@
                 </div>
                 <span>↗</span>
               </a>
-              <a class="artist-card" href="/pages/artist.html">
+              <a class="artist-card" href="/artist">
                 <div class="artist-avatar artist-kaito">KA</div>
                 <div>
                   <h3>KAITO</h3>
@@ -410,14 +341,14 @@
                   <p class="eyebrow muted">ТВОЯ МУЗЫКА</p>
                   <h2>Твоя коллекция</h2>
                 </div>
-                <a href="/pages/playlists.html" class="view-all"
+                <a href="/playlists" class="view-all"
                   >Мои плейлисты <span>↗</span></a
                 >
               </div>
               <div class="collection-grid">
                 <a
                   class="collection-tile collection-favorites"
-                  href="/pages/favorites.html"
+                  href="/favorites"
                 >
                   <span class="collection-icon">♡</span
                   ><span class="collection-arrow">↗</span>
@@ -426,7 +357,7 @@
                 </a>
                 <a
                   class="collection-tile collection-repeat"
-                  href="/pages/playlist.html"
+                  href="/playlist"
                 >
                   <span class="collection-icon collection-wave">≋</span
                   ><span class="collection-arrow">↗</span>
@@ -434,7 +365,7 @@
                   ><small>18 треков · Последний микс</small>
                 </a>
               </div>
-              <a href="/pages/create-playlist.html" class="create-collection"
+              <a href="/create-playlist" class="create-collection"
                 >＋ Создать новую подборку</a
               >
             </div>
@@ -444,12 +375,12 @@
                   <p class="eyebrow muted">ВСТРЕЧАЕМСЯ ВЖИВУЮ</p>
                   <h2>За пределами наушников</h2>
                 </div>
-                <a href="/pages/events.html" class="view-all"
+                <a href="/events" class="view-all"
                   >Все события <span>↗</span></a
                 >
               </div>
               <div class="event-list">
-                <a class="event-row" href="/pages/events.html">
+                <a class="event-row" href="/events">
                   <span class="event-date"><b>24</b><small>ОКТ</small></span>
                   <span class="event-info"
                     ><strong>Виртуальный мир — Live</strong
@@ -457,7 +388,7 @@
                   >
                   <span class="event-status">СКОРО</span>
                 </a>
-                <a class="event-row" href="/pages/events.html">
+                <a class="event-row" href="/events">
                   <span class="event-date"><b>31</b><small>ОКТ</small></span>
                   <span class="event-info"
                     ><strong>Vocaloid night: Tokyo</strong
@@ -471,27 +402,11 @@
               </p>
             </div>
           </section>
-          <footer class="site-footer">
-            <a class="footer-brand" href="/"
-              ><span class="soundmark"><i></i><i></i><i></i><i></i></span
-              >voxsekai</a
-            ><span>© 2026 VoxSekai. Музыка объединяет миры.</span>
-            <nav>
-              <a href="/pages/about.html">О проекте</a
-              ><a href="/pages/support.html">Поддержка</a
-              ><a href="/pages/rules.html">Правила</a
-              ><a href="/pages/privacy.html">Конфиденциальность</a>
-            </nav>
-          </footer>
+          <%- include('partials/footer', { footerClass: '', footerText: '© 2026 VoxSekai. Музыка объединяет миры.' }) %>
         </div>
       </main>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <nav class="mobile-nav" aria-label="Мобильная навигация">
-      <a class="active" href="/">⌂<span>Главная</span></a
-      ><a href="/pages/catalog.html">♫<span>Треки</span></a
-      ><a href="/pages/favorites.html">♡<span>Моё</span></a
-      ><a href="/pages/profile.html">○<span>Профиль</span></a>
-    </nav>
+    <%- include('partials/mobile-nav', { currentPath: '/' }) %>
   </body>
 </html>

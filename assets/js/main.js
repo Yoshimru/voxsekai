@@ -284,7 +284,7 @@
         pageSearch.focus();
       } else {
         window.location.assign(
-          `/pages/catalog.html?q=${encodeURIComponent(search.value.trim())}`,
+          `/catalog?q=${encodeURIComponent(search.value.trim())}`,
         );
       }
     }
@@ -303,18 +303,4 @@
     notify("Мобильное меню: используйте нижнюю навигацию"),
   );
 
-  document.querySelectorAll('a[href^="/pages/"]').forEach((link) => {
-    // Пока страницы не созданы, направляем переход на готовую 404-страницу.
-    link.addEventListener("click", (event) => {
-      const target = link.getAttribute("href");
-      const isAvailablePage =
-        /\/pages\/(login|register|catalog|artists|collections|events|playlists|create-playlist|profile)\.html$/.test(
-          target || "",
-        );
-      if (target && !target.endsWith("404.html") && !isAvailablePage) {
-        event.preventDefault();
-        window.location.href = "/pages/404.html";
-      }
-    });
-  });
 })();

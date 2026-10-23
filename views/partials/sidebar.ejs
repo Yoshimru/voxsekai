@@ -1,0 +1,55 @@
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="/" aria-label="VoxSekai — главная"
+    ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+    ><span>voxsekai</span></a
+  >
+  <nav class="primary-nav" aria-label="Основная навигация">
+    <a class="nav-link <%= currentPath === '/' ? 'active' : '' %>" href="/"
+      ><span class="nav-icon">⌂</span>Главная</a
+    >
+    <a
+      class="nav-link <%= currentPath === '/catalog' ? 'active' : '' %>"
+      href="/catalog"
+      ><span class="nav-icon">♫</span>Треки</a
+    >
+    <a
+      class="nav-link <%= currentPath === '/artists' ? 'active' : '' %>"
+      href="/artists"
+      ><span class="nav-icon">♬</span>Исполнители</a
+    >
+    <a
+      class="nav-link <%= currentPath === '/collections' ? 'active' : '' %>"
+      href="/collections"
+      ><span class="nav-icon">▱</span>Подборки</a
+    >
+    <a
+      class="nav-link <%= currentPath === '/events' ? 'active' : '' %>"
+      href="/events"
+      ><span class="nav-icon">▦</span>События</a
+    >
+  </nav>
+  <div class="side-collection">
+    <p class="side-label">МОЯ МУЗЫКА</p>
+    <a
+      class="side-link <%= currentPath === '/playlists' || currentPath === '/create-playlist' ? 'active' : '' %>"
+      href="/playlists"
+      ><span>☷</span>Мои плейлисты</a
+    >
+    <a class="side-link" href="/favorites"><span>♡</span>Избранное</a>
+    <a
+      class="side-link <%= currentPath === '/profile' ? 'active' : '' %>"
+      href="/profile"
+      ><span>⌁</span>Профиль</a
+    >
+    <div class="side-divider"></div>
+    <a class="create-playlist" href="/create-playlist"
+      >＋ Создать плейлист</a
+    >
+  </div>
+  <div class="sidebar-about">
+    <p>Твой голос. Твой мир.</p>
+    <span>Всё бесплатно.<br />Без подписок.</span
+    ><a href="/login">Войти ↗</a>
+    <a href="/register">Создать аккаунт</a>
+  </div>
+</aside>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e1014" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <script src="/assets/js/main.js" defer></script>
+  </head>
+  <body class="error-page">
+    <div class="app-shell">
+      <%- include('../partials/sidebar', { currentPath: '/404' }) %>
+      <main class="main-area">
+        <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: false }) %>
+        <div class="error-content">
+          <div class="error-label">
+            <span></span> СИГНАЛ ПОТЕРЯН · ОШИБКА 404
+          </div>
+          <div class="error-art" aria-label="404 — потерянная пластинка">
+            <span class="digit digit-left">4</span>
+            <div class="vinyl-wrap">
+              <div class="vinyl">
+                <div class="vinyl-grooves"></div>
+                <div class="vinyl-label"><span>VS</span></div>
+                <div class="vinyl-hole"></div>
+                <div class="signal-line"></div>
+              </div>
+              <span class="lost-tag">NO SIGNAL</span>
+            </div>
+            <span class="digit digit-right">4</span>
+          </div>
+          <div class="error-message">
+            <h1>Кажется, этот трек<br />не найден</h1>
+            <p>
+              Страница ушла на другую частоту или больше не существует. Давай
+              вернёмся к музыке и найдём что-нибудь новое.
+            </p>
+          </div>
+          <div class="error-actions">
+            <a class="button button-primary" href="/"
+              >На главную <span>→</span></a
+            ><a class="button button-secondary" href="/catalog"
+              >Открыть каталог <span>♫</span></a
+            >
+          </div>
+          <p class="error-help">
+            Если думаешь, что это ошибка, <a href="/support">напиши нам</a>.
+          </p>
+        </div>
+        <%- include('../partials/footer', { footerClass: 'error-footer', footerText: '© 2026 VoxSekai. Музыка объединяет миры.' }) %>
+      </main>
+    </div>
+    <%- include('../partials/mobile-nav', { currentPath: '/404' }) %>
+  </body>
+</html>

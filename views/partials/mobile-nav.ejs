@@ -1,0 +1,17 @@
+<nav class="mobile-nav" aria-label="Мобильная навигация">
+  <a class="<%= currentPath === '/' ? 'active' : '' %>" href="/"
+    >⌂<span>Главная</span></a
+  >
+  <a class="<%= currentPath === '/catalog' ? 'active' : '' %>" href="/catalog"
+    >♫<span>Треки</span></a
+  >
+  <% const isPlaylistPage = currentPath === '/playlists' || currentPath === '/create-playlist'; %>
+  <a
+    class="<%= isPlaylistPage ? 'active' : '' %>"
+    href="<%= isPlaylistPage ? '/playlists' : '/favorites' %>"
+    ><%= isPlaylistPage ? '☷' : '♡' %><span>Моё</span></a
+  >
+  <a class="<%= currentPath === '/profile' ? 'active' : '' %>" href="/profile"
+    >○<span>Профиль</span></a
+  >
+</nav>

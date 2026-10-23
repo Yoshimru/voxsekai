@@ -1,0 +1,27 @@
+<% if (typeof variant !== 'undefined' && variant === 'auth') { %>
+<footer class="auth-footer">
+  <a class="auth-footer-brand" href="/">voxsekai</a>
+  <span>© 2026 VoxSekai · Музыкальное пространство</span>
+  <nav aria-label="Дополнительная навигация">
+    <a href="/">О проекте</a><a href="/">Правила сервиса</a>
+    <a href="/">Конфиденциальность</a><a href="/">Поддержка</a>
+  </nav>
+</footer>
+<% } else { %>
+<footer class="site-footer <%= footerClass || '' %>">
+  <a class="footer-brand" href="/"
+    ><span class="soundmark"><i></i><i></i><i></i><i></i></span
+    >voxsekai</a
+  >
+  <span><%= footerText %></span>
+  <nav>
+    <% if (footerClass === 'error-footer') { %>
+    <a href="/about">О проекте</a><a href="/support">Поддержка</a>
+    <a href="/rules">Правила</a><a href="/privacy">Конфиденциальность</a>
+    <% } else { %>
+    <a href="/">О проекте</a><a href="/">Поддержка</a>
+    <a href="/">Правила сервиса</a><a href="/">Конфиденциальность</a>
+    <% } %>
+  </nav>
+</footer>
+<% } %>
