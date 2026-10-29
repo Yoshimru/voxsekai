@@ -27,6 +27,7 @@
             </div>
           </header>
           <% const featuredCollection = collections.find((collection) => collection.featured); %>
+          <% if (featuredCollection) { %>
           <section class="collection-feature" aria-label="Подборка недели">
             <div class="collection-feature-art">
               <span class="collection-feature-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong><%= featuredCollection.tagline %></strong>
@@ -40,6 +41,7 @@
               >
             </div>
           </section>
+          <% } %>
           <section class="collection-moods">
             <div class="directory-section-heading">
               <h2>Выбирай по настроению</h2>

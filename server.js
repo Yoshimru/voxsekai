@@ -3,7 +3,7 @@ const path = require("node:path");
 const contentRepository = require("./repositories/contentRepository");
 
 const app = express();
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 3001;
 const viewsDirectory = path.join(__dirname, "views");
 const pages = {
   "/": { view: "index", title: "VoxSekai \u2014 \u0413\u043b\u0430\u0432\u043d\u0430\u044f" },
