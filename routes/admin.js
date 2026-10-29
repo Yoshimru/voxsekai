@@ -9,7 +9,9 @@ const router = express.Router();
 authRepository.ensureAdmin("Yoshimru", "adminadmin");
 
 function isAuthed(req) {
-  return Boolean(req.session && req.session.userId);
+  if (!req.session || !req.session.userId) return false;
+  const user = authRepository.getUserById(req.session.userId);
+  return Boolean(user && user.role === "admin");
 }
 
 function requireAdmin(req, res, next) {
@@ -97,6 +99,11 @@ router.get("/tracks", (req, res, next) => {
       title: "Треки — админпанель",
       section: "tracks",
       tracks: contentRepository.getTracks(),
+      artists: contentRepository.getArtists(),
+      error:
+        req.query.error === "artist"
+          ? "Выберите исполнителя из списка добавленных."
+          : "",
     });
   } catch (error) {
     next(error);
@@ -105,7 +112,13 @@ router.get("/tracks", (req, res, next) => {
 
 router.post("/tracks", (req, res, next) => {
   try {
-    adminRepository.createTrack(req.body);
+    const artist = req.body.artistId
+      ? contentRepository.getArtistById(String(req.body.artistId))
+      : null;
+    if (!artist) {
+      return res.redirect("/admin/tracks?error=artist");
+    }
+    adminRepository.createTrack({ ...req.body, artistId: artist.id });
     res.redirect("/admin/tracks");
   } catch (error) {
     next(error);

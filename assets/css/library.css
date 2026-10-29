@@ -9,7 +9,7 @@
 .profile-content .directory-heading h1 {
   margin: 0;
   color: #f0f2f4;
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1.15;
   font-weight: 600;
 }
@@ -17,7 +17,7 @@
 .profile-content .directory-heading p {
   margin: 6px 0 0;
   color: #8c96a1;
-  font-size: 11px;
+  font-size: 13px;
 }
 .library-heading-actions {
   display: flex;
@@ -30,7 +30,7 @@
 .library-heading .button {
   min-height: 40px;
   padding: 0 16px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .library-section {
   margin-bottom: 34px;
@@ -41,7 +41,7 @@
 }
 .library-section .directory-section-heading > span {
   color: #838d97;
-  font-size: 9px;
+  font-size: 12px;
 }
 .playlist-grid {
   display: grid;
@@ -85,7 +85,7 @@
   border: 0;
   background: transparent;
   color: #aab5bd;
-  font-size: 10px;
+  font-size: 12px;
 }
 .playlist-detail-back:hover {
   color: var(--mint);
@@ -101,12 +101,12 @@
 }
 .playlist-detail-view .directory-section-heading > span {
   color: #89939d;
-  font-size: 9px;
+  font-size: 12px;
 }
 .playlist-detail-description {
   margin: -4px 0 14px;
   color: #89939d;
-  font-size: 10px;
+  font-size: 12px;
 }
 .playlist-detail-view .recent-track-list {
   display: grid;
@@ -155,7 +155,7 @@
   border: 1px solid #ffffff19;
   border-radius: 6px;
   color: #f4f5f6;
-  font-size: 18px;
+  font-size: 20px;
   text-decoration: none;
 }
 .playlist-detail-view .track-row-info {
@@ -171,7 +171,7 @@
 .playlist-detail-view .track-row-info h3 {
   margin-bottom: 4px;
   color: #edf0f2;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
 }
 .playlist-detail-view .track-row-info h3 a {
@@ -185,7 +185,7 @@
 .playlist-detail-view .track-row-tag,
 .playlist-detail-view .track-row-duration {
   color: #89939d;
-  font-size: 8px;
+  font-size: 11px;
 }
 .playlist-detail-view .track-row .play-button,
 .playlist-detail-view .track-row .like-button {
@@ -199,7 +199,7 @@
   border-radius: 50%;
   background: transparent;
   color: #9aa4ad;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
   transform: none;
 }
@@ -208,7 +208,7 @@
   color: var(--mint);
 }
 .playlist-detail-view .track-row .like-button {
-  font-size: 17px;
+  font-size: 19px;
 }
 .playlist-detail-view .artist-empty-state[hidden] {
   display: none;
@@ -289,14 +289,14 @@
 }
 .playlist-art > strong {
   color: #f1f3f4;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
 }
 .library-content > .track-back-link {
   display: inline-flex;
   margin: 2px 0 18px;
   color: #aab5bd;
-  font-size: 10px;
+  font-size: 12px;
   text-decoration: none;
 }
 .library-content > .track-back-link:hover {
@@ -348,7 +348,7 @@
   border-radius: 7px;
   background: var(--control-bg);
   color: var(--soft);
-  font-size: 9px;
+  font-size: 12px;
 }
 .playlist-card-actions button:hover {
   transform: translateY(-1px);
@@ -365,7 +365,7 @@
   overflow: hidden;
   margin: 0 0 6px;
   color: #e9edef;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -373,14 +373,14 @@
 .playlist-card-info p {
   margin: 0;
   color: #89939d;
-  font-size: 9px;
+  font-size: 12px;
 }
 .playlist-card-info small {
   display: block;
   overflow: hidden;
   margin-top: 7px;
   color: #76818b;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.4;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -390,7 +390,7 @@
   right: 4px;
   bottom: 8px;
   color: var(--mint);
-  font-size: 14px;
+  font-size: 16px;
   opacity: 0;
   transform: translate(-3px, 3px);
   transition:
@@ -424,32 +424,32 @@
   place-content: center;
   border-radius: 6px;
   color: #f4f5f6;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1.1;
 }
 .recent-track h3 {
   margin: 0 0 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 .recent-track p {
   margin: 0;
   color: #8b959f;
-  font-size: 8px;
+  font-size: 11px;
 }
 .recent-duration {
   color: #919ba4;
-  font-size: 8px;
+  font-size: 11px;
 }
 .recent-track > strong {
   color: var(--mint);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
 }
 .recent-track .like-button {
   color: var(--mint);
-  font-size: 16px;
+  font-size: 18px;
 }
 .recent-add-button {
   width: 28px;
@@ -460,7 +460,7 @@
   border-radius: 5px;
   background: transparent;
   color: var(--mint);
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   transition:
     background 0.18s,
@@ -498,7 +498,7 @@
   display: grid;
   gap: 8px;
   color: #d9dee1;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 .editor-field > span b {
@@ -514,7 +514,7 @@
   outline: 0;
   background: #11151a;
   color: var(--text);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 400;
   transition:
     border-color 0.2s,
@@ -548,7 +548,7 @@
   border-radius: 7px;
   background: #15191f;
   color: #b6c0c6;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 400;
   cursor: pointer;
   transition:
@@ -569,7 +569,7 @@
 }
 .cover-upload small {
   color: #79848e;
-  font-size: 8px;
+  font-size: 11px;
 }
 .cover-upload small[data-cover-hint] {
   max-width: 100%;
@@ -579,7 +579,7 @@
 }
 .upload-plus {
   color: var(--mint);
-  font-size: 25px;
+  font-size: 28px;
   line-height: 1;
 }
 .public-toggle {
@@ -588,7 +588,7 @@
   justify-content: space-between;
   gap: 16px;
   color: #dce1e3;
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
 }
 .public-toggle > span {
@@ -600,7 +600,7 @@
 }
 .public-toggle small {
   color: #89949e;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 400;
 }
 .public-toggle input {
@@ -643,7 +643,7 @@
   display: none;
   margin: 0;
   color: #f18a9b;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .editor-message.is-visible,
@@ -658,7 +658,7 @@
 .editor-actions .button {
   min-height: 38px;
   flex: 1;
-  font-size: 9px;
+  font-size: 12px;
 }
 .editor-panel-heading {
   display: flex;
@@ -670,12 +670,12 @@
 .editor-panel-heading h2 {
   margin: 0;
   color: #edf0f2;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 .editor-panel-heading span {
   color: #86919b;
-  font-size: 8px;
+  font-size: 11px;
 }
 .add-tracks-panel > .directory-search {
   margin-bottom: 10px;
@@ -692,7 +692,7 @@
 .track-picker-heading {
   margin: 0 0 8px;
   color: #aab4bb;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 .available-tracks,
@@ -728,7 +728,7 @@
   border: 1px dashed #303a41;
   border-radius: 7px;
   color: #78848e;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
   text-align: center;
 }
@@ -763,7 +763,7 @@
 .available-cover {
   width: 34px;
   height: 34px;
-  font-size: 7px;
+  font-size: 11px;
 }
 .available-track > span:nth-child(2) {
   min-width: 0;
@@ -773,14 +773,14 @@
 .available-track strong {
   overflow: hidden;
   color: #e8ecee;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .available-track small {
   color: #87919a;
-  font-size: 8px;
+  font-size: 11px;
 }
 .available-track button {
   width: 29px;
@@ -789,7 +789,7 @@
   border-radius: 7px;
   background: var(--control-bg);
   color: var(--mint);
-  font-size: 16px;
+  font-size: 18px;
 }
 .available-track button:hover,
 .available-track button.is-selected {
@@ -801,7 +801,7 @@
 .editor-hint {
   margin: 0;
   color: #89949e;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -831,7 +831,7 @@
 .profile-empty-note {
   margin: 0;
   color: #89949e;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
 }
 .profile-dynamic-list {
@@ -865,7 +865,7 @@
 }
 .playlist-edit-dialog h2 {
   margin: 0 0 18px;
-  font-size: 17px;
+  font-size: 19px;
 }
 .playlist-edit-dialog form {
   display: grid;
@@ -884,7 +884,7 @@
   border-radius: 50%;
   background: #103a34;
   color: var(--mint);
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 600;
 }
 .profile-identity {
@@ -893,7 +893,7 @@
 .profile-identity h2 {
   margin: 0 0 5px;
   color: #eef1f2;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 600;
 }
 .profile-identity p,
@@ -901,11 +901,11 @@
   display: block;
   margin: 0 0 5px;
   color: #919ba5;
-  font-size: 9px;
+  font-size: 12px;
 }
 .profile-identity small {
   color: #737e88;
-  font-size: 8px;
+  font-size: 11px;
 }
 .profile-edit {
   min-height: 34px;
@@ -915,7 +915,7 @@
   border-radius: 8px;
   background: var(--control-bg);
   color: #d4dade;
-  font-size: 9px;
+  font-size: 12px;
   cursor: pointer;
   transition:
     border-color 0.2s,
@@ -937,7 +937,7 @@
 .profile-artists > h2 {
   margin: 0 0 12px;
   color: #e8ecee;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
 }
 .profile-stat-grid {
@@ -957,13 +957,13 @@
 }
 .profile-stat-grid strong {
   color: var(--mint);
-  font-size: 23px;
+  font-size: 26px;
   line-height: 1;
   font-weight: 600;
 }
 .profile-stat-grid span {
   color: #8c96a0;
-  font-size: 8px;
+  font-size: 11px;
 }
 .profile-insights {
   display: grid;
@@ -986,7 +986,7 @@
   gap: 12px;
   margin: 13px 0;
   color: #aab3ba;
-  font-size: 9px;
+  font-size: 12px;
 }
 .genre-meter > i {
   height: 6px;
@@ -1003,7 +1003,7 @@
 }
 .genre-meter > strong {
   color: #aab8b4;
-  font-size: 8px;
+  font-size: 11px;
   text-align: right;
   font-weight: 500;
 }
@@ -1014,7 +1014,7 @@
   gap: 10px;
   border-top: 1px solid #292f36;
   color: #dce1e3;
-  font-size: 9px;
+  font-size: 12px;
 }
 .profile-artist-dot {
   width: 23px;
@@ -1023,7 +1023,7 @@
   place-items: center;
   border-radius: 50%;
   color: #101713;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 .dot-mira {
@@ -1038,7 +1038,7 @@
 .profile-artists > a b {
   margin-left: auto;
   color: var(--mint);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 500;
 }
 .profile-rating-grid {
@@ -1062,7 +1062,7 @@
   overflow: hidden;
   margin: 0 0 5px;
   color: #e6eaec;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1070,11 +1070,11 @@
 .profile-rating-grid p {
   margin: 0;
   color: #87919a;
-  font-size: 8px;
+  font-size: 11px;
 }
 .profile-rating-grid article > strong {
   color: var(--mint);
-  font-size: 9px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1097,7 +1097,7 @@
   }
   .library-heading h1,
   .profile-content .directory-heading h1 {
-    font-size: 24px;
+    font-size: 27px;
   }
   .playlist-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1106,14 +1106,14 @@
   .playlist-card-actions button {
     flex: 1;
     padding: 5px 4px;
-    font-size: 8px;
+    font-size: 11px;
   }
   .playlist-art {
     min-height: 120px;
     padding: 10px;
   }
   .playlist-card-info h3 {
-    font-size: 11px;
+    font-size: 13px;
   }
   .recent-track {
     grid-template-columns: 38px minmax(0, 1fr) 25px;
@@ -1157,7 +1157,7 @@
     width: 56px;
     height: 56px;
     flex-basis: 56px;
-    font-size: 21px;
+    font-size: 23px;
   }
   .profile-edit {
     margin-left: 68px;
@@ -1202,17 +1202,17 @@
 }
 .favorites-empty > span {
   color: #ff8fa8;
-  font-size: 34px;
+  font-size: 36px;
 }
 .favorites-empty h2 {
   margin: 12px 0 8px;
   color: #eef1f2;
-  font-size: 20px;
+  font-size: 22px;
 }
 .favorites-empty p {
   max-width: 420px;
   margin: 0 auto 20px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.7;
 }

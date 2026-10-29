@@ -6,7 +6,7 @@
   display: inline-flex;
   margin: 0 0 20px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 .track-back-link:hover {
@@ -97,7 +97,7 @@
   right: 14px;
   bottom: 13px;
   color: #ffffffb3;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.6px;
   text-shadow: 0 2px 8px #0008;
@@ -109,13 +109,13 @@
 }
 .track-detail-copy .directory-kicker {
   color: var(--mint);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.6px;
 }
 .track-detail-type {
   margin: 24px 0 7px;
   color: #9aaab2;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.4px;
 }
@@ -129,12 +129,12 @@
 .track-original-title {
   margin: 8px 0 10px;
   color: #a9b3bb;
-  font-size: 14px;
+  font-size: 16px;
 }
 .track-artist-link {
   display: inline-flex;
   color: var(--mint);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
 }
 .track-artist-link:hover {
@@ -145,7 +145,7 @@
   max-width: 500px;
   margin: 18px 0 16px;
   color: #abb4bd;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.8;
 }
 .track-detail-meta {
@@ -159,7 +159,7 @@
   border-radius: 20px;
   background: #ffffff08;
   color: #c8d0d5;
-  font-size: 10px;
+  font-size: 12px;
 }
 .track-detail-meta span:first-child {
   color: #dff8a8;
@@ -174,7 +174,7 @@
   gap: 9px;
 }
 .track-detail-play > span {
-  font-size: 12px;
+  font-size: 14px;
 }
 .track-detail-actions .like-button {
   position: static;
@@ -195,7 +195,7 @@
   gap: 8px;
   margin: 17px 0 0;
   color: #788792;
-  font-size: 9px;
+  font-size: 12px;
 }
 .track-backend-note span {
   width: 6px;
@@ -215,13 +215,13 @@
 .track-detail-information h2,
 .track-related-section h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
 }
 .track-detail-information > div > p:last-child {
   max-width: 470px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.8;
 }
 .track-information-list {
@@ -237,12 +237,12 @@
 .track-information-list dt {
   margin-bottom: 6px;
   color: #7e8995;
-  font-size: 9px;
+  font-size: 12px;
 }
 .track-information-list dd {
   margin: 0;
   color: #e2e7ea;
-  font-size: 11px;
+  font-size: 13px;
 }
 .track-related-section {
   margin: 34px 0;
@@ -280,7 +280,7 @@
   overflow: hidden;
   border-radius: 7px;
   color: #ffffffc9;
-  font-size: 20px;
+  font-size: 22px;
 }
 .related-track-copy {
   min-width: 0;
@@ -294,11 +294,11 @@
   white-space: nowrap;
 }
 .related-track-copy strong {
-  font-size: 11px;
+  font-size: 13px;
 }
 .related-track-copy small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
 }
 .related-track-arrow {
   margin-left: auto;

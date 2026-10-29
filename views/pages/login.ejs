@@ -51,14 +51,19 @@
           <p class="auth-form-lead">
             Войди, чтобы открыть свою музыкальную библиотеку.
           </p>
-          <form class="auth-form" data-auth-form="login">
+          <form class="auth-form" method="post" action="/login" data-auth-form="login">
+            <input type="hidden" name="next" value="<%= typeof next !== 'undefined' ? next : '' %>" />
+            <% if (typeof error !== 'undefined' && error) { %>
+            <p class="auth-error" role="alert"><%= error %></p>
+            <% } %>
             <label class="auth-field">
-              <span>E-mail</span>
+              <span>E-mail или имя пользователя</span>
               <input
-                type="email"
-                name="email"
-                autocomplete="email"
-                placeholder="name@example.com"
+                type="text"
+                name="login"
+                autocomplete="username"
+                placeholder="name@example.com или Aki"
+                value="<%= typeof values !== 'undefined' ? (values.login || '') : '' %>"
                 required
               />
             </label>

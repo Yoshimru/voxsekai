@@ -9,7 +9,7 @@
   padding: 24px 28px 44px;
 }
 .error-label {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1.5px;
   color: var(--muted);
   display: flex;
@@ -33,7 +33,7 @@
   margin: 25px 0 14px;
 }
 .digit {
-  font-size: 220px;
+  font-size: 233px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -15px;
@@ -104,7 +104,7 @@
   place-items: center;
   background: radial-gradient(circle at 35% 25%, #9af2dc, #277f79 70%, #164a4b);
   color: #102622;
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 800;
   letter-spacing: 2px;
 }
@@ -128,7 +128,7 @@
   border: 1px solid #424b56;
   border-radius: 4px;
   color: #c0c6d1;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1px;
   transform: rotate(8deg);
 }
@@ -136,14 +136,14 @@
   max-width: 620px;
 }
 .error-message h1 {
-  font-size: 34px;
+  font-size: 36px;
   line-height: 1.2;
   letter-spacing: -1.2px;
   font-weight: 600;
   margin: 0 0 14px;
 }
 .error-message p {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.8;
   color: var(--muted);
   max-width: 480px;
@@ -157,7 +157,7 @@
   margin-top: 26px;
 }
 .error-help {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   margin-top: 24px;
 }
@@ -174,7 +174,7 @@
   cursor: pointer;
 }
 .search-placeholder {
-  font-size: 13px;
+  font-size: 15px;
   flex: 1;
 }
 .error-page .sidebar {

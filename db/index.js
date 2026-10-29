@@ -17,7 +17,21 @@ function getDb() {
   instance.pragma("journal_mode = WAL");
   instance.pragma("foreign_keys = ON");
   instance.exec(fs.readFileSync(schemaSqlPath, "utf8"));
+  migrate(instance);
   return instance;
+}
+
+// Простые миграции для баз, созданных до появления новых колонок.
+function migrate(db) {
+  const userColumns = db.prepare("PRAGMA table_info(users)").all();
+  if (!userColumns.some((column) => column.name === "email")) {
+    db.exec("ALTER TABLE users ADD COLUMN email TEXT");
+  }
+  db.exec(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
+      ON users (email)
+      WHERE email IS NOT NULL AND email <> ''
+  `);
 }
 
 module.exports = { getDb };

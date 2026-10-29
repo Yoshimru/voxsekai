@@ -51,7 +51,7 @@ function mapArtist(row, trackIds = []) {
     cardClass: row.card_class,
     genreLabel: row.genre_label,
     genres: JSON.parse(row.genres || "[]"),
-    trackCount: row.track_count,
+    trackCount: trackIds.length,
     listenersLabel: row.listeners_label,
     country: row.country,
     trackIds,

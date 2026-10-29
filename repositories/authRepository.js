@@ -16,17 +16,28 @@ function verifyPassword(password, stored) {
 
 function mapUser(row) {
   if (!row) return null;
-  return { id: row.id, username: row.username, role: row.role, createdAt: row.created_at, passwordHash: row.password_hash };
+  return {
+    id: row.id,
+    username: row.username,
+    email: row.email || "",
+    role: row.role,
+    createdAt: row.created_at,
+    passwordHash: row.password_hash,
+  };
 }
 
 function createAuthRepository(db = getDb()) {
   const statements = {
     allUsers: db.prepare("SELECT * FROM users ORDER BY username"),
     userById: db.prepare("SELECT * FROM users WHERE id = ?"),
-    userByUsername: db.prepare("SELECT * FROM users WHERE username = ?"),
+    userByUsername: db.prepare("SELECT * FROM users WHERE username = ? COLLATE NOCASE"),
+    userByEmail: db.prepare("SELECT * FROM users WHERE email = ? COLLATE NOCASE"),
+    userByLogin: db.prepare(
+      "SELECT * FROM users WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE LIMIT 1",
+    ),
     countAll: db.prepare("SELECT COUNT(*) AS n FROM users"),
     insertUser: db.prepare(
-      "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+      "INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)",
     ),
     deleteUser: db.prepare("DELETE FROM users WHERE id = ?"),
   };
@@ -43,11 +54,22 @@ function createAuthRepository(db = getDb()) {
     getUserByUsername(username) {
       return mapUser(statements.userByUsername.get(username));
     },
+    getUserByEmail(email) {
+      return mapUser(statements.userByEmail.get(email));
+    },
+    getUserByLogin(login) {
+      return mapUser(statements.userByLogin.get(login, login));
+    },
     countUsers() {
       return statements.countAll.get().n;
     },
-    createUser({ username, password, role = "user" }) {
-      const info = statements.insertUser.run(username, hashPassword(password), role);
+    createUser({ username, email = "", password, role = "user" }) {
+      const info = statements.insertUser.run(
+        username,
+        email || null,
+        hashPassword(password),
+        role,
+      );
       return this.getUserById(info.lastInsertRowid);
     },
     deleteUser(id) {
@@ -56,7 +78,7 @@ function createAuthRepository(db = getDb()) {
     /** Создаёт указанного админа, если его ещё нет. */
     ensureAdmin(username, password) {
       if (statements.userByUsername.get(username)) return false;
-      statements.insertUser.run(username, hashPassword(password), "admin");
+      statements.insertUser.run(username, null, hashPassword(password), "admin");
       return true;
     },
   };

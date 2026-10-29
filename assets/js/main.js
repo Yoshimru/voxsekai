@@ -840,6 +840,53 @@
     renderProfile();
   }
 
+  function renderTaste() {
+    const card = document.querySelector("[data-taste-card]");
+    if (!card || !trackCatalog.length) return;
+
+    const source = favoriteIds.length
+      ? trackCatalog.filter((track) => favoriteIds.includes(track.id))
+      : trackCatalog;
+    if (!source.length) return;
+
+    const genreCounts = new Map();
+    source.forEach((track) => {
+      if (!track.genre) return;
+      genreCounts.set(track.genre, (genreCounts.get(track.genre) || 0) + 1);
+    });
+    if (!genreCounts.size) return;
+
+    const [genre, count] = Array.from(genreCounts.entries()).sort(
+      (first, second) =>
+        second[1] - first[1] || first[0].localeCompare(second[0], "ru"),
+    )[0];
+    const percent = Math.round((count / source.length) * 100);
+    const sample = source.find((track) => track.genre === genre);
+    const genreFilter = sample?.filterGenre || "all";
+
+    const setText = (selector, value) => {
+      const element = card.querySelector(selector);
+      if (element) element.textContent = value;
+    };
+
+    setText("[data-taste-genre]", genre);
+    setText("[data-taste-genre-label]", genre);
+    setText("[data-taste-percent]", `${percent}%`);
+    setText("[data-taste-count]", String(count));
+    setText(
+      "[data-taste-description]",
+      favoriteIds.length ? "Твой выбор в этом сезоне" : "Тебе особенно близко",
+    );
+
+    const meter = card.querySelector("[data-taste-meter]");
+    if (meter) meter.style.setProperty("--level", `${percent}%`);
+
+    const link = card.querySelector("[data-taste-link]");
+    if (link) link.href = `/catalog?genre=${encodeURIComponent(genreFilter)}`;
+
+    card.dataset.personal = favoriteIds.length ? "true" : "false";
+  }
+
   function renderFavorites() {
     document.querySelectorAll("[data-favorite-track]").forEach((button) => {
       const liked = favoriteIds.includes(button.dataset.favoriteTrack);
@@ -872,6 +919,7 @@
     const emptyState = document.querySelector("[data-favorites-empty]");
     if (emptyState) emptyState.hidden = favoriteIds.length > 0;
     renderProfile();
+    renderTaste();
   }
 
   document.querySelectorAll("[data-favorite-track]").forEach((button) => {
@@ -993,7 +1041,9 @@
     "[data-genre-item], .track-row[data-genre]",
   );
   const pageSearch = document.getElementById("page-search");
-  let selectedGenre = "all";
+  const initialGenre =
+    new URLSearchParams(window.location.search).get("genre") || "all";
+  let selectedGenre = initialGenre;
 
   function filterDirectory() {
     const query = pageSearch?.value.trim().toLocaleLowerCase("ru") || "";
@@ -1030,6 +1080,25 @@
       filterDirectory();
     });
   });
+  if (initialGenre !== "all") {
+    const matchingButton = Array.from(genreButtons).find(
+      (button) => button.dataset.filter === initialGenre,
+    );
+    if (matchingButton) {
+      genreButtons.forEach((button) => {
+        const selected = button === matchingButton;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+      const filters = document.getElementById("catalog-genres");
+      if (filters) filters.hidden = false;
+      document
+        .querySelector("[data-filter-toggle]")
+        ?.setAttribute("aria-expanded", "true");
+    } else {
+      selectedGenre = "all";
+    }
+  }
   pageSearch?.addEventListener("input", filterDirectory);
 
   document.querySelectorAll("select[id$='-sort']").forEach((select) => {
@@ -1311,20 +1380,6 @@
     });
   });
 
-  document.querySelectorAll("[data-auth-form]").forEach((form) => {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const message = form.querySelector("[data-auth-message]");
-      if (!message) return;
-
-      message.textContent =
-        form.dataset.authForm === "login"
-          ? "Вход появится после подключения сервера авторизации."
-          : "Регистрация появится после подключения сервера авторизации.";
-      message.classList.add("is-visible");
-    });
-  });
-
   document.querySelectorAll("[data-auth-notice]").forEach((button) => {
     button.addEventListener("click", () => {
       const message = document.querySelector("[data-auth-message]");
@@ -1360,6 +1415,8 @@
     const initialQuery = new URLSearchParams(window.location.search).get("q");
     if (initialQuery) {
       pageSearch.value = initialQuery;
+      filterDirectory();
+    } else if (selectedGenre !== "all") {
       filterDirectory();
     }
   }

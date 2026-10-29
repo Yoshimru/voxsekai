@@ -51,7 +51,11 @@
           <p class="auth-form-lead">
             Начни собирать коллекцию музыки, которая похожа на тебя.
           </p>
-          <form class="auth-form" data-auth-form="register">
+          <form class="auth-form" method="post" action="/register" data-auth-form="register">
+            <input type="hidden" name="next" value="<%= typeof next !== 'undefined' ? next : '' %>" />
+            <% if (typeof error !== 'undefined' && error) { %>
+            <p class="auth-error" role="alert"><%= error %></p>
+            <% } %>
             <label class="auth-field">
               <span>Имя пользователя</span>
               <input
@@ -59,8 +63,10 @@
                 name="name"
                 autocomplete="username"
                 placeholder="Как к тебе обращаться"
+                value="<%= typeof values !== 'undefined' ? (values.name || '') : '' %>"
                 required
                 minlength="2"
+                maxlength="32"
               />
             </label>
             <label class="auth-field">
@@ -70,6 +76,7 @@
                 name="email"
                 autocomplete="email"
                 placeholder="name@example.com"
+                value="<%= typeof values !== 'undefined' ? (values.email || '') : '' %>"
                 required
               />
             </label>

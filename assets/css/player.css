@@ -97,7 +97,7 @@
 }
 .player-time {
   color: #b5c7cf;
-  font-size: 9px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 .player-time:last-child {
@@ -160,7 +160,7 @@
   border: 1px solid #ffffff2b;
   border-radius: 9px;
   color: #ffffffb8;
-  font-size: 25px;
+  font-size: 28px;
   box-shadow: 0 5px 14px #0005;
 }
 .player-artwork::after {
@@ -183,16 +183,16 @@
   white-space: nowrap;
 }
 .player-track-copy strong {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 .player-track-copy > span {
   color: #b5c7cf;
-  font-size: 10px;
+  font-size: 12px;
 }
 .player-track-status {
   color: #9db8c1;
-  font-size: 8px;
+  font-size: 11px;
 }
 .player-controls {
   display: flex;
@@ -212,7 +212,7 @@
   border-radius: 50%;
   background: transparent;
   color: #c3d1d6;
-  font-size: 15px;
+  font-size: 17px;
   transition:
     color 0.2s ease,
     background 0.2s ease,
@@ -336,7 +336,7 @@
   height: 8px;
 }
 .player-dismiss {
-  font-size: 22px;
+  font-size: 25px;
 }
 .artwork-cyan {
   background: radial-gradient(circle at 68% 25%, #b6fff0, #217c83 38%, #182d45 78%);
@@ -470,7 +470,7 @@
   .player-control {
     width: 28px;
     height: 28px;
-    font-size: 12px;
+    font-size: 14px;
   }
   .player-toggle {
     width: 38px;
@@ -485,7 +485,7 @@
   }
   .player-dismiss {
     width: 24px;
-    font-size: 19px;
+    font-size: 21px;
   }
 }
 @media (max-width: 420px) {
@@ -506,10 +506,10 @@
     flex-basis: 36px;
   }
   .player-track-copy strong {
-    font-size: 10px;
+    font-size: 12px;
   }
   .player-track-copy > span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .player-track-status {
     display: none;

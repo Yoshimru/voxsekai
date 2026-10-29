@@ -25,6 +25,19 @@ function createAdminRepository(db = getDb()) {
       WHERE id = @id
     `),
     deleteTrack: db.prepare("DELETE FROM tracks WHERE id = ?"),
+    artistById: db.prepare("SELECT * FROM artists WHERE id = ?"),
+    artistIdsByTrack: db.prepare(
+      "SELECT artist_id FROM artist_tracks WHERE track_id = ?",
+    ),
+    insertArtistTrack: db.prepare(
+      "INSERT OR IGNORE INTO artist_tracks (artist_id, track_id, position) VALUES (?, ?, ?)",
+    ),
+    nextArtistTrackPosition: db.prepare(
+      "SELECT COALESCE(MAX(position), -1) + 1 AS next_position FROM artist_tracks WHERE artist_id = ?",
+    ),
+    syncArtistTrackCount: db.prepare(
+      "UPDATE artists SET track_count = (SELECT COUNT(*) FROM artist_tracks WHERE artist_id = ?) WHERE id = ?",
+    ),
 
     insertArtist: db.prepare(`
       INSERT INTO artists (id, name, alias, initials, card_class, genre_label, genres,
@@ -85,25 +98,41 @@ function createAdminRepository(db = getDb()) {
   }
 
   return {
-    // --- РўСЂРµРєРё ---
+    // --- Треки ---
     createTrack(fields) {
+      const artist = fields.artistId
+        ? statements.artistById.get(String(fields.artistId))
+        : null;
+      const artistLabel = artist
+        ? [artist.alias, artist.name].filter(Boolean).join(" · ")
+        : fields.artist || "";
       const track = {
         id: slug(fields.id, `track-${Date.now()}`),
         title: fields.title || "",
         displayTitle: fields.displayTitle || fields.title || "",
-        artist: fields.artist || "",
-        artistName: fields.artistName || "",
+        artist: artistLabel,
+        artistName: artist ? artist.name : fields.artistName || "",
         duration: Number(fields.duration) || 0,
         genre: fields.genre || "",
         artworkClass: fields.artworkClass || "artwork-cyan",
-        artworkGlyph: fields.artworkGlyph || "в™Є",
+        artworkGlyph: fields.artworkGlyph || "♪",
         rating: fields.rating || "0",
         album: fields.album || null,
         releaseYear: fields.releaseYear ? Number(fields.releaseYear) : null,
         description: fields.description || "",
         audioUrl: fields.audioUrl || null,
       };
-      statements.insertTrack.run(track);
+
+      const create = db.transaction(() => {
+        statements.insertTrack.run(track);
+        if (artist) {
+          const position =
+            statements.nextArtistTrackPosition.get(artist.id).next_position;
+          statements.insertArtistTrack.run(artist.id, track.id, position);
+          statements.syncArtistTrackCount.run(artist.id, artist.id);
+        }
+      });
+      create.call(this);
       return track.id;
     },
     updateTrack(id, fields) {
@@ -128,7 +157,15 @@ function createAdminRepository(db = getDb()) {
       return true;
     },
     deleteTrack(id) {
-      statements.deleteTrack.run(id);
+      const artistIds = statements.artistIdsByTrack
+        .all(id)
+        .map((row) => row.artist_id);
+      db.transaction(() => {
+        statements.deleteTrack.run(id);
+        artistIds.forEach((artistId) => {
+          statements.syncArtistTrackCount.run(artistId, artistId);
+        });
+      })();
     },
 
     // --- РСЃРїРѕР»РЅРёС‚РµР»Рё ---
@@ -141,7 +178,7 @@ function createAdminRepository(db = getDb()) {
         cardClass: fields.cardClass || "",
         genreLabel: fields.genreLabel || "",
         genres: JSON.stringify(asArray(fields.genres)),
-        trackCount: Number(fields.trackCount) || 0,
+        trackCount: 0,
         listenersLabel: fields.listenersLabel || "",
         country: fields.country || "",
       };

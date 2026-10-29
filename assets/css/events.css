@@ -38,7 +38,7 @@
 .events-feature-copy h2 {
   margin: 0;
   color: #f1f4f5;
-  font-size: 31px;
+  font-size: 33px;
   line-height: 1.12;
   font-weight: 600;
 }
@@ -46,13 +46,13 @@
   max-width: 440px;
   margin: 10px 0 16px;
   color: #c1cbce;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.55;
 }
 .events-feature-copy .button {
   min-height: 39px;
   padding: 0 15px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .events-feature-date {
   position: absolute;
@@ -71,13 +71,13 @@
   backdrop-filter: blur(8px);
 }
 .events-feature-date b {
-  font-size: 22px;
+  font-size: 25px;
   line-height: 1;
   font-weight: 600;
 }
 .events-feature-date small {
   color: var(--mint);
-  font-size: 8px;
+  font-size: 11px;
 }
 .events-controls {
   display: flex;
@@ -103,7 +103,7 @@
   padding: 0 14px;
   border: 1px solid #282e36;
   background: #191d23;
-  font-size: 10px;
+  font-size: 12px;
 }
 .events-controls .genre-chip.active {
   background: #0d3b34;
@@ -170,7 +170,7 @@
 }
 .event-card-art > span {
   color: #e2edeb;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.6px;
 }
@@ -179,7 +179,7 @@
   right: 16px;
   bottom: 12px;
   color: #ffffffdc;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 600;
 }
 .event-card-virtual .event-card-art {
@@ -212,21 +212,21 @@
 .event-card-info p {
   margin: 0 0 7px;
   color: var(--mint);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 .event-card-info h3 {
   overflow: hidden;
   margin: 0 0 6px;
   color: #edf0f2;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .event-card-info span {
   color: #929ca6;
-  font-size: 10px;
+  font-size: 12px;
 }
 .event-card-action {
   min-height: 34px;
@@ -237,7 +237,7 @@
   border: 1px solid #303740;
   border-radius: 5px;
   color: #d2d9dc;
-  font-size: 9px;
+  font-size: 12px;
   transition:
     border-color 0.2s,
     color 0.2s;
@@ -258,11 +258,11 @@
   }
   .events-feature-copy h2 {
     max-width: 330px;
-    font-size: 25px;
+    font-size: 28px;
   }
   .events-feature-copy > p:not(.directory-kicker) {
     max-width: 320px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .events-feature-date {
     top: 10px;
@@ -271,7 +271,7 @@
     height: 48px;
   }
   .events-feature-date b {
-    font-size: 18px;
+    font-size: 20px;
   }
   .events-controls {
     align-items: stretch;
@@ -308,10 +308,10 @@
     padding: 9px 0;
   }
   .event-card-info h3 {
-    font-size: 12px;
+    font-size: 14px;
   }
   .event-card-info span {
-    font-size: 8px;
+    font-size: 11px;
   }
   .event-card-action {
     align-self: end;
@@ -323,7 +323,7 @@
   display: inline-flex;
   margin: 0 0 20px;
   color: var(--mint);
-  font-size: 11px;
+  font-size: 13px;
 }
 .event-detail {
   display: grid;
@@ -368,7 +368,7 @@
   top: 20px;
   left: 20px;
   color: #e2edeb;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -390,7 +390,7 @@
 }
 .event-detail-description {
   color: #aeb8bf;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.75;
 }
 .event-detail-facts {
@@ -407,12 +407,12 @@
 .event-detail-facts dt {
   margin-bottom: 5px;
   color: #83909a;
-  font-size: 9px;
+  font-size: 12px;
 }
 .event-detail-facts dd {
   margin: 0;
   color: #e4e9eb;
-  font-size: 11px;
+  font-size: 13px;
 }
 .event-detail.event-card-virtual .event-detail-art { --event-background: linear-gradient(135deg, #173d43, #285c55); --event-orb: #75d8c677; }
 .event-detail.event-card-tokyo .event-detail-art { --event-background: linear-gradient(135deg, #392b4d, #724255); --event-orb: #e29aa177; }

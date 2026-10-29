@@ -11,7 +11,7 @@
     <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
     <div class="admin-heading">
       <h1>Исполнители <%= artists.length ? '(' + artists.length + ')' : '' %></h1>
-      <p>Исполнители связаны с треками таблицей artist_tracks — треки указываются при создании здесь или в отдельном поле страницы исполнителя (позже).</p>
+      <p>Исполнители связаны с треками через таблицу artist_tracks. Количество треков считается автоматически, когда вы добавляете трек и выбираете исполнителя.</p>
     </div>
     <div class="admin-panel">
       <h2>Новый исполнитель</h2>
@@ -23,9 +23,9 @@
           <label>Стиль карточки<span><input type="text" name="cardClass" placeholder="performer-miku" /></span></label>
           <label>Подпись жанра<span><input type="text" name="genreLabel" placeholder="J-POP · ВОКАЛОИД" /></span></label>
           <label>Жанры (через запятую)<span><input type="text" name="genres" placeholder="vocaloid, j-pop" /></span></label>
-          <label>Всего треков<span><input type="number" name="trackCount" min="0" value="0" /></span></label>
           <label>Слушатели<span><input type="text" name="listenersLabel" placeholder="1,2 млн" /></span></label>
           <label>Страна<span><input type="text" name="country" placeholder="Япония" /></span></label>
+          <p class="admin-hint is-wide">Количество треков не заполняется вручную: оно обновится автоматически после добавления трека этого исполнителя.</p>
           <div class="admin-actions">
             <button class="admin-button" type="submit">Добавить исполнителя</button>
           </div>

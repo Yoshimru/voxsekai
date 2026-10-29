@@ -15,12 +15,24 @@
     </div>
     <div class="admin-panel">
       <h2>Новый трек</h2>
+      <% if (error) { %>
+        <p class="admin-error" role="alert"><%= error %></p>
+      <% } %>
+      <% if (!artists.length) { %>
+        <p class="admin-hint">Сначала добавьте исполнителя в разделе <a href="/admin/artists">«Исполнители»</a> — затем его можно будет выбрать здесь.</p>
+      <% } %>
       <form method="post" action="/admin/tracks">
         <div class="admin-form">
           <label>Название<span><input type="text" name="title" required /></span></label>
           <label>Название для показа<span><input type="text" name="displayTitle" required /></span></label>
-          <label>Подпись (artist)<span><input type="text" name="artist" placeholder="author · Vocal" /></span></label>
-          <label>Имя исполнителя<span><input type="text" name="artistName" /></span></label>
+          <label>Исполнитель<span>
+            <select name="artistId" required <%= artists.length ? '' : 'disabled' %>>
+              <option value="">— выберите из добавленных —</option>
+              <% artists.forEach((artist) => { %>
+                <option value="<%= artist.id %>"><%= artist.name %><% if (artist.alias) { %> · <%= artist.alias %><% } %></option>
+              <% }) %>
+            </select>
+          </span></label>
           <label>Длительность (сек)<span><input type="number" name="duration" min="0" value="200" /></span></label>
           <label>Жанр<span><input type="text" name="genre" /></span></label>
           <label>Рейтинг<span><input type="text" name="rating" placeholder="4.8" /></span></label>
@@ -42,7 +54,7 @@
           <label class="is-wide">Ссылка на аудио<span><input type="text" name="audioUrl" placeholder="https://..." /></span></label>
           <label class="is-wide">Описание<span><textarea name="description" rows="2"></textarea></span></label>
           <div class="admin-actions">
-            <button class="admin-button" type="submit">Добавить трек</button>
+            <button class="admin-button" type="submit" <%= artists.length ? '' : 'disabled' %>>Добавить трек</button>
           </div>
         </div>
       </form>

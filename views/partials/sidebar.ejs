@@ -28,6 +28,7 @@
       ><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7.5 3v4M16.5 3v4M3.5 10h17M8 14h3v3H8z"/><path d="m16.5 13 .6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg>События</a
     >
   </nav>
+  <% if (currentUser) { %>
   <div class="side-collection">
     <p class="side-label">МОЯ МУЗЫКА</p>
     <a
@@ -46,10 +47,30 @@
       >＋ Создать плейлист</a
     >
   </div>
+  <% } else { %>
+  <div class="side-collection side-collection-locked">
+    <p class="side-label">МОЯ МУЗЫКА</p>
+    <p class="side-lock-note">
+      Войди в аккаунт, чтобы открыть плейлисты, избранное и профиль.
+    </p>
+    <a class="side-lock-link" href="/login?next=%2Fprofile"
+      >Войти в аккаунт <span>↗</span></a
+    >
+  </div>
+  <% } %>
   <div class="sidebar-about">
+    <% if (currentUser) { %>
+    <p class="sidebar-user">Привет, <%= currentUser.username %></p>
+    <span>Твой музыкальный профиль подключён.</span>
+    <a href="/profile">Профиль ↗</a>
+    <form method="post" action="/logout" class="sidebar-logout-form">
+      <button type="submit" class="sidebar-logout">Выйти</button>
+    </form>
+    <% } else { %>
     <p>Твой голос. Твой мир.</p>
     <span>Всё бесплатно.<br />Без подписок.</span
     ><a href="/login">Войти ↗</a>
     <a href="/register">Создать аккаунт</a>
+    <% } %>
   </div>
 </aside>

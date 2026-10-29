@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("node:path");
 const session = require("express-session");
 const contentRepository = require("./repositories/contentRepository");
+const authRepository = require("./repositories/authRepository");
 const adminRouter = require("./routes/admin");
 
 const app = express();
@@ -55,6 +56,87 @@ const pages = {
   },
 };
 
+const protectedPaths = new Set([
+  "/playlists",
+  "/favorites",
+  "/profile",
+  "/create-playlist",
+]);
+
+const loginTitle = "Вход — VoxSekai";
+const registerTitle = "Регистрация — VoxSekai";
+const loginView = "pages/login";
+const registerView = "pages/register";
+
+/** Разрешаем только внутренние пути, чтобы не открыть редирект на чужой сайт. */
+function safeNext(value) {
+  const target = typeof value === "string" ? value.trim() : "";
+  if (!target.startsWith("/") || target.startsWith("//")) return "";
+  return target;
+}
+
+function renderLogin(res, { error = "", values = {}, next = "" } = {}) {
+  return res.status(error ? 400 : 200).render(loginView, {
+    title: loginTitle,
+    error,
+    values,
+    next,
+  });
+}
+
+function renderRegister(res, { error = "", values = {}, next = "" } = {}) {
+  return res.status(error ? 400 : 200).render(registerView, {
+    title: registerTitle,
+    error,
+    values,
+    next,
+  });
+}
+
+/** Считает жанр недели по каталогу; на клиенте он уточняется по избранному. */
+function buildTaste(tracks) {
+  const counts = new Map();
+  tracks.forEach((track) => {
+    if (!track.genre) return;
+    const current = counts.get(track.genre) || {
+      count: 0,
+      filter: track.filterGenre || "all",
+    };
+    current.count += 1;
+    if (track.filterGenre && track.filterGenre !== "all") {
+      current.filter = track.filterGenre;
+    }
+    counts.set(track.genre, current);
+  });
+
+  const sorted = [...counts.entries()].sort(
+    (first, second) =>
+      second[1].count - first[1].count ||
+      first[0].localeCompare(second[0], "ru"),
+  );
+
+  if (!sorted.length) {
+    return {
+      genre: "Электроника",
+      count: 0,
+      percent: 0,
+      filter: "electronic",
+      hasData: false,
+      description: "Добавь треки в избранное — и мы определим твой жанр.",
+    };
+  }
+
+  const [genre, data] = sorted[0];
+  return {
+    genre,
+    count: data.count,
+    percent: Math.round((data.count / tracks.length) * 100),
+    filter: data.filter,
+    hasData: true,
+    description: "Тебе особенно близко",
+  };
+}
+
 app.disable("x-powered-by");
 app.set("views", viewsDirectory);
 app.set("view engine", "ejs");
@@ -63,7 +145,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 app.use("/admin/assets", express.static(path.join(__dirname, "assets")));
-// Сессии нужны админпанели: cookie выделяется и для обычных страниц, но их содержимое пустое.
+// Сессии общие для сайта и админпанели: в них хранится id текущего пользователя.
 app.use(
   session({
     secret: "voxsekai-admin-secret-dev",
@@ -72,6 +154,14 @@ app.use(
     cookie: { httpOnly: true, sameSite: "lax", maxAge: 1000 * 60 * 60 * 8 },
   }),
 );
+// Пользователь из сессии доступен всем публичным шаблонам.
+app.use((req, res, next) => {
+  const userId = req.session?.userId;
+  const user = userId ? authRepository.getUserById(userId) : null;
+  if (userId && !user) delete req.session.userId;
+  res.locals.currentUser = user;
+  next();
+});
 app.use("/admin", adminRouter);
 app.use((req, res, next) => {
   Promise.resolve()
@@ -83,6 +173,83 @@ app.use((req, res, next) => {
 });
 
 app.get("/index.html", (req, res) => res.redirect(301, "/"));
+
+// --- Авторизация пользователей ---
+app.post("/login", (req, res, next) => {
+  try {
+    const login = String(req.body.login || "").trim();
+    const password = String(req.body.password || "");
+    const nextPath = safeNext(req.body.next);
+
+    const user = login ? authRepository.getUserByLogin(login) : null;
+    if (!user || !authRepository.verifyPassword(password, user.passwordHash)) {
+      return renderLogin(res, {
+        error: "Неверный логин или пароль.",
+        values: { login },
+        next: nextPath,
+      });
+    }
+
+    req.session.userId = user.id;
+    req.session.save((error) => {
+      if (error) return next(error);
+      res.redirect(nextPath || "/");
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/register", (req, res, next) => {
+  try {
+    const username = String(req.body.name || "").trim();
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+    const nextPath = safeNext(req.body.next);
+
+    const errors = [];
+    if (username.length < 2 || username.length > 32) {
+      errors.push("Имя должно содержать от 2 до 32 символов.");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      errors.push("Укажи корректный e-mail.");
+    }
+    if (password.length < 8) {
+      errors.push("Пароль должен содержать не менее 8 символов.");
+    }
+    if (authRepository.getUserByUsername(username)) {
+      errors.push("Пользователь с таким именем уже существует.");
+    }
+    if (email && authRepository.getUserByEmail(email)) {
+      errors.push("Этот e-mail уже привязан к аккаунту.");
+    }
+
+    if (errors.length) {
+      return renderRegister(res, {
+        error: errors.join(" "),
+        values: { name: username, email },
+        next: nextPath,
+      });
+    }
+
+    const user = authRepository.createUser({ username, email, password });
+    req.session.userId = user.id;
+    req.session.save((error) => {
+      if (error) return next(error);
+      res.redirect(nextPath || "/profile");
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/logout", (req, res, next) => {
+  req.session.destroy((error) => {
+    if (error) return next(error);
+    res.clearCookie("connect.sid");
+    res.redirect("/");
+  });
+});
 
 const notFoundTitle =
   "404 \u2014 \u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u0430 | VoxSekai";
@@ -165,9 +332,29 @@ app.get("/events/:slug", async (req, res, next) => {
 for (const [route, page] of Object.entries(pages)) {
   app.get(route, async (req, res, next) => {
     try {
+      if (
+        (route === "/login" || route === "/register") &&
+        res.locals.currentUser
+      ) {
+        return res.redirect("/");
+      }
+      if (protectedPaths.has(route) && !res.locals.currentUser) {
+        return res.redirect(
+          `/login?next=${encodeURIComponent(req.originalUrl)}`,
+        );
+      }
+
       const viewData = { title: page.title };
+      if (route === "/login" || route === "/register") {
+        viewData.error = "";
+        viewData.values = {};
+        viewData.next = safeNext(req.query.next);
+      }
       if (route === "/" || route === "/favorites" || route === "/artists") {
         viewData.tracks = res.locals.trackCatalog;
+      }
+      if (route === "/") {
+        viewData.taste = buildTaste(res.locals.trackCatalog);
       }
       if (route === "/catalog") {
         const collectionId = req.query.collection;

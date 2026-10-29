@@ -177,6 +177,26 @@
   grid-column: 1 / -1;
 }
 
+.admin-hint {
+  margin: 0 0 14px;
+  color: var(--admin-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-form .admin-hint {
+  margin: 0;
+}
+
+.admin-hint.is-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-hint a {
+  color: #8ec9d6;
+  text-decoration: underline;
+}
+
 .admin-form input,
 .admin-form select,
 .admin-form textarea {

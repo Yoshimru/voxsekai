@@ -47,16 +47,32 @@
             </div>
             <div class="taste-layout">
               <div class="track-list recommendation-track-list" aria-label="Рекомендованные треки">
-                <% tracks.forEach((track) => { %>
-                  <%- include('partials/track-row', { track }) %>
-                <% }) %>
+                <% if (tracks.length) { %>
+                  <% tracks.forEach((track) => { %>
+                    <%- include('partials/track-row', { track }) %>
+                  <% }) %>
+                <% } else { %>
+                  <div class="recommendation-empty">
+                    <span aria-hidden="true">♫</span>
+                    <p>Пока нет рекомендаций. Добавь треки в каталог — здесь появятся подборки для тебя.</p>
+                    <a class="view-all" href="/catalog">Открыть каталог <span>↗</span></a>
+                  </div>
+                <% } %>
               </div>
-              <aside class="taste-card" aria-label="Жанр недели">
+              <aside class="taste-card" data-taste-card aria-label="Жанр недели">
                 <div class="taste-card-heading"><span class="taste-card-mark">≋</span><span>ТВОЙ ЖАНР НЕДЕЛИ</span></div>
-                <h3>Электроника<br />с характером</h3><p>Тебе особенно близко</p>
-                <div class="taste-meter"><span style="--level: 86%"></span></div>
-                <div class="taste-meter-label"><span>Электроника</span><b>86%</b></div>
-                <a class="view-all" href="/catalog">Исследовать жанр <span>↗</span></a>
+                <% if (taste.hasData) { %>
+                <h3><span data-taste-genre><%= taste.genre %></span><br />с характером</h3>
+                <p data-taste-description><%= taste.description %></p>
+                <div class="taste-meter"><span style="--level: <%= taste.percent %>%" data-taste-meter></span></div>
+                <div class="taste-meter-label"><span data-taste-genre-label><%= taste.genre %></span><b data-taste-percent><%= taste.percent %>%</b></div>
+                <div class="taste-card-meta"><span data-taste-count><%= taste.count %></span> треков в этом жанре</div>
+                <a class="taste-card-link" href="/catalog?genre=<%= taste.filter %>" data-taste-link>Исследовать жанр <span>↗</span></a>
+                <% } else { %>
+                <h3>Жанр ещё<br />не определён</h3>
+                <p>Добавь треки в избранное — и мы поймём, что звучит у тебя чаще.</p>
+                <a class="taste-card-link" href="/catalog" data-taste-link>Открыть каталог <span>↗</span></a>
+                <% } %>
               </aside>
             </div>
           </section>
