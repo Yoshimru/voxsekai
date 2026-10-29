@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body admin-login-wrap">
+    <div class="admin-login-card">
+      <h1>VoxSekai · Админ</h1>
+      <p class="admin-sub">Управление контентом сайта</p>
+      <% if (error) { %>
+        <p class="admin-error"><%= error %></p>
+      <% } %>
+      <div class="admin-panel">
+        <form method="post" action="/admin/login">
+          <div class="admin-form">
+            <label class="is-wide">Логин
+              <input type="text" name="username" required autofocus autocomplete="username" />
+            </label>
+            <label class="is-wide">Пароль
+              <input type="password" name="password" required autocomplete="current-password" />
+            </label>
+            <div class="admin-actions">
+              <button class="admin-button" type="submit">Войти</button>
+              <a class="admin-button admin-button-secondary" href="/">← На сайт</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Подборки <%= collections.length ? '(' + collections.length + ')' : '' %></h1>
+      <p>Одна из подборок может быть «подборкой недели» — она показывается на каталоге и главной странице подборок.</p>
+    </div>
+    <div class="admin-panel">
+      <h2>Новая подборка</h2>
+      <form method="post" action="/admin/collections">
+        <div class="admin-form">
+          <label>Название<span><input type="text" name="title" required /></span></label>
+          <label>Подпись (tagline)<span><input type="text" name="tagline" placeholder="AFTER HOURS" /></span></label>
+          <label>Стиль карточки<span>
+            <select name="cardClass">
+              <option value="collection-mood-new">collection-mood-new</option>
+              <option value="collection-mood-road">collection-mood-road</option>
+              <option value="collection-mood-soft">collection-mood-soft</option>
+              <option value="collection-mood-tokyo">collection-mood-tokyo</option>
+            </select>
+          </span></label>
+          <label class="is-wide">Описание<span><input type="text" name="description" /></span></label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="featured" />
+            Сделать подборкой недели
+          </label>
+          <label class="is-wide">Треки подборки
+            <span class="admin-track-picker">
+              <% tracks.forEach((track) => { %>
+                <label>
+                  <input type="checkbox" name="trackIds" value="<%= track.id %>" />
+                  <%= track.displayTitle %> · <%= track.artistName %>
+                </label>
+              <% }) %>
+            </span>
+          </label>
+          <div class="admin-actions">
+            <button class="admin-button" type="submit">Создать подборку</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="admin-panel">
+      <h2>Все подборки</h2>
+      <% if (collections.length) { %>
+        <table class="admin-table">
+          <thead>
+            <tr><th>Название</th><th>Подпись</th><th>Треков</th><th>Неделя</th><th style="width:45%">Состав (галочки = сохранить)</th></tr>
+          </thead>
+          <tbody>
+            <% collections.forEach((collection) => { %>
+              <tr>
+                <td><b><%= collection.title %></b> <small style="color:var(--admin-muted)"><%= collection.id %></small></td>
+                <td><%= collection.tagline %></td>
+                <td><%= collection.trackCount %></td>
+                <td><%= collection.featured ? '★' : '' %></td>
+                <td>
+                  <form method="post" action="/admin/collections/<%= collection.id %>/tracks" style="margin:0">
+                    <details>
+                      <summary style="cursor:pointer;color:var(--admin-muted)">Изменить треки</summary>
+                      <span class="admin-track-picker" style="margin-top:8px">
+                        <% tracks.forEach((track) => { %>
+                          <label>
+                            <input type="checkbox" name="trackIds" value="<%= track.id %>" <%= collection.trackIds.includes(track.id) ? 'checked' : '' %> />
+                            <%= track.displayTitle %>
+                          </label>
+                        <% }) %>
+                      </span>
+                      <button class="admin-button admin-button-secondary" type="submit" style="margin-top:8px">Сохранить треки подборки</button>
+                    </details>
+                  </form>
+                </td>
+                <td>
+                  <form method="post" action="/admin/collections/<%= collection.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить подборку?')">
+                    <button class="admin-button-danger" type="submit">Удалить</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p style="color:var(--admin-muted)">Подборок пока нет. Создайте первую — она появится на сайте сразу.</p>
+      <% } %>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

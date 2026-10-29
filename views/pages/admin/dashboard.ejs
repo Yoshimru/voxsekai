@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Обзор</h1>
+      <p>Всё содержимое сайта берётся из базы данных. Добавляйте записи через разделы слева.</p>
+    </div>
+    <div class="admin-stats">
+      <div class="admin-stat"><b><%= counts.tracks %></b><span>Треков</span></div>
+      <div class="admin-stat"><b><%= counts.artists %></b><span>Исполнителей</span></div>
+      <div class="admin-stat"><b><%= counts.collections %></b><span>Подборок</span></div>
+      <div class="admin-stat"><b><%= counts.playlists %></b><span>Плейлистов</span></div>
+      <div class="admin-stat"><b><%= counts.events %></b><span>Событий</span></div>
+      <div class="admin-stat"><b><%= counts.users %></b><span>Пользователей</span></div>
+    </div>
+    <div class="admin-panel">
+      <h2>Ссылки на сайт</h2>
+      <p><a class="admin-button admin-button-secondary" href="/">← Открыть сайт</a></p>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

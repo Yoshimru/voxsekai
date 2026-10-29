@@ -45,11 +45,13 @@
               <button class="genre-chip" type="button" data-filter="dance" aria-pressed="false">Dance</button>
             </div>
           </section>
+          <% if (featuredCollection) { %>
           <section class="catalog-feature" aria-label="Подборка недели">
-            <div class="catalog-feature-art"><span class="catalog-feature-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span>AFTER HOURS</span></div>
-            <div class="catalog-feature-copy"><p class="eyebrow">ПОДБОРКА НЕДЕЛИ</p><h2>После полуночи</h2><p>Нежный синтвейв и электро-поп для ночных поездок.</p><small><%= tracks.length %> треков в каталоге</small></div>
-            <a class="button button-primary" href="/collections">Слушать подборку <span>↗</span></a>
+            <div class="catalog-feature-art"><span class="catalog-feature-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span><%= featuredCollection.tagline %></span></div>
+            <div class="catalog-feature-copy"><p class="eyebrow">ПОДБОРКА НЕДЕЛИ</p><h2><%= featuredCollection.title %></h2><p><%= featuredCollection.description %></p><small><%= featuredCollection.trackCount %> треков в подборке</small></div>
+            <a class="button button-primary" href="/catalog?collection=<%= featuredCollection.id %>">Слушать подборку <span>↗</span></a>
           </section>
+          <% } %>
           <section class="catalog-tracks">
             <div class="directory-section-heading"><h2>Треки для твоего следующего вайба</h2><p><span data-results-count><%= tracks.length %></span> треков · сортировка по популярности</p></div>
             <div class="catalog-track-grid" data-sort-list>

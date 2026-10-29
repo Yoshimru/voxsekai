@@ -1,0 +1,25 @@
+<%
+  const nav = [
+    { href: basePath, label: "Дашборд", key: "" },
+    { href: basePath + "/tracks", label: "Треки", key: "tracks" },
+    { href: basePath + "/artists", label: "Исполнители", key: "artists" },
+    { href: basePath + "/collections", label: "Подборки", key: "collections" },
+    { href: basePath + "/playlists", label: "Плейлисты", key: "playlists" },
+    { href: basePath + "/events", label: "События", key: "events" },
+    { href: basePath + "/users", label: "Пользователи", key: "users" },
+  ];
+%>
+<div class="admin-shell">
+  <nav class="admin-nav" aria-label="Разделы админпанели">
+    <h1 class="admin-brand">VOXSEKAI<small>АДМИНПАНЕЛЬ</small></h1>
+    <% nav.forEach((item) => { %>
+      <a href="<%= item.href %>" class="<%= section === item.key ? 'is-active' : '' %>"><%= item.label %></a>
+    <% }) %>
+    <div class="admin-nav-footer">
+      <p class="admin-user-label">Вошёл: <b><%= adminUser.username %></b></p>
+      <form method="post" action="/admin/logout">
+        <button class="admin-button admin-button-secondary" type="submit" style="margin: 8px 12px; width: calc(100% - 24px);">Выйти</button>
+      </form>
+    </div>
+  </nav>
+  <main class="admin-main">

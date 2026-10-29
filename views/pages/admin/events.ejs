@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>События <%= events.length ? '(' + events.length + ')' : '' %></h1>
+      <p>События отображаются на главной и в разделе «События». Главное поле — дата (YYYY-MM-DD); подписи «день», «месяц» и «дата-в-тексте» вычисляются автоматически, если оставить пустыми.</p>
+    </div>
+    <div class="admin-panel">
+      <h2>Новое событие</h2>
+      <form method="post" action="/admin/events">
+        <div class="admin-form">
+          <label>Название<span><input type="text" name="title" required /></span></label>
+          <label>Формат<span>
+            <select name="type">
+              <option value="offline">офлайн</option>
+              <option value="online">онлайн</option>
+            </select>
+          </span></label>
+          <label>Площадка (venue)<span><input type="text" name="venue" /></span></label>
+          <label>Город<span><input type="text" name="location" /></span></label>
+          <label>Дата (YYYY-MM-DD)<span><input type="date" name="date" required /></span></label>
+          <label>Время<span><input type="text" name="time" placeholder="20:00" /></span></label>
+          <label>Категория<span><input type="text" name="category" placeholder="Концерт" /></span></label>
+          <label>Подпись (tag)<span><input type="text" name="tag" placeholder="LIVE SHOW · 02" /></span></label>
+          <label>Стиль обложки<span>
+            <select name="artworkClass">
+              <option value="event-card-neon">event-card-neon</option>
+              <option value="event-card-virtual">event-card-virtual</option>
+              <option value="event-card-tokyo">event-card-tokyo</option>
+              <option value="event-card-synth">event-card-synth</option>
+              <option value="event-card-studio">event-card-studio</option>
+              <option value="event-card-radio">event-card-radio</option>
+            </select>
+          </span></label>
+          <label>Глиф<span><input type="text" name="artworkGlyph" placeholder="VS" /></span></label>
+          <label class="is-wide">Описание<span><textarea name="description" rows="2"></textarea></span></label>
+          <div class="admin-actions">
+            <button class="admin-button" type="submit">Добавить событие</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="admin-panel">
+      <h2>Все события</h2>
+      <% if (events.length) { %>
+        <table class="admin-table">
+          <thead>
+            <tr><th>Название</th><th>Дата</th><th>Формат</th><th>Город</th><th>Начало</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% events.forEach((event) => { %>
+              <tr>
+                <td><b><%= event.title %></b> <small style="color:var(--admin-muted)"><%= event.id %></small></td>
+                <td><%= event.dateLabel %></td>
+                <td><%= event.type %></td>
+                <td><%= event.location %></td>
+                <td><%= event.time %></td>
+                <td>
+                  <form method="post" action="/admin/events/<%= event.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить событие?')">
+                    <button class="admin-button-danger" type="submit">Удалить</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p style="color:var(--admin-muted)">Сегодня событий нет. Добавьте первое — оно сразу появится на главной.</p>
+      <% } %>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

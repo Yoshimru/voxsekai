@@ -1,4 +1,4 @@
-const { createDatabase } = require("../db");
+const { getDb } = require("../db");
 
 // Презентационные маппинги — остались на стороне репозитория, как и раньше.
 const genreKeys = {
@@ -105,7 +105,7 @@ function mapEvent(row) {
   };
 }
 
-function createContentRepository(db = createDatabase()) {
+function createContentRepository(db = getDb()) {
   const statements = {
     allTracks: db.prepare("SELECT * FROM tracks ORDER BY id"),
     trackById: db.prepare("SELECT * FROM tracks WHERE id = ?"),

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Пользователи <%= users.length ? '(' + users.length + ')' : '' %></h1>
+      <p>Пароли хранятся в базе данных только в виде хешей (scrypt). Нельзя удалить собственный аккаунт.</p>
+    </div>
+    <div class="admin-panel">
+      <h2>Новый пользователь</h2>
+      <form method="post" action="/admin/users">
+        <div class="admin-form">
+          <label>Логин<span><input type="text" name="username" required /></span></label>
+          <label>Пароль<span><input type="password" name="password" required /></span></label>
+          <label>Роль<span>
+            <select name="role">
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
+          </span></label>
+          <div class="admin-actions">
+            <button class="admin-button" type="submit">Создать пользователя</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="admin-panel">
+      <h2>Все пользователи</h2>
+      <table class="admin-table">
+        <thead>
+          <tr><th>Логин</th><th>Роль</th><th>Создан</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% users.forEach((user) => { %>
+            <tr>
+              <td><b><%= user.username %></b></td>
+              <td><span class="admin-badge <%= user.role === 'admin' ? 'admin-badge-admin' : 'admin-badge-user' %>"><%= user.role %></span></td>
+              <td><%= user.createdAt %></td>
+              <td>
+                <% if (user.id !== adminUser.id) { %>
+                  <form method="post" action="/admin/users/<%= user.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить пользователя?')">
+                    <button class="admin-button-danger" type="submit">Удалить</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

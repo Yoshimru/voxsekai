@@ -92,7 +92,15 @@ CREATE TABLE IF NOT EXISTS events (
   description   TEXT NOT NULL DEFAULT ''
 );
 
-CREATE INDEX IF NOT EXISTS idx_artist_tracks_artist ON artist_tracks (artist_id, position);
+CREATE TABLE IF NOT EXISTS users (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  username      TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role          TEXT NOT NULL DEFAULT 'user',   -- 'user' | 'admin'
+  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+
 CREATE INDEX IF NOT EXISTS idx_artist_tracks_track  ON artist_tracks (track_id);
 CREATE INDEX IF NOT EXISTS idx_collection_tracks_collection ON collection_tracks (collection_id, position);
 CREATE INDEX IF NOT EXISTS idx_playlist_tracks_playlist ON playlist_tracks (playlist_id, position);

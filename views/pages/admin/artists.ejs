@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Исполнители <%= artists.length ? '(' + artists.length + ')' : '' %></h1>
+      <p>Исполнители связаны с треками таблицей artist_tracks — треки указываются при создании здесь или в отдельном поле страницы исполнителя (позже).</p>
+    </div>
+    <div class="admin-panel">
+      <h2>Новый исполнитель</h2>
+      <form method="post" action="/admin/artists">
+        <div class="admin-form">
+          <label>Имя (name)<span><input type="text" name="name" required /></span></label>
+          <label>Алиас на русском<span><input type="text" name="alias" /></span></label>
+          <label>Инициалы<span><input type="text" name="initials" placeholder="MI" /></span></label>
+          <label>Стиль карточки<span><input type="text" name="cardClass" placeholder="performer-miku" /></span></label>
+          <label>Подпись жанра<span><input type="text" name="genreLabel" placeholder="J-POP · ВОКАЛОИД" /></span></label>
+          <label>Жанры (через запятую)<span><input type="text" name="genres" placeholder="vocaloid, j-pop" /></span></label>
+          <label>Всего треков<span><input type="number" name="trackCount" min="0" value="0" /></span></label>
+          <label>Слушатели<span><input type="text" name="listenersLabel" placeholder="1,2 млн" /></span></label>
+          <label>Страна<span><input type="text" name="country" placeholder="Япония" /></span></label>
+          <div class="admin-actions">
+            <button class="admin-button" type="submit">Добавить исполнителя</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="admin-panel">
+      <h2>Все исполнители</h2>
+      <% if (artists.length) { %>
+        <table class="admin-table">
+          <thead>
+            <tr><th>Имя</th><th>Алиас</th><th>Жанр</th><th>Страна</th><th>Треков в базе</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% artists.forEach((artist) => { %>
+              <tr>
+                <td><b><%= artist.name %></b> <small style="color:var(--admin-muted)"><%= artist.id %></small></td>
+                <td><%= artist.alias %></td>
+                <td><%= artist.genreLabel %></td>
+                <td><%= artist.country %></td>
+                <td><%= artist.trackIds.length %></td>
+                <td>
+                  <form method="post" action="/admin/artists/<%= artist.id %>/delete" style="margin:0">
+                    <button class="admin-button-danger" type="submit">Удалить</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p style="color:var(--admin-muted)">Исполнителей пока нет.</p>
+      <% } %>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

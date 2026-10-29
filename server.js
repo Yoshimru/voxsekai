@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("node:path");
+const session = require("express-session");
 const contentRepository = require("./repositories/contentRepository");
+const adminRouter = require("./routes/admin");
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -60,6 +62,17 @@ app.locals.contentRepository = contentRepository;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/assets", express.static(path.join(__dirname, "assets")));
+app.use("/admin/assets", express.static(path.join(__dirname, "assets")));
+// Сессии нужны админпанели: cookie выделяется и для обычных страниц, но их содержимое пустое.
+app.use(
+  session({
+    secret: "voxsekai-admin-secret-dev",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { httpOnly: true, sameSite: "lax", maxAge: 1000 * 60 * 60 * 8 },
+  }),
+);
+app.use("/admin", adminRouter);
 app.use((req, res, next) => {
   Promise.resolve()
     .then(() => contentRepository.getTracks())
@@ -164,6 +177,9 @@ for (const [route, page] of Object.entries(pages)) {
         if (collectionId && !collection) {
           return res.status(404).render("pages/404", { title: notFoundTitle });
         }
+        const featuredCollection = (await contentRepository.getCollections())
+          .find((item) => item.featured) || null;
+        viewData.featuredCollection = featuredCollection;
         viewData.collection = collection;
         if (collection) viewData.title = `${collection.title} — VoxSekai`;
         viewData.tracks = collection

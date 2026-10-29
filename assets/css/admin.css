@@ -1,0 +1,366 @@
+:root {
+  --admin-bg: #0e1014;
+  --admin-panel: #16191f;
+  --admin-panel-2: #1c2027;
+  --admin-border: #2a2f3a;
+  --admin-text: #e8eaf0;
+  --admin-muted: #9aa2b1;
+  --admin-accent: #7154b4;
+  --admin-accent-2: #248c9f;
+  --admin-danger: #c0392b;
+  --admin-ok: #2e7d32;
+}
+
+.admin-body {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  min-height: 100vh;
+}
+
+.admin-nav {
+  background: var(--admin-panel);
+  border-right: 1px solid var(--admin-border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-brand {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 8px 16px;
+  color: #fff;
+}
+
+.admin-brand small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--admin-muted);
+  letter-spacing: 0.2em;
+  margin-top: 2px;
+}
+
+.admin-nav a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--admin-muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.admin-nav a:hover {
+  background: var(--admin-panel-2);
+  color: var(--admin-text);
+}
+
+.admin-nav a.is-active {
+  background: rgba(113, 84, 180, 0.18);
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-nav-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--admin-border);
+  padding-top: 12px;
+}
+
+.admin-main {
+  padding: 32px 40px;
+  max-width: 1100px;
+}
+
+.admin-heading h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+}
+
+.admin-heading p {
+  margin: 0 0 24px;
+  color: var(--admin-muted);
+}
+
+/* Карточки-счётчики */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.admin-stat {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.admin-stat b {
+  display: block;
+  font-size: 28px;
+  color: #fff;
+}
+
+.admin-stat span {
+  color: var(--admin-muted);
+  font-size: 13px;
+}
+
+/* Панель */
+.admin-panel {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.admin-panel h2 {
+  margin: 0 0 16px;
+  font-size: 17px;
+}
+
+/* Таблица */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin-table th {
+  text-align: left;
+  color: var(--admin-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(42, 47, 58, 0.5);
+}
+
+.admin-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Формы */
+.admin-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--admin-muted);
+}
+
+.admin-form label.is-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  color: var(--admin-text);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+}
+
+.admin-form .checkbox-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-form .checkbox-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--admin-accent);
+}
+
+.admin-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Кнопки */
+.admin-button {
+  background: var(--admin-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.admin-button:hover { background: #5d45a0; }
+
+.admin-button-secondary {
+  background: var(--admin-panel-2);
+  color: var(--admin-text);
+  border: 1px solid var(--admin-border);
+}
+
+.admin-button-secondary:hover { background: #232833; }
+
+.admin-button-danger {
+  background: transparent;
+  color: #e57368;
+  border: 1px solid rgba(192, 57, 43, 0.5);
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.admin-button-danger:hover {
+  background: rgba(192, 57, 43, 0.15);
+}
+
+/* Чекбоксы треков */
+.admin-track-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--admin-bg);
+}
+
+.admin-track-picker label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  color: var(--admin-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Логин */
+.admin-login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-login-card {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 36px;
+  width: 360px;
+}
+
+.admin-login-card h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.admin-login-card .admin-sub {
+  color: var(--admin-muted);
+  font-size: 13px;
+  margin: 0 0 20px;
+}
+
+.admin-login-card .admin-panel {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-error {
+  background: rgba(192, 57, 43, 0.15);
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  color: #f2b1aa;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.admin-user-label {
+  color: var(--admin-muted);
+  font-size: 13px;
+  padding: 6px 12px 0;
+}
+
+/* Бейджи */
+.admin-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-badge-admin {
+  background: rgba(113, 84, 180, 0.25);
+  color: #cfc0f0;
+}
+
+.admin-badge-user {
+  background: rgba(36, 140, 159, 0.2);
+  color: #9fd8e2;
+}
+
+@media (max-width: 800px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+  .admin-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid var(--admin-border);
+  }
+  .admin-nav-footer {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+    margin-left: auto;
+  }
+  .admin-main {
+    padding: 20px;
+  }
+}
