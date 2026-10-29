@@ -1,5 +1,11 @@
-<article class="track-card track-row" data-track-id="<%= track.id %>" data-favorite-item="<%= track.id %>" data-genre-item data-genre="<%= track.filterGenre %>" data-search-text="<%= `${track.displayTitle} ${track.title} ${track.artist} ${track.genre}`.toLocaleLowerCase('ru') %>" data-track-slug="<%= track.id %>" data-track-title="<%= track.displayTitle %>" data-track-original-title="<%= track.title %>" data-track-artist="<%= track.artist %>" data-track-duration="<%= track.duration %>" data-track-genre="<%= track.genre %>" data-track-artwork="<%= track.artworkClass %>" data-track-glyph="<%= track.artworkGlyph %>" data-track-audio="<%= track.audioUrl || '' %>">
-  <a class="mini-cover <%= track.artworkClass %>" href="/track/<%= track.id %>" aria-label="Подробнее о треке <%= track.displayTitle %>"><span><%= track.artworkGlyph %></span><span class="track-playing-indicator" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></a>
+<article class="track-card track-row" data-track-id="<%= track.id %>" data-favorite-item="<%= track.id %>" data-genre-item data-genre="<%= track.filterGenre %>" data-search-text="<%= `${track.displayTitle} ${track.title} ${track.artist} ${track.genre}`.toLocaleLowerCase('ru') %>" data-track-slug="<%= track.id %>" data-track-title="<%= track.displayTitle %>" data-track-original-title="<%= track.title %>" data-track-artist="<%= track.artist %>" data-track-duration="<%= track.duration %>" data-track-genre="<%= track.genre %>" data-track-artwork="<%= track.artworkClass %>" data-track-glyph="<%= track.artworkGlyph %>" data-track-image="<%= track.imageUrl || '' %>" data-track-audio="<%= track.audioUrl || '' %>">
+  <a class="mini-cover <%= track.artworkClass %> <%= track.imageUrl ? 'has-photo' : '' %>" href="/track/<%= track.id %>" aria-label="Подробнее о треке <%= track.displayTitle %>">
+    <% if (track.imageUrl) { %>
+      <img class="mini-cover-photo" src="<%= track.imageUrl %>" alt="<%= track.displayTitle %>" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
+    <% } %>
+    <span class="mini-cover-glyph"><%= track.artworkGlyph %></span>
+    <span class="track-playing-indicator" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+  </a>
   <div class="track-row-info">
     <h3><a href="/track/<%= track.id %>"><%= track.displayTitle %></a></h3>
     <p><%= track.artist %></p>

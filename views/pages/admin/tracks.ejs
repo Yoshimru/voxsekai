@@ -18,58 +18,37 @@
       <% if (error) { %>
         <p class="admin-error" role="alert"><%= error %></p>
       <% } %>
-      <% if (!artists.length) { %>
-        <p class="admin-hint">Сначала добавьте исполнителя в разделе <a href="/admin/artists">«Исполнители»</a> — затем его можно будет выбрать здесь.</p>
-      <% } %>
-      <form method="post" action="/admin/tracks">
-        <div class="admin-form">
-          <label>Название<span><input type="text" name="title" required /></span></label>
-          <label>Название для показа<span><input type="text" name="displayTitle" required /></span></label>
-          <label>Исполнитель<span>
-            <select name="artistId" required <%= artists.length ? '' : 'disabled' %>>
-              <option value="">— выберите из добавленных —</option>
-              <% artists.forEach((artist) => { %>
-                <option value="<%= artist.id %>"><%= artist.name %><% if (artist.alias) { %> · <%= artist.alias %><% } %></option>
-              <% }) %>
-            </select>
-          </span></label>
-          <label>Длительность (сек)<span><input type="number" name="duration" min="0" value="200" /></span></label>
-          <label>Жанр<span><input type="text" name="genre" /></span></label>
-          <label>Рейтинг<span><input type="text" name="rating" placeholder="4.8" /></span></label>
-          <label>Альбом<span><input type="text" name="album" /></span></label>
-          <label>Год выпуска<span><input type="number" name="releaseYear" min="1900" max="2100" /></span></label>
-          <label>Стиль обложки<span>
-            <select name="artworkClass">
-              <option value="artwork-cyan">artwork-cyan</option>
-              <option value="artwork-sakura">artwork-sakura</option>
-              <option value="artwork-night">artwork-night</option>
-              <option value="artwork-mono">artwork-mono</option>
-              <option value="artwork-peach">artwork-peach</option>
-              <option value="artwork-violet">artwork-violet</option>
-              <option value="artwork-orange">artwork-orange</option>
-              <option value="artwork-pink">artwork-pink</option>
-            </select>
-          </span></label>
-          <label>Глиф обложки<span><input type="text" name="artworkGlyph" placeholder="初" /></span></label>
-          <label class="is-wide">Ссылка на аудио<span><input type="text" name="audioUrl" placeholder="https://..." /></span></label>
-          <label class="is-wide">Описание<span><textarea name="description" rows="2"></textarea></span></label>
-          <div class="admin-actions">
-            <button class="admin-button" type="submit" <%= artists.length ? '' : 'disabled' %>>Добавить трек</button>
-          </div>
-        </div>
-      </form>
+      <%- include('../../partials/track-form', {
+        formAction: '/admin/tracks',
+        track: null,
+        artists,
+        selectedArtistId: '',
+        submitLabel: 'Добавить трек',
+      }) %>
     </div>
     <div class="admin-panel">
       <h2>Все треки</h2>
       <% if (tracks.length) { %>
-        <table class="admin-table">
+        <table class="admin-table admin-table-entities">
           <thead>
-            <tr><th>Название</th><th>Исполнитель</th><th>Жанр</th><th>Длит.</th><th>Рейтинг</th><th>Альбом</th><th>Год</th><th></th></tr>
+            <tr><th></th><th>Название</th><th>Исполнитель</th><th>Жанр</th><th>Длит.</th><th>Рейтинг</th><th>Альбом</th><th>Год</th><th></th></tr>
           </thead>
           <tbody>
             <% tracks.forEach((track) => { %>
               <tr>
-                <td><b><%= track.displayTitle %></b> <small style="color:var(--admin-muted)"><%= track.title %></small></td>
+                <td>
+                  <span class="admin-thumb admin-track-thumb" style="background: linear-gradient(135deg, <%= track.artworkColors[0] %>, <%= track.artworkColors[1] %>);">
+                    <% if (track.imageUrl) { %>
+                      <img src="<%= track.imageUrl %>" alt="<%= track.displayTitle %>" />
+                    <% } else { %>
+                      <b><%= track.artworkGlyph %></b>
+                    <% } %>
+                  </span>
+                </td>
+                <td>
+                  <b><%= track.displayTitle %></b>
+                  <small class="admin-muted"><%= track.title %></small>
+                </td>
                 <td><%= track.artistName %></td>
                 <td><%= track.genre %></td>
                 <td><%= track.duration %>с</td>
@@ -77,16 +56,19 @@
                 <td><%= track.album || '—' %></td>
                 <td><%= track.releaseYear || '—' %></td>
                 <td>
-                  <form method="post" action="/admin/tracks/<%= track.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить трек?')">
-                    <button class="admin-button-danger" type="submit">Удалить</button>
-                  </form>
+                  <div class="admin-row-actions">
+                    <a class="admin-button admin-button-secondary admin-button-small" href="/admin/tracks/<%= track.id %>/edit">Редактировать</a>
+                    <form method="post" action="/admin/tracks/<%= track.id %>/delete" onsubmit="return confirm('Удалить трек?')">
+                      <button class="admin-button-danger" type="submit">Удалить</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             <% }) %>
           </tbody>
         </table>
       <% } else { %>
-        <p style="color:var(--admin-muted)">Треков пока нет. Добавьте первый трек через форму выше.</p>
+        <p class="admin-muted">Треков пока нет. Добавьте первый трек через форму выше.</p>
       <% } %>
     </div>
     <%- include('../../partials/admin-footer') %>

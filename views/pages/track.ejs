@@ -22,9 +22,12 @@
           <a class="track-back-link" href="/catalog">← Назад в каталог</a>
           <section class="track-detail-hero">
             <div
-              class="track-detail-art <%= track.artworkClass %>"
+              class="track-detail-art <%= track.artworkClass %> <%= track.imageUrl ? 'has-photo' : '' %>"
               aria-label="Обложка <%= track.displayTitle %>"
             >
+              <% if (track.imageUrl) { %>
+                <img class="track-detail-photo" src="<%= track.imageUrl %>" alt="<%= track.displayTitle %>" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
+              <% } %>
               <span class="track-detail-glyph"><%= track.artworkGlyph %></span>
               <span class="track-art-orbit track-art-orbit-one"></span>
               <span class="track-art-orbit track-art-orbit-two"></span>
@@ -56,6 +59,7 @@
                   data-track-genre="<%= track.genre %>"
                   data-track-artwork="<%= track.artworkClass %>"
                   data-track-glyph="<%= track.artworkGlyph %>"
+                  data-track-image="<%= track.imageUrl || '' %>"
                   data-track-audio=""
                 >
                   <span class="track-play-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path data-toggle-play d="M8.2 5.8a1 1 0 0 1 1.5-.86l9.1 6.2a1.03 1.03 0 0 1 0 1.72l-9.1 6.2a1 1 0 0 1-1.5-.86z"/><g data-toggle-pause><rect x="6.5" y="5" width="4.5" height="14" rx="1.4"/><rect x="13" y="5" width="4.5" height="14" rx="1.4"/></g></svg></span> Слушать
@@ -96,7 +100,12 @@
             <div class="track-related-grid">
               <% tracks.filter((item) => item.id !== track.id && item.genre === track.genre).slice(0, 3).forEach((item) => { %>
               <a class="related-track-card" href="/track/<%= item.id %>">
-                <span class="related-track-art <%= item.artworkClass %>"><%= item.artworkGlyph %></span>
+                <span class="related-track-art <%= item.artworkClass %> <%= item.imageUrl ? 'has-photo' : '' %>">
+                  <% if (item.imageUrl) { %>
+                    <img class="related-track-photo" src="<%= item.imageUrl %>" alt="<%= item.displayTitle %>" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
+                  <% } %>
+                  <span class="related-track-glyph"><%= item.artworkGlyph %></span>
+                </span>
                 <span class="related-track-copy">
                   <strong><%= item.displayTitle %></strong>
                   <small><%= item.artistName %></small>

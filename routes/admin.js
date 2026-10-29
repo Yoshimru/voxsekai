@@ -2,8 +2,37 @@ const express = require("express");
 const contentRepository = require("../repositories/contentRepository");
 const authRepository = require("../repositories/authRepository");
 const adminRepository = require("../repositories/adminRepository");
+const {
+  uploadImage,
+  resolveImageUrl,
+  cleanupImage,
+} = require("../middleware/imageUpload");
 
 const router = express.Router();
+
+const artistCardStyles = [
+  { value: "performer-miku", label: "Miku", hint: "Мятный", initials: "MI" },
+  { value: "performer-rin", label: "Rin", hint: "Золотой", initials: "RN" },
+  { value: "performer-luka", label: "Luka", hint: "Розовый", initials: "LU" },
+  { value: "performer-kaito", label: "Kaito", hint: "Синий", initials: "KA" },
+  { value: "performer-mira", label: "Mira", hint: "Индиго", initials: "MK" },
+  { value: "performer-meiko", label: "Meiko", hint: "Терракотовый", initials: "ME" },
+  { value: "performer-gumi", label: "Gumi", hint: "Зелёный", initials: "GU" },
+  { value: "performer-ia", label: "IA", hint: "Фиолетовый", initials: "IA" },
+];
+
+function pageError(queryError) {
+  if (queryError === "artist") {
+    return "Выберите исполнителя из списка добавленных.";
+  }
+  if (queryError === "upload") {
+    return "Не удалось загрузить картинку. Проверьте формат (JPG, PNG, WEBP, GIF, AVIF) и размер до 6 МБ.";
+  }
+  if (queryError === "notfound") {
+    return "Запись не найдена.";
+  }
+  return "";
+}
 
 // --- Гарантия наличия админского аккаунта (Yoshimru / adminadmin) ---
 authRepository.ensureAdmin("Yoshimru", "adminadmin");
@@ -100,25 +129,81 @@ router.get("/tracks", (req, res, next) => {
       section: "tracks",
       tracks: contentRepository.getTracks(),
       artists: contentRepository.getArtists(),
-      error:
-        req.query.error === "artist"
-          ? "Выберите исполнителя из списка добавленных."
-          : "",
+      error: pageError(req.query.error),
     });
   } catch (error) {
     next(error);
   }
 });
 
-router.post("/tracks", (req, res, next) => {
+router.get("/tracks/:id/edit", (req, res, next) => {
   try {
+    const track = contentRepository.getTrackById(req.params.id);
+    if (!track) return res.redirect("/admin/tracks?error=notfound");
+    const artists = contentRepository.getArtists();
+    const linkedArtist = artists.find((artist) =>
+      artist.trackIds.includes(track.id),
+    );
+    render(res, "pages/admin/track-edit", {
+      title: `Редактирование «${track.displayTitle}» — админпанель`,
+      section: "tracks",
+      track,
+      artists,
+      selectedArtistId: linkedArtist ? linkedArtist.id : "",
+      error: pageError(req.query.error),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/tracks", uploadImage, (req, res, next) => {
+  try {
+    if (req.imageUploadError) {
+      return res.redirect("/admin/tracks?error=upload");
+    }
     const artist = req.body.artistId
       ? contentRepository.getArtistById(String(req.body.artistId))
       : null;
     if (!artist) {
       return res.redirect("/admin/tracks?error=artist");
     }
-    adminRepository.createTrack({ ...req.body, artistId: artist.id });
+    adminRepository.createTrack({
+      ...req.body,
+      artistId: artist.id,
+      imageUrl: resolveImageUrl(req),
+    });
+    res.redirect("/admin/tracks");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/tracks/:id/edit", uploadImage, (req, res, next) => {
+  try {
+    const track = contentRepository.getTrackById(req.params.id);
+    if (!track) return res.redirect("/admin/tracks?error=notfound");
+    if (req.imageUploadError) {
+      return res.redirect(
+        `/admin/tracks/${encodeURIComponent(track.id)}/edit?error=upload`,
+      );
+    }
+    const artist = req.body.artistId
+      ? contentRepository.getArtistById(String(req.body.artistId))
+      : null;
+    if (!artist) {
+      return res.redirect(
+        `/admin/tracks/${encodeURIComponent(track.id)}/edit?error=artist`,
+      );
+    }
+
+    const imageUrl = resolveImageUrl(req, track.imageUrl);
+    adminRepository.updateTrack(track.id, {
+      ...req.body,
+      artistId: artist.id,
+      imageUrl,
+    });
+    cleanupImage(track.imageUrl, imageUrl);
     res.redirect("/admin/tracks");
   } catch (error) {
     next(error);
@@ -127,7 +212,9 @@ router.post("/tracks", (req, res, next) => {
 
 router.post("/tracks/:id/delete", (req, res, next) => {
   try {
+    const track = contentRepository.getTrackById(req.params.id);
     adminRepository.deleteTrack(req.params.id);
+    if (track) cleanupImage(track.imageUrl, "");
     res.redirect("/admin/tracks");
   } catch (error) {
     next(error);
@@ -141,15 +228,60 @@ router.get("/artists", (req, res, next) => {
       title: "Исполнители — админпанель",
       section: "artists",
       artists: contentRepository.getArtists(),
+      cardStyles: artistCardStyles,
+      error: pageError(req.query.error),
     });
   } catch (error) {
     next(error);
   }
 });
 
-router.post("/artists", (req, res, next) => {
+router.get("/artists/:id/edit", (req, res, next) => {
   try {
-    adminRepository.createArtist(req.body);
+    const artist = contentRepository.getArtistById(req.params.id);
+    if (!artist) return res.redirect("/admin/artists?error=notfound");
+    render(res, "pages/admin/artist-edit", {
+      title: `Редактирование «${artist.name}» — админпанель`,
+      section: "artists",
+      artist,
+      cardStyles: artistCardStyles,
+      error: pageError(req.query.error),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/artists", uploadImage, (req, res, next) => {
+  try {
+    if (req.imageUploadError) {
+      return res.redirect("/admin/artists?error=upload");
+    }
+    adminRepository.createArtist({
+      ...req.body,
+      imageUrl: resolveImageUrl(req),
+    });
+    res.redirect("/admin/artists");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/artists/:id/edit", uploadImage, (req, res, next) => {
+  try {
+    const artist = contentRepository.getArtistById(req.params.id);
+    if (!artist) return res.redirect("/admin/artists?error=notfound");
+    if (req.imageUploadError) {
+      return res.redirect(
+        `/admin/artists/${encodeURIComponent(artist.id)}/edit?error=upload`,
+      );
+    }
+    const imageUrl = resolveImageUrl(req, artist.imageUrl);
+    adminRepository.updateArtist(artist.id, {
+      ...req.body,
+      imageUrl,
+    });
+    cleanupImage(artist.imageUrl, imageUrl);
     res.redirect("/admin/artists");
   } catch (error) {
     next(error);
@@ -158,7 +290,9 @@ router.post("/artists", (req, res, next) => {
 
 router.post("/artists/:id/delete", (req, res, next) => {
   try {
+    const artist = contentRepository.getArtistById(req.params.id);
     adminRepository.deleteArtist(req.params.id);
+    if (artist) cleanupImage(artist.imageUrl, "");
     res.redirect("/admin/artists");
   } catch (error) {
     next(error);

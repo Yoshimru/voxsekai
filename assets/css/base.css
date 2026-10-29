@@ -1383,3 +1383,69 @@ kbd {
   opacity: 1;
   transform: translate(-50%, 0);
 }
+
+/* Картинки исполнителей и треков */
+.mini-cover {
+  position: relative;
+}
+
+.mini-cover-photo,
+.catalog-cover-photo,
+.related-track-photo,
+.track-detail-photo,
+.performer-photo,
+.artist-detail-photo,
+.player-artwork-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.mini-cover-photo,
+.track-detail-photo,
+.related-track-photo,
+.performer-photo,
+.artist-detail-photo,
+.player-artwork-photo {
+  z-index: 0;
+}
+
+.catalog-cover-photo {
+  z-index: 2;
+}
+
+.catalog-cover.has-photo span,
+.catalog-cover.has-photo i,
+.mini-cover.has-photo .mini-cover-glyph,
+.related-track-art.has-photo .related-track-glyph,
+.track-detail-art.has-photo .track-detail-glyph,
+.track-detail-art.has-photo .track-art-orbit,
+.artist-detail-art.has-photo > b,
+.artist-detail-art.has-photo .performer-bars,
+.performer-art.has-photo .performer-bars,
+.player-artwork.has-photo [data-player-glyph] {
+  display: none;
+}
+
+.track-detail-art.has-photo::before,
+.track-detail-art.has-photo::after {
+  display: none;
+}
+
+.performer-art > b,
+.artist-detail-art > b {
+  z-index: 1;
+}
+
+.performer-art .performer-bars,
+.artist-detail-art .performer-bars {
+  position: relative;
+  z-index: 1;
+}
+
+.player-artwork-photo[hidden] {
+  display: none;
+}

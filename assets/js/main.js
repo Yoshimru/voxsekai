@@ -25,6 +25,7 @@
     artist: player?.querySelector("[data-player-artist]"),
     status: player?.querySelector("[data-player-status]"),
     artwork: player?.querySelector("[data-player-artwork]"),
+    image: player?.querySelector("[data-player-image]"),
     glyph: player?.querySelector("[data-player-glyph]"),
     current: player?.querySelector("[data-player-current]"),
     duration: player?.querySelector("[data-player-duration]"),
@@ -126,6 +127,21 @@
       : "Демо · аудио не подключено";
     playerElements.glyph.textContent = track.artworkGlyph;
     playerElements.artwork.className = `player-artwork ${track.artworkClass}`;
+    if (playerElements.image) {
+      const hasImage = Boolean(track.imageUrl);
+      playerElements.artwork.classList.toggle("has-photo", hasImage);
+      playerElements.image.onerror = () => {
+        playerElements.image.hidden = true;
+        playerElements.artwork.classList.remove("has-photo");
+      };
+      if (hasImage) {
+        playerElements.image.src = track.imageUrl;
+        playerElements.image.hidden = false;
+      } else {
+        playerElements.image.removeAttribute("src");
+        playerElements.image.hidden = true;
+      }
+    }
     const colors = track.artworkColors || ["#248c9f", "#41569c", "#173f51"];
     player.style.setProperty("--player-color-one", colors[0]);
     player.style.setProperty("--player-color-two", colors[1]);
@@ -625,13 +641,27 @@
     row.dataset.trackGenre = track.genre;
     row.dataset.trackArtwork = track.artworkClass;
     row.dataset.trackGlyph = track.artworkGlyph;
+    row.dataset.trackImage = track.imageUrl || "";
     row.dataset.trackAudio = track.audioUrl || "";
 
     const cover = document.createElement("a");
-    cover.className = `mini-cover ${track.artworkClass}`;
+    cover.className = `mini-cover ${track.artworkClass}${track.imageUrl ? " has-photo" : ""}`;
     cover.href = `/track/${track.id}`;
     cover.setAttribute("aria-label", `Подробнее о треке ${track.displayTitle}`);
+    if (track.imageUrl) {
+      const image = document.createElement("img");
+      image.className = "mini-cover-photo";
+      image.src = track.imageUrl;
+      image.alt = track.displayTitle;
+      image.loading = "lazy";
+      image.addEventListener("error", () => {
+        cover.classList.remove("has-photo");
+        image.remove();
+      });
+      cover.append(image);
+    }
     const glyph = document.createElement("span");
+    glyph.className = "mini-cover-glyph";
     glyph.textContent = track.artworkGlyph;
     const indicator = document.createElement("span");
     indicator.className = "track-playing-indicator";

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Редактирование трека</h1>
+      <p><a class="admin-back-link" href="/admin/tracks">← Назад к трекам</a></p>
+    </div>
+    <div class="admin-panel">
+      <h2><%= track.displayTitle %> <small class="admin-muted"><%= track.id %></small></h2>
+      <% if (error) { %>
+        <p class="admin-error" role="alert"><%= error %></p>
+      <% } %>
+      <%- include('../../partials/track-form', {
+        formAction: `/admin/tracks/${track.id}/edit`,
+        track,
+        artists,
+        selectedArtistId,
+        submitLabel: 'Сохранить изменения',
+      }) %>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

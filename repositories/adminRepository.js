@@ -12,16 +12,16 @@ function createAdminRepository(db = getDb()) {
   const statements = {
     insertTrack: db.prepare(`
       INSERT INTO tracks (id, title, display_title, artist, artist_name, duration, genre,
-        artwork_class, artwork_glyph, rating, album, release_year, description, audio_url)
+        artwork_class, artwork_glyph, rating, album, release_year, description, audio_url, image_url)
       VALUES (@id, @title, @displayTitle, @artist, @artistName, @duration, @genre,
-        @artworkClass, @artworkGlyph, @rating, @album, @releaseYear, @description, @audioUrl)
+        @artworkClass, @artworkGlyph, @rating, @album, @releaseYear, @description, @audioUrl, @imageUrl)
     `),
     updateTrack: db.prepare(`
       UPDATE tracks SET
         title = @title, display_title = @displayTitle, artist = @artist, artist_name = @artistName,
         duration = @duration, genre = @genre, artwork_class = @artworkClass, artwork_glyph = @artworkGlyph,
         rating = @rating, album = @album, release_year = @releaseYear, description = @description,
-        audio_url = @audioUrl
+        audio_url = @audioUrl, image_url = @imageUrl
       WHERE id = @id
     `),
     deleteTrack: db.prepare("DELETE FROM tracks WHERE id = ?"),
@@ -29,6 +29,7 @@ function createAdminRepository(db = getDb()) {
     artistIdsByTrack: db.prepare(
       "SELECT artist_id FROM artist_tracks WHERE track_id = ?",
     ),
+    clearTrackArtists: db.prepare("DELETE FROM artist_tracks WHERE track_id = ?"),
     insertArtistTrack: db.prepare(
       "INSERT OR IGNORE INTO artist_tracks (artist_id, track_id, position) VALUES (?, ?, ?)",
     ),
@@ -41,9 +42,16 @@ function createAdminRepository(db = getDb()) {
 
     insertArtist: db.prepare(`
       INSERT INTO artists (id, name, alias, initials, card_class, genre_label, genres,
-        track_count, listeners_label, country)
+        track_count, listeners_label, country, image_url)
       VALUES (@id, @name, @alias, @initials, @cardClass, @genreLabel, @genres,
-        @trackCount, @listenersLabel, @country)
+        @trackCount, @listenersLabel, @country, @imageUrl)
+    `),
+    updateArtist: db.prepare(`
+      UPDATE artists SET
+        name = @name, alias = @alias, initials = @initials, card_class = @cardClass,
+        genre_label = @genreLabel, genres = @genres, listeners_label = @listenersLabel,
+        country = @country, image_url = @imageUrl
+      WHERE id = @id
     `),
     deleteArtist: db.prepare("DELETE FROM artists WHERE id = ?"),
 
@@ -84,6 +92,16 @@ function createAdminRepository(db = getDb()) {
     return [input];
   }
 
+  function parseGenres(input) {
+    if (Array.isArray(input)) {
+      return input.map((item) => String(item).trim()).filter(Boolean);
+    }
+    return String(input || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
   function slug(id, fallback) {
     const normalized = id == null ? "" : normalizeId(id);
     return normalized || fallback;
@@ -121,6 +139,7 @@ function createAdminRepository(db = getDb()) {
         releaseYear: fields.releaseYear ? Number(fields.releaseYear) : null,
         description: fields.description || "",
         audioUrl: fields.audioUrl || null,
+        imageUrl: fields.imageUrl || "",
       };
 
       const create = db.transaction(() => {
@@ -138,22 +157,69 @@ function createAdminRepository(db = getDb()) {
     updateTrack(id, fields) {
       const row = db.prepare("SELECT * FROM tracks WHERE id = ?").get(id);
       if (!row) return false;
-      statements.updateTrack.run({
-        id,
-        title: fields.title ?? row.title,
-        displayTitle: fields.displayTitle ?? row.display_title,
-        artist: fields.artist ?? row.artist,
-        artistName: fields.artistName ?? row.artist_name,
-        duration: fields.duration !== undefined ? Number(fields.duration) || 0 : row.duration,
-        genre: fields.genre ?? row.genre,
-        artworkClass: fields.artworkClass ?? row.artwork_class,
-        artworkGlyph: fields.artworkGlyph ?? row.artwork_glyph,
-        rating: fields.rating ?? row.rating,
-        album: fields.album ?? row.album,
-        releaseYear: fields.releaseYear !== undefined ? Number(fields.releaseYear) || null : row.release_year,
-        description: fields.description ?? row.description,
-        audioUrl: fields.audioUrl ?? row.audio_url,
+
+      const oldArtistIds = statements.artistIdsByTrack
+        .all(id)
+        .map((item) => item.artist_id);
+      const artistChanged = fields.artistId !== undefined;
+      const targetArtist = fields.artistId
+        ? statements.artistById.get(String(fields.artistId))
+        : null;
+      const artistLabel = targetArtist
+        ? [targetArtist.alias, targetArtist.name].filter(Boolean).join(" · ")
+        : artistChanged
+          ? ""
+          : fields.artist ?? row.artist;
+      const artistName = targetArtist
+        ? targetArtist.name
+        : artistChanged
+          ? ""
+          : fields.artistName ?? row.artist_name;
+
+      const update = db.transaction(() => {
+        statements.updateTrack.run({
+          id,
+          title: fields.title ?? row.title,
+          displayTitle: fields.displayTitle ?? row.display_title,
+          artist: artistLabel,
+          artistName,
+          duration:
+            fields.duration !== undefined
+              ? Number(fields.duration) || 0
+              : row.duration,
+          genre: fields.genre ?? row.genre,
+          artworkClass: fields.artworkClass ?? row.artwork_class,
+          artworkGlyph: fields.artworkGlyph ?? row.artwork_glyph,
+          rating: fields.rating ?? row.rating,
+          album: fields.album ?? row.album,
+          releaseYear:
+            fields.releaseYear !== undefined
+              ? Number(fields.releaseYear) || null
+              : row.release_year,
+          description: fields.description ?? row.description,
+          audioUrl: fields.audioUrl ?? row.audio_url,
+          imageUrl:
+            fields.imageUrl !== undefined ? fields.imageUrl : row.image_url,
+        });
+
+        if (artistChanged) {
+          statements.clearTrackArtists.run(id);
+          if (targetArtist) {
+            const position =
+              statements.nextArtistTrackPosition.get(targetArtist.id)
+                .next_position;
+            statements.insertArtistTrack.run(targetArtist.id, id, position);
+          }
+        }
+
+        const affectedArtistIds = new Set(oldArtistIds);
+        if (targetArtist) affectedArtistIds.add(targetArtist.id);
+        affectedArtistIds.forEach((artistId) => {
+          statements.syncArtistTrackCount.run(artistId, artistId);
+        });
       });
+
+      update();
       return true;
     },
     deleteTrack(id) {
@@ -175,15 +241,36 @@ function createAdminRepository(db = getDb()) {
         name: fields.name || "",
         alias: fields.alias || "",
         initials: fields.initials || "",
-        cardClass: fields.cardClass || "",
+        cardClass: fields.cardClass || "performer-miku",
         genreLabel: fields.genreLabel || "",
-        genres: JSON.stringify(asArray(fields.genres)),
+        genres: JSON.stringify(parseGenres(fields.genres)),
         trackCount: 0,
         listenersLabel: fields.listenersLabel || "",
         country: fields.country || "",
+        imageUrl: fields.imageUrl || "",
       };
       statements.insertArtist.run(artist);
       return artist.id;
+    },
+    updateArtist(id, fields) {
+      const row = statements.artistById.get(id);
+      if (!row) return false;
+      statements.updateArtist.run({
+        id,
+        name: fields.name ?? row.name,
+        alias: fields.alias ?? row.alias,
+        initials: fields.initials ?? row.initials,
+        cardClass: fields.cardClass ?? row.card_class,
+        genreLabel: fields.genreLabel ?? row.genre_label,
+        genres:
+          fields.genres !== undefined
+            ? JSON.stringify(parseGenres(fields.genres))
+            : row.genres,
+        listenersLabel: fields.listenersLabel ?? row.listeners_label,
+        country: fields.country ?? row.country,
+        imageUrl: fields.imageUrl !== undefined ? fields.imageUrl : row.image_url,
+      });
+      return true;
     },
     deleteArtist(id) {
       statements.deleteArtist.run(id);

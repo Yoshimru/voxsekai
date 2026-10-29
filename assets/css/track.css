@@ -275,12 +275,17 @@
   width: 44px;
   height: 44px;
   flex: 0 0 44px;
+  position: relative;
   display: grid;
   place-items: center;
   overflow: hidden;
   border-radius: 7px;
   color: #ffffffc9;
   font-size: 22px;
+}
+.related-track-glyph {
+  position: relative;
+  z-index: 1;
 }
 .related-track-copy {
   min-width: 0;

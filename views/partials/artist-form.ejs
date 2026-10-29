@@ -1,0 +1,76 @@
+<%
+  const currentArtist = typeof artist !== "undefined" && artist ? artist : null;
+  const currentCardClass =
+    currentArtist && currentArtist.cardClass
+      ? currentArtist.cardClass
+      : "performer-miku";
+  const genresValue =
+    currentArtist && Array.isArray(currentArtist.genres)
+      ? currentArtist.genres.join(", ")
+      : "";
+%>
+<form method="post" action="<%= formAction %>" enctype="multipart/form-data">
+  <div class="admin-form">
+    <label>Имя (name)<span><input type="text" name="name" value="<%= currentArtist ? currentArtist.name : '' %>" required /></span></label>
+    <label>Алиас на русском<span><input type="text" name="alias" value="<%= currentArtist ? currentArtist.alias : '' %>" /></span></label>
+    <label>Инициалы<span><input type="text" name="initials" maxlength="4" value="<%= currentArtist ? currentArtist.initials : '' %>" placeholder="MI" /></span></label>
+    <label>Подпись жанра<span><input type="text" name="genreLabel" value="<%= currentArtist ? currentArtist.genreLabel : '' %>" placeholder="J-POP · ВОКАЛОИД" /></span></label>
+    <label>Жанры (через запятую)<span><input type="text" name="genres" value="<%= genresValue %>" placeholder="vocaloid, j-pop" /></span></label>
+    <label>Слушатели<span><input type="text" name="listenersLabel" value="<%= currentArtist ? currentArtist.listenersLabel : '' %>" placeholder="1,2 млн" /></span></label>
+    <label>Страна<span><input type="text" name="country" value="<%= currentArtist ? currentArtist.country : '' %>" placeholder="Япония" /></span></label>
+
+    <div class="admin-style-field is-wide">
+      <span class="admin-form-label">Стиль карточки исполнителя</span>
+      <div class="admin-style-grid">
+        <% cardStyles.forEach((style) => { %>
+          <label class="admin-style-option">
+            <input
+              type="radio"
+              name="cardClass"
+              value="<%= style.value %>"
+              <%= currentCardClass === style.value ? "checked" : "" %>
+            />
+            <span class="admin-style-preview <%= style.value %>">
+              <span class="admin-style-preview-art">
+                <span class="admin-style-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+                <b><%= currentArtist && currentArtist.initials ? currentArtist.initials : style.initials %></b>
+              </span>
+              <span class="admin-style-preview-copy">
+                <strong><%= style.label %></strong>
+                <small><%= style.hint %></small>
+              </span>
+            </span>
+          </label>
+        <% }) %>
+      </div>
+      <p class="admin-hint">Выберите один из готовых стилей — превью показывает градиент и акцентный цвет карточки.</p>
+    </div>
+
+    <div class="admin-image-field is-wide">
+      <span class="admin-form-label">Картинка исполнителя</span>
+      <div class="admin-image-row">
+        <span class="admin-image-preview">
+          <% if (currentArtist && currentArtist.imageUrl) { %>
+            <img src="<%= currentArtist.imageUrl %>" alt="<%= currentArtist.name %>" />
+          <% } else { %>
+            <span class="admin-image-placeholder">Нет<br />картинки</span>
+          <% } %>
+        </span>
+        <div class="admin-image-controls">
+          <label>Загрузить файл<span><input type="file" name="imageFile" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" /></span></label>
+          <label>Или ссылка на картинку<span><input type="text" name="imageUrl" placeholder="/assets/uploads/... или https://..." /></span></label>
+          <% if (currentArtist && currentArtist.imageUrl) { %>
+            <label class="admin-checkbox-line"><input type="checkbox" name="removeImage" /> Удалить текущую картинку</label>
+          <% } %>
+          <p class="admin-hint">JPG, PNG, WEBP, GIF или AVIF, до 6 МБ. Загруженный файл имеет приоритет над ссылкой.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="admin-hint is-wide">Количество треков не заполняется вручную: оно обновляется автоматически после добавления трека этого исполнителя.</p>
+    <div class="admin-actions">
+      <button class="admin-button" type="submit"><%= submitLabel %></button>
+      <a class="admin-button admin-button-secondary" href="/admin/artists">Отмена</a>
+    </div>
+  </div>
+</form>

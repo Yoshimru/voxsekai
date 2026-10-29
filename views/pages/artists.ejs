@@ -51,7 +51,12 @@
           <section class="performer-grid" data-sort-list aria-label="Исполнители">
             <% artists.forEach((artist) => { %>
               <a class="performer-card <%= artist.cardClass %>" href="/artists/<%= artist.id %>" data-genre-item data-genre="<%= artist.genres.join(' ') %>" data-search-text="<%= artist.searchText %>" data-tracks="<%= artist.trackCount %>">
-                <div class="performer-art"><span class="performer-bars"><i></i><i></i><i></i><i></i><i></i></span><b><%= artist.initials %></b></div>
+                <div class="performer-art <%= artist.imageUrl ? 'has-photo' : '' %>">
+                  <% if (artist.imageUrl) { %>
+                    <img class="performer-photo" src="<%= artist.imageUrl %>" alt="<%= artist.name %>" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
+                  <% } %>
+                  <span class="performer-bars"><i></i><i></i><i></i><i></i><i></i></span><b><%= artist.initials %></b>
+                </div>
                 <div class="performer-info">
                   <p><%= artist.genreLabel %></p><h2><%= artist.name %></h2>
                   <small><%= artist.alias %> · <%= artist.country %></small>

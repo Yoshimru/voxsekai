@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS tracks (
   album         TEXT,
   release_year  INTEGER,
   description   TEXT,
-  audio_url     TEXT
+  audio_url     TEXT,
+  image_url     TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS artists (
@@ -29,7 +30,8 @@ CREATE TABLE IF NOT EXISTS artists (
   genres         TEXT NOT NULL DEFAULT '[]',   -- JSON-массив
   track_count    INTEGER NOT NULL DEFAULT 0,
   listeners_label TEXT NOT NULL DEFAULT '',
-  country        TEXT NOT NULL DEFAULT ''
+  country        TEXT NOT NULL DEFAULT '',
+  image_url      TEXT NOT NULL DEFAULT ''
 );
 
 -- Связь «исполнитель — треки» (многие ко многим)

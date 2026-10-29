@@ -23,15 +23,21 @@ function getDb() {
 
 // Простые миграции для баз, созданных до появления новых колонок.
 function migrate(db) {
-  const userColumns = db.prepare("PRAGMA table_info(users)").all();
-  if (!userColumns.some((column) => column.name === "email")) {
-    db.exec("ALTER TABLE users ADD COLUMN email TEXT");
-  }
+  ensureColumn(db, "users", "email", "TEXT");
+  ensureColumn(db, "artists", "image_url", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn(db, "tracks", "image_url", "TEXT NOT NULL DEFAULT ''");
   db.exec(`
     CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
       ON users (email)
       WHERE email IS NOT NULL AND email <> ''
   `);
+}
+
+function ensureColumn(db, table, column, definition) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!columns.some((item) => item.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
 }
 
 module.exports = { getDb };

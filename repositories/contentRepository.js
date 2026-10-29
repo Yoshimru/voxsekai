@@ -37,6 +37,7 @@ function mapTrack(row) {
     releaseYear: row.release_year,
     description: row.description,
     audioUrl: row.audio_url,
+    imageUrl: row.image_url || "",
     filterGenre: genreKeys[row.genre] || "all",
     artworkColors: [...(palettes[row.artwork_class] || palettes["artwork-cyan"])],
   };
@@ -54,6 +55,7 @@ function mapArtist(row, trackIds = []) {
     trackCount: trackIds.length,
     listenersLabel: row.listeners_label,
     country: row.country,
+    imageUrl: row.image_url || "",
     trackIds,
     searchText: `${row.name} ${row.alias} ${row.genre_label}`.toLocaleLowerCase("ru"),
   };

@@ -1,0 +1,79 @@
+<%
+  const currentTrack = typeof track !== "undefined" && track ? track : null;
+  const currentArtistId =
+    typeof selectedArtistId !== "undefined" && selectedArtistId
+      ? selectedArtistId
+      : "";
+  const artworkClasses = [
+    "artwork-cyan",
+    "artwork-sakura",
+    "artwork-night",
+    "artwork-mono",
+    "artwork-peach",
+    "artwork-violet",
+    "artwork-orange",
+    "artwork-pink",
+  ];
+  const currentArtwork = currentTrack
+    ? currentTrack.artworkClass
+    : "artwork-cyan";
+  const canSubmit = artists.length > 0;
+%>
+<% if (!artists.length) { %>
+  <p class="admin-hint">Сначала добавьте исполнителя в разделе <a href="/admin/artists">«Исполнители»</a> — затем его можно будет выбрать здесь.</p>
+<% } %>
+<form method="post" action="<%= formAction %>" enctype="multipart/form-data">
+  <div class="admin-form">
+    <label>Название<span><input type="text" name="title" value="<%= currentTrack ? currentTrack.title : '' %>" required /></span></label>
+    <label>Название для показа<span><input type="text" name="displayTitle" value="<%= currentTrack ? currentTrack.displayTitle : '' %>" required /></span></label>
+    <label>Исполнитель<span>
+      <select name="artistId" required <%= canSubmit ? "" : "disabled" %>>
+        <option value="">— выберите из добавленных —</option>
+        <% artists.forEach((artist) => { %>
+          <option value="<%= artist.id %>" <%= currentArtistId === artist.id ? "selected" : "" %>><%= artist.name %><% if (artist.alias) { %> · <%= artist.alias %><% } %></option>
+        <% }) %>
+      </select>
+    </span></label>
+    <label>Длительность (сек)<span><input type="number" name="duration" min="0" value="<%= currentTrack ? currentTrack.duration : 200 %>" /></span></label>
+    <label>Жанр<span><input type="text" name="genre" value="<%= currentTrack ? currentTrack.genre : '' %>" /></span></label>
+    <label>Рейтинг<span><input type="text" name="rating" value="<%= currentTrack ? currentTrack.rating : '' %>" placeholder="4.8" /></span></label>
+    <label>Альбом<span><input type="text" name="album" value="<%= currentTrack && currentTrack.album ? currentTrack.album : '' %>" /></span></label>
+    <label>Год выпуска<span><input type="number" name="releaseYear" min="1900" max="2100" value="<%= currentTrack && currentTrack.releaseYear ? currentTrack.releaseYear : '' %>" /></span></label>
+    <label>Стиль обложки<span>
+      <select name="artworkClass">
+        <% artworkClasses.forEach((artwork) => { %>
+          <option value="<%= artwork %>" <%= currentArtwork === artwork ? "selected" : "" %>><%= artwork %></option>
+        <% }) %>
+      </select>
+    </span></label>
+    <label>Глиф обложки<span><input type="text" name="artworkGlyph" value="<%= currentTrack ? currentTrack.artworkGlyph : '' %>" placeholder="初" /></span></label>
+    <label class="is-wide">Ссылка на аудио<span><input type="text" name="audioUrl" value="<%= currentTrack && currentTrack.audioUrl ? currentTrack.audioUrl : '' %>" placeholder="https://..." /></span></label>
+    <label class="is-wide">Описание<span><textarea name="description" rows="2"><%= currentTrack ? currentTrack.description : '' %></textarea></span></label>
+
+    <div class="admin-image-field is-wide">
+      <span class="admin-form-label">Картинка трека</span>
+      <div class="admin-image-row">
+        <span class="admin-image-preview">
+          <% if (currentTrack && currentTrack.imageUrl) { %>
+            <img src="<%= currentTrack.imageUrl %>" alt="<%= currentTrack.displayTitle %>" />
+          <% } else { %>
+            <span class="admin-image-placeholder">Нет<br />картинки</span>
+          <% } %>
+        </span>
+        <div class="admin-image-controls">
+          <label>Загрузить файл<span><input type="file" name="imageFile" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" /></span></label>
+          <label>Или ссылка на картинку<span><input type="text" name="imageUrl" placeholder="/assets/uploads/... или https://..." /></span></label>
+          <% if (currentTrack && currentTrack.imageUrl) { %>
+            <label class="admin-checkbox-line"><input type="checkbox" name="removeImage" /> Удалить текущую картинку</label>
+          <% } %>
+          <p class="admin-hint">JPG, PNG, WEBP, GIF или AVIF, до 6 МБ. Загруженный файл имеет приоритет над ссылкой.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-actions">
+      <button class="admin-button" type="submit" <%= canSubmit ? "" : "disabled" %>><%= submitLabel %></button>
+      <a class="admin-button admin-button-secondary" href="/admin/tracks">Отмена</a>
+    </div>
+  </div>
+</form>

@@ -20,7 +20,12 @@
         <div class="content directory-content artist-detail-content">
           <a class="track-back-link" href="/artists">← Все исполнители</a>
           <section class="artist-detail-hero <%= artist.cardClass %>">
-            <div class="artist-detail-art"><span class="performer-bars"><i></i><i></i><i></i><i></i><i></i></span><b><%= artist.initials %></b></div>
+            <div class="artist-detail-art <%= artist.imageUrl ? 'has-photo' : '' %>">
+              <% if (artist.imageUrl) { %>
+                <img class="artist-detail-photo" src="<%= artist.imageUrl %>" alt="<%= artist.name %>" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
+              <% } %>
+              <span class="performer-bars"><i></i><i></i><i></i><i></i><i></i></span><b><%= artist.initials %></b>
+            </div>
             <div class="artist-detail-copy">
               <p class="directory-kicker"><%= artist.genreLabel %></p>
               <h1><%= artist.name %></h1>
