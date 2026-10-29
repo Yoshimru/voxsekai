@@ -30,16 +30,20 @@
           <label>Время<span><input type="text" name="time" placeholder="20:00" /></span></label>
           <label>Категория<span><input type="text" name="category" placeholder="Концерт" /></span></label>
           <label>Подпись (tag)<span><input type="text" name="tag" placeholder="LIVE SHOW · 02" /></span></label>
-          <label>Стиль обложки<span>
-            <select name="artworkClass">
-              <option value="event-card-neon">event-card-neon</option>
-              <option value="event-card-virtual">event-card-virtual</option>
-              <option value="event-card-tokyo">event-card-tokyo</option>
-              <option value="event-card-synth">event-card-synth</option>
-              <option value="event-card-studio">event-card-studio</option>
-              <option value="event-card-radio">event-card-radio</option>
-            </select>
-          </span></label>
+          <div class="admin-style-field is-wide">
+            <span class="admin-form-label">Стиль обложки события</span>
+            <div class="admin-cover-style-grid">
+              <% cardStyles.forEach((style, index) => { %>
+                <label class="admin-cover-style-option">
+                  <input type="radio" name="artworkClass" value="<%= style.id %>" <%= index === 0 ? 'checked' : '' %> />
+                  <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
+                    <span class="admin-cover-style-glyph"><%= style.glyph %></span>
+                    <span class="admin-cover-style-name"><%= style.name %></span>
+                  </span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
           <label>Глиф<span><input type="text" name="artworkGlyph" placeholder="VS" /></span></label>
           <label class="is-wide">Описание<span><textarea name="description" rows="2"></textarea></span></label>
           <div class="admin-actions">

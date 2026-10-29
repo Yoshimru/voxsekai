@@ -60,6 +60,33 @@ CREATE TABLE IF NOT EXISTS track_styles (
   color_three TEXT NOT NULL DEFAULT '#182d45'
 );
 
+-- Стили карточек подборок
+CREATE TABLE IF NOT EXISTS collection_styles (
+  id               TEXT PRIMARY KEY,
+  name             TEXT NOT NULL,
+  accent           TEXT NOT NULL DEFAULT '#83c5ed',
+  background_start TEXT NOT NULL DEFAULT '#21415c',
+  background_end   TEXT NOT NULL DEFAULT '#1f5663'
+);
+
+-- Стили карточек плейлистов
+CREATE TABLE IF NOT EXISTS playlist_styles (
+  id               TEXT PRIMARY KEY,
+  name             TEXT NOT NULL,
+  accent           TEXT NOT NULL DEFAULT '#ee987d',
+  background_start TEXT NOT NULL DEFAULT '#54352f',
+  background_end   TEXT NOT NULL DEFAULT '#77443a'
+);
+
+-- Стили карточек событий
+CREATE TABLE IF NOT EXISTS event_styles (
+  id               TEXT PRIMARY KEY,
+  name             TEXT NOT NULL,
+  accent           TEXT NOT NULL DEFAULT '#d586d4',
+  background_start TEXT NOT NULL DEFAULT '#492d44',
+  background_end   TEXT NOT NULL DEFAULT '#6b3d62'
+);
+
 CREATE TABLE IF NOT EXISTS collections (
   id          TEXT PRIMARY KEY,
   title       TEXT NOT NULL,
@@ -120,6 +147,17 @@ CREATE TABLE IF NOT EXISTS users (
   role          TEXT NOT NULL DEFAULT 'user',   -- 'user' | 'admin'
   created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Пользовательские оценки треков (1–5)
+CREATE TABLE IF NOT EXISTS track_ratings (
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  track_id   TEXT NOT NULL REFERENCES tracks(id) ON DELETE CASCADE,
+  value      INTEGER NOT NULL CHECK (value BETWEEN 1 AND 5),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, track_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_track_ratings_track ON track_ratings (track_id);
 
 
 CREATE INDEX IF NOT EXISTS idx_artist_tracks_track  ON artist_tracks (track_id);

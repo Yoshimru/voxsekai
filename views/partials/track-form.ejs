@@ -16,7 +16,7 @@
 <% if (!styles.length) { %>
   <p class="admin-hint">Сначала добавьте стиль обложки в разделе <a href="/admin/styles">«Стили»</a>.</p>
 <% } %>
-<form method="post" action="<%= formAction %>" enctype="multipart/form-data">
+<form method="post" action="<%= formAction %>" enctype="multipart/form-data" data-track-form>
   <div class="admin-form">
     <label>Название<span><input type="text" name="title" value="<%= currentTrack ? currentTrack.title : '' %>" required /></span></label>
     <label>Название для показа<span><input type="text" name="displayTitle" value="<%= currentTrack ? currentTrack.displayTitle : '' %>" required /></span></label>
@@ -28,13 +28,21 @@
         <% }) %>
       </select>
     </span></label>
-    <label>Длительность (сек)<span><input type="number" name="duration" min="0" value="<%= currentTrack ? currentTrack.duration : 200 %>" /></span></label>
+    <label>Длительность (сек)<span><input type="number" name="duration" min="0" value="<%= currentTrack ? currentTrack.duration : 200 %>" data-duration-input /></span></label>
     <label>Жанр<span><input type="text" name="genre" value="<%= currentTrack ? currentTrack.genre : '' %>" /></span></label>
     <label>Рейтинг<span><input type="text" name="rating" value="<%= currentTrack ? currentTrack.rating : '' %>" placeholder="4.8" /></span></label>
     <label>Альбом<span><input type="text" name="album" value="<%= currentTrack && currentTrack.album ? currentTrack.album : '' %>" /></span></label>
     <label>Год выпуска<span><input type="number" name="releaseYear" min="1900" max="2100" value="<%= currentTrack && currentTrack.releaseYear ? currentTrack.releaseYear : '' %>" /></span></label>
     <label>Глиф обложки<span><input type="text" name="artworkGlyph" value="<%= currentTrack ? currentTrack.artworkGlyph : '' %>" placeholder="初" /></span></label>
-    <label class="is-wide">Ссылка на аудио<span><input type="text" name="audioUrl" value="<%= currentTrack && currentTrack.audioUrl ? currentTrack.audioUrl : '' %>" placeholder="https://..." /></span></label>
+    <div class="admin-audio-field is-wide">
+      <label>Ссылка на аудио<span><input type="text" name="audioUrl" value="<%= currentTrack && currentTrack.audioUrl ? currentTrack.audioUrl : '' %>" placeholder="https://..." data-audio-url /></span></label>
+      <label>Или загрузить аудиофайл<span><input type="file" name="audioFile" accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/x-m4a,audio/flac,audio/webm" data-audio-file /></span></label>
+      <div class="admin-audio-actions">
+        <button class="admin-button admin-button-secondary admin-button-small" type="button" data-detect-duration>Определить длительность</button>
+        <span class="admin-hint" data-duration-status>Длительность подставится автоматически после ссылки или выбора аудиофайла.</span>
+      </div>
+      <p class="admin-hint">MP3, WAV, OGG, M4A, FLAC или WEBM, до 30 МБ. Загруженный файл имеет приоритет над ссылкой.</p>
+    </div>
     <label class="is-wide">Описание<span><textarea name="description" rows="2"><%= currentTrack ? currentTrack.description : '' %></textarea></span></label>
 
     <div class="admin-style-field is-wide">
@@ -85,3 +93,4 @@
     </div>
   </div>
 </form>
+<script src="/assets/js/admin-track-duration.js" defer></script>

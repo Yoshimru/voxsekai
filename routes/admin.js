@@ -4,7 +4,9 @@ const authRepository = require("../repositories/authRepository");
 const adminRepository = require("../repositories/adminRepository");
 const {
   uploadImage,
+  uploadTrackMedia,
   resolveImageUrl,
+  resolveAudioUrl,
   cleanupImage,
 } = require("../middleware/imageUpload");
 
@@ -167,9 +169,13 @@ router.get("/tracks/:id/edit", (req, res, next) => {
   }
 });
 
-router.post("/tracks", uploadImage, (req, res, next) => {
+router.post("/tracks", uploadTrackMedia, (req, res, next) => {
   try {
-    if (req.imageUploadError) {
+    if (
+      req.mediaUploadError ||
+      req.imageUploadError ||
+      req.audioUploadError
+    ) {
       return res.redirect("/admin/tracks?error=upload");
     }
     const artist = req.body.artistId
@@ -182,6 +188,7 @@ router.post("/tracks", uploadImage, (req, res, next) => {
       ...req.body,
       artistId: artist.id,
       imageUrl: resolveImageUrl(req),
+      audioUrl: resolveAudioUrl(req),
     });
     res.redirect("/admin/tracks");
   } catch (error) {
@@ -189,11 +196,15 @@ router.post("/tracks", uploadImage, (req, res, next) => {
   }
 });
 
-router.post("/tracks/:id/edit", uploadImage, (req, res, next) => {
+router.post("/tracks/:id/edit", uploadTrackMedia, (req, res, next) => {
   try {
     const track = contentRepository.getTrackById(req.params.id);
     if (!track) return res.redirect("/admin/tracks?error=notfound");
-    if (req.imageUploadError) {
+    if (
+      req.mediaUploadError ||
+      req.imageUploadError ||
+      req.audioUploadError
+    ) {
       return res.redirect(
         `/admin/tracks/${encodeURIComponent(track.id)}/edit?error=upload`,
       );
@@ -208,12 +219,15 @@ router.post("/tracks/:id/edit", uploadImage, (req, res, next) => {
     }
 
     const imageUrl = resolveImageUrl(req, track.imageUrl);
+    const audioUrl = resolveAudioUrl(req, track.audioUrl);
     adminRepository.updateTrack(track.id, {
       ...req.body,
       artistId: artist.id,
       imageUrl,
+      audioUrl,
     });
     cleanupImage(track.imageUrl, imageUrl);
+    cleanupImage(track.audioUrl, audioUrl);
     res.redirect("/admin/tracks");
   } catch (error) {
     next(error);
@@ -224,7 +238,10 @@ router.post("/tracks/:id/delete", (req, res, next) => {
   try {
     const track = contentRepository.getTrackById(req.params.id);
     adminRepository.deleteTrack(req.params.id);
-    if (track) cleanupImage(track.imageUrl, "");
+    if (track) {
+      cleanupImage(track.imageUrl, "");
+      cleanupImage(track.audioUrl, "");
+    }
     res.redirect("/admin/tracks");
   } catch (error) {
     next(error);
@@ -314,21 +331,51 @@ router.get("/styles", (req, res, next) => {
   try {
     const artistUsage = adminRepository.getArtistStyleUsage();
     const trackUsage = adminRepository.getTrackStyleUsage();
+    const collectionUsage = adminRepository.getCollectionStyleUsage();
+    const playlistUsage = adminRepository.getPlaylistStyleUsage();
+    const eventUsage = adminRepository.getEventStyleUsage();
+    const withUsage = (styles, usage) =>
+      styles.map((style) => ({
+        ...style,
+        usage: usage.get(style.id) || 0,
+      }));
     render(res, "pages/admin/styles", {
       title: "Стили — админпанель",
       section: "styles",
-      artistStyles: contentRepository
-        .getArtistStyles()
-        .map((style) => ({
-          ...style,
-          usage: artistUsage.get(style.id) || 0,
-        })),
-      trackStyles: contentRepository
-        .getTrackStyles()
-        .map((style) => ({
-          ...style,
-          usage: trackUsage.get(style.id) || 0,
-        })),
+      artistStyles: withUsage(
+        contentRepository.getArtistStyles(),
+        artistUsage,
+      ),
+      trackStyles: withUsage(contentRepository.getTrackStyles(), trackUsage),
+      cardStyleGroups: [
+        {
+          key: "collections",
+          title: "Стили карточек подборок",
+          hint: "Градиент и акцент используются в карточках подборок и на странице подборки.",
+          glyph: "≋",
+          styles: withUsage(
+            contentRepository.getCollectionStyles(),
+            collectionUsage,
+          ),
+        },
+        {
+          key: "playlists",
+          title: "Стили карточек плейлистов",
+          hint: "Цвета применяются к обложкам плейлистов в библиотеке и публичных плейлистах.",
+          glyph: "☷",
+          styles: withUsage(
+            contentRepository.getPlaylistStyles(),
+            playlistUsage,
+          ),
+        },
+        {
+          key: "events",
+          title: "Стили карточек событий",
+          hint: "Цвета применяются к карточкам и странице события.",
+          glyph: "✦",
+          styles: withUsage(contentRepository.getEventStyles(), eventUsage),
+        },
+      ],
       error: pageError(req.query.error),
     });
   } catch (error) {
@@ -429,6 +476,141 @@ router.post("/styles/tracks/:id/delete", (req, res, next) => {
   }
 });
 
+// --- Стили подборок, плейлистов и событий ---
+function cardStyleFields(body, current, fallback) {
+  const name = String(body.name || "").trim();
+  if (!name) return null;
+  return {
+    name: name.slice(0, 48),
+    accent: normalizeColor(body.accent, current?.accent || fallback.accent),
+    backgroundStart: normalizeColor(
+      body.backgroundStart,
+      current?.backgroundStart || fallback.backgroundStart,
+    ),
+    backgroundEnd: normalizeColor(
+      body.backgroundEnd,
+      current?.backgroundEnd || fallback.backgroundEnd,
+    ),
+  };
+}
+
+router.post("/styles/collections", (req, res, next) => {
+  try {
+    const fields = cardStyleFields(req.body, null, {
+      accent: "#83c5ed",
+      backgroundStart: "#21415c",
+      backgroundEnd: "#1f5663",
+    });
+    if (!fields) return res.redirect("/admin/styles?error=style");
+    adminRepository.createCollectionStyle(fields);
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/collections/:id", (req, res, next) => {
+  try {
+    const current = contentRepository
+      .getCollectionStyles()
+      .find((style) => style.id === req.params.id);
+    if (!current) return res.redirect("/admin/styles?error=notfound");
+    const fields = cardStyleFields(req.body, current, current);
+    if (!fields) return res.redirect("/admin/styles?error=style");
+    adminRepository.updateCollectionStyle(current.id, fields);
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/collections/:id/delete", (req, res, next) => {
+  try {
+    const deleted = adminRepository.deleteCollectionStyle(req.params.id);
+    res.redirect(deleted ? "/admin/styles" : "/admin/styles?error=inuse");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/playlists", (req, res, next) => {
+  try {
+    const fields = cardStyleFields(req.body, null, {
+      accent: "#ee987d",
+      backgroundStart: "#54352f",
+      backgroundEnd: "#77443a",
+    });
+    if (!fields) return res.redirect("/admin/styles?error=style");
+    adminRepository.createPlaylistStyle(fields);
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/playlists/:id", (req, res, next) => {
+  try {
+    const current = contentRepository
+      .getPlaylistStyles()
+      .find((style) => style.id === req.params.id);
+    if (!current) return res.redirect("/admin/styles?error=notfound");
+    const fields = cardStyleFields(req.body, current, current);
+    if (!fields) return res.redirect("/admin/styles?error=style");
+    adminRepository.updatePlaylistStyle(current.id, fields);
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/playlists/:id/delete", (req, res, next) => {
+  try {
+    const deleted = adminRepository.deletePlaylistStyle(req.params.id);
+    res.redirect(deleted ? "/admin/styles" : "/admin/styles?error=inuse");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/events", (req, res, next) => {
+  try {
+    const fields = cardStyleFields(req.body, null, {
+      accent: "#d586d4",
+      backgroundStart: "#492d44",
+      backgroundEnd: "#6b3d62",
+    });
+    if (!fields) return res.redirect("/admin/styles?error=style");
+    adminRepository.createEventStyle(fields);
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/events/:id", (req, res, next) => {
+  try {
+    const current = contentRepository
+      .getEventStyles()
+      .find((style) => style.id === req.params.id);
+    if (!current) return res.redirect("/admin/styles?error=notfound");
+    const fields = cardStyleFields(req.body, current, current);
+    if (!fields) return res.redirect("/admin/styles?error=style");
+    adminRepository.updateEventStyle(current.id, fields);
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/events/:id/delete", (req, res, next) => {
+  try {
+    const deleted = adminRepository.deleteEventStyle(req.params.id);
+    res.redirect(deleted ? "/admin/styles" : "/admin/styles?error=inuse");
+  } catch (error) {
+    next(error);
+  }
+});
+
 // --- Подборки ---
 router.get("/collections", (req, res, next) => {
   try {
@@ -437,6 +619,7 @@ router.get("/collections", (req, res, next) => {
       section: "collections",
       collections: contentRepository.getCollections(),
       tracks: contentRepository.getTracks(),
+      cardStyles: contentRepository.getCollectionStyles(),
     });
   } catch (error) {
     next(error);
@@ -478,6 +661,7 @@ router.get("/playlists", (req, res, next) => {
       section: "playlists",
       playlists: contentRepository.getPlaylists(),
       tracks: contentRepository.getTracks(),
+      cardStyles: contentRepository.getPlaylistStyles(),
     });
   } catch (error) {
     next(error);
@@ -518,6 +702,7 @@ router.get("/events", (req, res, next) => {
       title: "События — админпанель",
       section: "events",
       events: contentRepository.getEvents(),
+      cardStyles: contentRepository.getEventStyles(),
     });
   } catch (error) {
     next(error);

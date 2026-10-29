@@ -5,6 +5,11 @@ const {
   artistStyles,
   trackStyles,
 } = require("../data/stylePresets");
+const {
+  collectionStyles,
+  playlistStyles,
+  eventStyles,
+} = require("../data/cardStylePresets");
 
 const schemaSqlPath = path.join(__dirname, "schema.sql");
 
@@ -45,16 +50,8 @@ function ensureColumn(db, table, column, definition) {
   }
 }
 
-/** Заполняет таблицы стилей стартовыми пресетами только при первом запуске. */
+/** Заполняет таблицы стилей стартовыми пресетами, если они ещё пустые. */
 function seedStyles(db) {
-  const artistStyleCount = db
-    .prepare("SELECT COUNT(*) AS n FROM artist_styles")
-    .get().n;
-  const trackStyleCount = db
-    .prepare("SELECT COUNT(*) AS n FROM track_styles")
-    .get().n;
-  if (artistStyleCount || trackStyleCount) return;
-
   const insertArtistStyle = db.prepare(`
     INSERT OR IGNORE INTO artist_styles
       (id, name, accent, background_start, background_end)
@@ -65,9 +62,48 @@ function seedStyles(db) {
       (id, name, color_one, color_two, color_three)
     VALUES (@id, @name, @colorOne, @colorTwo, @colorThree)
   `);
+  const insertCardStyle = (table) =>
+    db.prepare(`
+      INSERT OR IGNORE INTO ${table}
+        (id, name, accent, background_start, background_end)
+      VALUES (@id, @name, @accent, @backgroundStart, @backgroundEnd)
+    `);
+  const insertCollectionStyle = insertCardStyle("collection_styles");
+  const insertPlaylistStyle = insertCardStyle("playlist_styles");
+  const insertEventStyle = insertCardStyle("event_styles");
+  const cardStyleValues = (style) => ({
+    id: style.id,
+    name: style.name,
+    accent: style.accent,
+    backgroundStart: style.backgroundStart,
+    backgroundEnd: style.backgroundEnd,
+  });
+
+  const isEmpty = (table) =>
+    db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n === 0;
+
   db.transaction(() => {
-    artistStyles.forEach((style) => insertArtistStyle.run(style));
-    trackStyles.forEach((style) => insertTrackStyle.run(style));
+    if (isEmpty("artist_styles")) {
+      artistStyles.forEach((style) => insertArtistStyle.run(style));
+    }
+    if (isEmpty("track_styles")) {
+      trackStyles.forEach((style) => insertTrackStyle.run(style));
+    }
+    if (isEmpty("collection_styles")) {
+      collectionStyles.forEach((style) =>
+        insertCollectionStyle.run(cardStyleValues(style)),
+      );
+    }
+    if (isEmpty("playlist_styles")) {
+      playlistStyles.forEach((style) =>
+        insertPlaylistStyle.run(cardStyleValues(style)),
+      );
+    }
+    if (isEmpty("event_styles")) {
+      eventStyles.forEach((style) =>
+        insertEventStyle.run(cardStyleValues(style)),
+      );
+    }
   })();
 }
 

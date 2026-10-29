@@ -3,6 +3,7 @@ const path = require("node:path");
 const session = require("express-session");
 const contentRepository = require("./repositories/contentRepository");
 const authRepository = require("./repositories/authRepository");
+const ratingRepository = require("./repositories/ratingRepository");
 const adminRouter = require("./routes/admin");
 
 const app = express();
@@ -262,7 +263,30 @@ app.get("/track/:slug", async (req, res, next) => {
       title: `${track.displayTitle} — VoxSekai`,
       track,
       tracks: res.locals.trackCatalog,
+      ratingSummary: ratingRepository.getSummary(track.id),
+      userRating: res.locals.currentUser
+        ? ratingRepository.getUserRating(res.locals.currentUser.id, track.id)
+        : null,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/track/:slug/rate", (req, res, next) => {
+  try {
+    const track = contentRepository.getTrackById(req.params.slug);
+    if (!track) return res.status(404).render("pages/404", { title: notFoundTitle });
+    if (!res.locals.currentUser) {
+      return res.redirect(
+        `/login?next=${encodeURIComponent(`/track/${track.id}`)}`,
+      );
+    }
+    const value = Number(req.body.value);
+    if (Number.isInteger(value) && value >= 1 && value <= 5) {
+      ratingRepository.rate(res.locals.currentUser.id, track.id, value);
+    }
+    res.redirect(`/track/${encodeURIComponent(track.id)}#rating`);
   } catch (error) {
     next(error);
   }

@@ -1064,6 +1064,8 @@
   font-weight: 500;
 }
 .profile-artists > a {
+  width: 100%;
+  min-width: 0;
   min-height: 37px;
   display: flex;
   align-items: center;
@@ -1072,9 +1074,16 @@
   color: #dce1e3;
   font-size: 12px;
 }
+.profile-artists > a strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .profile-artist-dot {
   width: 23px;
   height: 23px;
+  flex: 0 0 23px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -1093,6 +1102,7 @@
 }
 .profile-artists > a b {
   margin-left: auto;
+  flex: 0 0 auto;
   color: var(--mint);
   font-size: 11px;
   font-weight: 500;

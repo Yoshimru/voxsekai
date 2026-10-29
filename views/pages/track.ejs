@@ -42,7 +42,7 @@
               <a class="track-artist-link" href="/artists"><%= track.artistName %></a>
               <p class="track-detail-description"><%= track.description %></p>
               <div class="track-detail-meta">
-                <span>★ <%= track.rating %></span>
+                <span>★ <%= ratingSummary && ratingSummary.average ? ratingSummary.average : track.rating %></span>
                 <span><%= Math.floor(track.duration / 60) %>:<%= String(track.duration % 60).padStart(2, '0') %></span>
                 <span><%= track.releaseYear %></span>
               </div>
@@ -69,9 +69,45 @@
                   ♡
                 </button>
               </div>
-              <p class="track-backend-note">
-                <span></span> Карточка трека готова к подключению аудио и данных каталога
-              </p>
+              <%
+                const ratingCount = ratingSummary ? ratingSummary.count : 0;
+                const ratingValue = ratingSummary && ratingSummary.average
+                  ? ratingSummary.average
+                  : track.rating;
+                const ratingWord =
+                  ratingCount % 10 === 1 && ratingCount % 100 !== 11
+                    ? "оценка"
+                    : ratingCount % 10 >= 2 &&
+                        ratingCount % 10 <= 4 &&
+                        !(ratingCount % 100 >= 12 && ratingCount % 100 <= 14)
+                      ? "оценки"
+                      : "оценок";
+              %>
+              <div class="track-rating" id="rating">
+                <div class="track-rating-summary">
+                  <strong>★ <%= ratingValue %></strong>
+                  <span><%= ratingCount ? `${ratingCount} ${ratingWord}` : "оценок пока нет" %></span>
+                </div>
+                <% if (currentUser) { %>
+                  <form class="track-rating-form" method="post" action="/track/<%= track.id %>/rate">
+                    <span class="track-rating-label"><%= userRating ? "Твоя оценка:" : "Поставь оценку:" %></span>
+                    <span class="track-rating-stars">
+                      <% for (let star = 1; star <= 5; star += 1) { %>
+                        <button
+                          class="track-rating-star <%= userRating && star <= userRating ? "is-active" : "" %>"
+                          type="submit"
+                          name="value"
+                          value="<%= star %>"
+                          aria-label="Оценить на <%= star %> из 5"
+                          title="<%= star %> из 5"
+                        >★</button>
+                      <% } %>
+                    </span>
+                  </form>
+                <% } else { %>
+                  <a class="track-rating-login" href="/login?next=<%= encodeURIComponent(`/track/${track.id}`) %>">Войди, чтобы оценить трек</a>
+                <% } %>
+              </div>
             </div>
           </section>
 

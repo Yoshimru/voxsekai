@@ -215,9 +215,48 @@
 }
 
 .admin-form .admin-style-field,
-.admin-form .admin-image-field {
+.admin-form .admin-image-field,
+.admin-form .admin-audio-field {
   grid-column: 1 / -1;
   min-width: 0;
+}
+
+.admin-audio-field {
+  display: grid;
+  gap: 9px;
+}
+
+.admin-audio-field input[type="text"],
+.admin-audio-field input[type="file"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-audio-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-audio-actions .admin-hint {
+  margin: 0;
+}
+
+.admin-audio-actions .admin-button {
+  flex: 0 0 auto;
+}
+
+.admin-audio-actions .admin-hint[data-state="error"] {
+  color: #f0a79e;
+}
+
+.admin-audio-actions .admin-hint[data-state="ok"] {
+  color: #8ed6c2;
+}
+
+.admin-audio-actions .admin-hint[data-state="loading"] {
+  color: #b8c7d2;
 }
 
 .admin-form-label {
@@ -397,6 +436,7 @@
 
 .admin-image-controls input {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .admin-form .admin-image-controls label {

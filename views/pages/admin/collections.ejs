@@ -19,14 +19,20 @@
         <div class="admin-form">
           <label>Название<span><input type="text" name="title" required /></span></label>
           <label>Подпись (tagline)<span><input type="text" name="tagline" placeholder="AFTER HOURS" /></span></label>
-          <label>Стиль карточки<span>
-            <select name="cardClass">
-              <option value="collection-mood-new">collection-mood-new</option>
-              <option value="collection-mood-road">collection-mood-road</option>
-              <option value="collection-mood-soft">collection-mood-soft</option>
-              <option value="collection-mood-tokyo">collection-mood-tokyo</option>
-            </select>
-          </span></label>
+          <div class="admin-style-field is-wide">
+            <span class="admin-form-label">Стиль карточки подборки</span>
+            <div class="admin-cover-style-grid">
+              <% cardStyles.forEach((style, index) => { %>
+                <label class="admin-cover-style-option">
+                  <input type="radio" name="cardClass" value="<%= style.id %>" <%= index === 0 ? 'checked' : '' %> />
+                  <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
+                    <span class="admin-cover-style-glyph"><%= style.glyph %></span>
+                    <span class="admin-cover-style-name"><%= style.name %></span>
+                  </span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
           <label class="is-wide">Описание<span><input type="text" name="description" /></span></label>
           <label class="checkbox-row">
             <input type="checkbox" name="featured" />

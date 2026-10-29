@@ -89,6 +89,65 @@ function createAdminRepository(db = getDb()) {
       "SELECT COUNT(*) AS n FROM tracks WHERE artwork_class = ?",
     ),
 
+    allCollectionStyles: db.prepare(
+      "SELECT * FROM collection_styles ORDER BY name",
+    ),
+    collectionStyleById: db.prepare(
+      "SELECT * FROM collection_styles WHERE id = ?",
+    ),
+    insertCollectionStyle: db.prepare(`
+      INSERT INTO collection_styles (id, name, accent, background_start, background_end)
+      VALUES (@id, @name, @accent, @backgroundStart, @backgroundEnd)
+    `),
+    updateCollectionStyle: db.prepare(`
+      UPDATE collection_styles SET
+        name = @name, accent = @accent,
+        background_start = @backgroundStart, background_end = @backgroundEnd
+      WHERE id = @id
+    `),
+    deleteCollectionStyle: db.prepare(
+      "DELETE FROM collection_styles WHERE id = ?",
+    ),
+    countCollectionsByStyle: db.prepare(
+      "SELECT COUNT(*) AS n FROM collections WHERE card_class = ?",
+    ),
+
+    allPlaylistStyles: db.prepare("SELECT * FROM playlist_styles ORDER BY name"),
+    playlistStyleById: db.prepare(
+      "SELECT * FROM playlist_styles WHERE id = ?",
+    ),
+    insertPlaylistStyle: db.prepare(`
+      INSERT INTO playlist_styles (id, name, accent, background_start, background_end)
+      VALUES (@id, @name, @accent, @backgroundStart, @backgroundEnd)
+    `),
+    updatePlaylistStyle: db.prepare(`
+      UPDATE playlist_styles SET
+        name = @name, accent = @accent,
+        background_start = @backgroundStart, background_end = @backgroundEnd
+      WHERE id = @id
+    `),
+    deletePlaylistStyle: db.prepare("DELETE FROM playlist_styles WHERE id = ?"),
+    countPlaylistsByStyle: db.prepare(
+      "SELECT COUNT(*) AS n FROM playlists WHERE artwork_class = ?",
+    ),
+
+    allEventStyles: db.prepare("SELECT * FROM event_styles ORDER BY name"),
+    eventStyleById: db.prepare("SELECT * FROM event_styles WHERE id = ?"),
+    insertEventStyle: db.prepare(`
+      INSERT INTO event_styles (id, name, accent, background_start, background_end)
+      VALUES (@id, @name, @accent, @backgroundStart, @backgroundEnd)
+    `),
+    updateEventStyle: db.prepare(`
+      UPDATE event_styles SET
+        name = @name, accent = @accent,
+        background_start = @backgroundStart, background_end = @backgroundEnd
+      WHERE id = @id
+    `),
+    deleteEventStyle: db.prepare("DELETE FROM event_styles WHERE id = ?"),
+    countEventsByStyle: db.prepare(
+      "SELECT COUNT(*) AS n FROM events WHERE artwork_class = ?",
+    ),
+
     insertCollection: db.prepare(`
       INSERT INTO collections (id, title, tagline, description, card_class, featured)
       VALUES (@id, @title, @tagline, @description, @cardClass, @featured)
@@ -142,6 +201,17 @@ function createAdminRepository(db = getDb()) {
   }
 
   const existingTrackIds = db.prepare("SELECT id FROM tracks");
+
+  function uniqueStyleId(baseValue, fallback, statement) {
+    const base = slug(baseValue, fallback);
+    let id = base;
+    let suffix = 2;
+    while (statement.get(id)) {
+      id = `${base}-${suffix}`;
+      suffix += 1;
+    }
+    return id;
+  }
 
   /** Оставляет только id реально существующих треков. */
   function filterTrackIds(trackIds) {
@@ -400,6 +470,135 @@ function createAdminRepository(db = getDb()) {
       const usage = new Map();
       db.prepare(
         "SELECT artwork_class AS id, COUNT(*) AS n FROM tracks GROUP BY artwork_class",
+      )
+        .all()
+        .forEach((row) => usage.set(row.id, row.n));
+      return usage;
+    },
+
+    // --- Стили карточек подборок ---
+    createCollectionStyle(fields) {
+      const id = uniqueStyleId(
+        fields.id || fields.name,
+        `collection-style-${Date.now()}`,
+        statements.collectionStyleById,
+      );
+      statements.insertCollectionStyle.run({
+        id,
+        name: fields.name || "Новый стиль",
+        accent: fields.accent || "#83c5ed",
+        backgroundStart: fields.backgroundStart || "#21415c",
+        backgroundEnd: fields.backgroundEnd || "#1f5663",
+      });
+      return id;
+    },
+    updateCollectionStyle(id, fields) {
+      const row = statements.collectionStyleById.get(id);
+      if (!row) return false;
+      statements.updateCollectionStyle.run({
+        id,
+        name: fields.name || row.name,
+        accent: fields.accent || row.accent,
+        backgroundStart: fields.backgroundStart || row.background_start,
+        backgroundEnd: fields.backgroundEnd || row.background_end,
+      });
+      return true;
+    },
+    deleteCollectionStyle(id) {
+      if (statements.countCollectionsByStyle.get(id).n > 0) return false;
+      statements.deleteCollectionStyle.run(id);
+      return true;
+    },
+    getCollectionStyleUsage() {
+      const usage = new Map();
+      db.prepare(
+        "SELECT card_class AS id, COUNT(*) AS n FROM collections GROUP BY card_class",
+      )
+        .all()
+        .forEach((row) => usage.set(row.id, row.n));
+      return usage;
+    },
+
+    // --- Стили карточек плейлистов ---
+    createPlaylistStyle(fields) {
+      const id = uniqueStyleId(
+        fields.id || fields.name,
+        `playlist-style-${Date.now()}`,
+        statements.playlistStyleById,
+      );
+      statements.insertPlaylistStyle.run({
+        id,
+        name: fields.name || "Новый стиль",
+        accent: fields.accent || "#ee987d",
+        backgroundStart: fields.backgroundStart || "#54352f",
+        backgroundEnd: fields.backgroundEnd || "#77443a",
+      });
+      return id;
+    },
+    updatePlaylistStyle(id, fields) {
+      const row = statements.playlistStyleById.get(id);
+      if (!row) return false;
+      statements.updatePlaylistStyle.run({
+        id,
+        name: fields.name || row.name,
+        accent: fields.accent || row.accent,
+        backgroundStart: fields.backgroundStart || row.background_start,
+        backgroundEnd: fields.backgroundEnd || row.background_end,
+      });
+      return true;
+    },
+    deletePlaylistStyle(id) {
+      if (statements.countPlaylistsByStyle.get(id).n > 0) return false;
+      statements.deletePlaylistStyle.run(id);
+      return true;
+    },
+    getPlaylistStyleUsage() {
+      const usage = new Map();
+      db.prepare(
+        "SELECT artwork_class AS id, COUNT(*) AS n FROM playlists GROUP BY artwork_class",
+      )
+        .all()
+        .forEach((row) => usage.set(row.id, row.n));
+      return usage;
+    },
+
+    // --- Стили карточек событий ---
+    createEventStyle(fields) {
+      const id = uniqueStyleId(
+        fields.id || fields.name,
+        `event-style-${Date.now()}`,
+        statements.eventStyleById,
+      );
+      statements.insertEventStyle.run({
+        id,
+        name: fields.name || "Новый стиль",
+        accent: fields.accent || "#d586d4",
+        backgroundStart: fields.backgroundStart || "#492d44",
+        backgroundEnd: fields.backgroundEnd || "#6b3d62",
+      });
+      return id;
+    },
+    updateEventStyle(id, fields) {
+      const row = statements.eventStyleById.get(id);
+      if (!row) return false;
+      statements.updateEventStyle.run({
+        id,
+        name: fields.name || row.name,
+        accent: fields.accent || row.accent,
+        backgroundStart: fields.backgroundStart || row.background_start,
+        backgroundEnd: fields.backgroundEnd || row.background_end,
+      });
+      return true;
+    },
+    deleteEventStyle(id) {
+      if (statements.countEventsByStyle.get(id).n > 0) return false;
+      statements.deleteEventStyle.run(id);
+      return true;
+    },
+    getEventStyleUsage() {
+      const usage = new Map();
+      db.prepare(
+        "SELECT artwork_class AS id, COUNT(*) AS n FROM events GROUP BY artwork_class",
       )
         .all()
         .forEach((row) => usage.set(row.id, row.n));

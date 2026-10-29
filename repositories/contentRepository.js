@@ -3,6 +3,11 @@ const {
   fallbackArtistStyle: defaultArtistPreset,
   fallbackTrackStyle: defaultTrackPreset,
 } = require("../data/stylePresets");
+const {
+  collectionStyles,
+  playlistStyles,
+  eventStyles,
+} = require("../data/cardStylePresets");
 
 // Презентационные маппинги — остались на стороне репозитория, как и раньше.
 const genreKeys = {
@@ -36,6 +41,30 @@ function mapTrackStyle(row) {
     background: `radial-gradient(circle at 65% 28%, ${row.color_one}, ${row.color_two} 38%, ${row.color_three} 80%)`,
   };
 }
+
+function mapCardStyle(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    accent: row.accent,
+    backgroundStart: row.background_start,
+    backgroundEnd: row.background_end,
+    background: `linear-gradient(135deg, ${row.background_start}, ${row.background_end})`,
+    orb: `color-mix(in srgb, ${row.accent} 42%, transparent)`,
+  };
+}
+
+function cardStyleFallback(preset) {
+  return {
+    ...preset,
+    background: `linear-gradient(135deg, ${preset.backgroundStart}, ${preset.backgroundEnd})`,
+    orb: `color-mix(in srgb, ${preset.accent} 42%, transparent)`,
+  };
+}
+
+const fallbackCollectionStyle = cardStyleFallback(collectionStyles[0]);
+const fallbackPlaylistStyle = cardStyleFallback(playlistStyles[0]);
+const fallbackEventStyle = cardStyleFallback(eventStyles[0]);
 
 const fallbackArtistStyle = {
   ...defaultArtistPreset,
@@ -94,33 +123,35 @@ function mapArtist(row, trackIds = [], style = fallbackArtistStyle) {
   };
 }
 
-function mapCollection(row, trackIds = []) {
+function mapCollection(row, trackIds = [], style = fallbackCollectionStyle) {
   return {
     id: row.id,
     title: row.title,
     tagline: row.tagline,
     description: row.description,
     cardClass: row.card_class,
+    style,
     ...(row.featured === undefined ? {} : { featured: Boolean(row.featured) }),
     trackIds,
     trackCount: trackIds.length,
   };
 }
 
-function mapPlaylist(row, trackIds = []) {
+function mapPlaylist(row, trackIds = [], style = fallbackPlaylistStyle) {
   return {
     id: row.id,
     title: row.title,
     description: row.description,
     label: row.label,
     artworkClass: row.artwork_class,
+    style,
     isPublic: Boolean(row.is_public),
     trackIds,
     trackCount: trackIds.length,
   };
 }
 
-function mapEvent(row) {
+function mapEvent(row, style = fallbackEventStyle) {
   return {
     id: row.id,
     title: row.title,
@@ -135,6 +166,7 @@ function mapEvent(row) {
     category: row.category,
     artworkClass: row.artwork_class,
     artworkGlyph: row.artwork_glyph,
+    style,
     tag: row.tag,
     description: row.description,
   };
@@ -159,6 +191,18 @@ function createContentRepository(db = getDb()) {
     allTrackStyles: db.prepare("SELECT * FROM track_styles ORDER BY name"),
     artistStyleById: db.prepare("SELECT * FROM artist_styles WHERE id = ?"),
     trackStyleById: db.prepare("SELECT * FROM track_styles WHERE id = ?"),
+    allCollectionStyles: db.prepare(
+      "SELECT * FROM collection_styles ORDER BY name",
+    ),
+    allPlaylistStyles: db.prepare("SELECT * FROM playlist_styles ORDER BY name"),
+    allEventStyles: db.prepare("SELECT * FROM event_styles ORDER BY name"),
+    collectionStyleById: db.prepare(
+      "SELECT * FROM collection_styles WHERE id = ?",
+    ),
+    playlistStyleById: db.prepare(
+      "SELECT * FROM playlist_styles WHERE id = ?",
+    ),
+    eventStyleById: db.prepare("SELECT * FROM event_styles WHERE id = ?"),
     allCollections: db.prepare("SELECT * FROM collections ORDER BY id"),
     collectionById: db.prepare("SELECT * FROM collections WHERE id = ?"),
     allPlaylists: db.prepare("SELECT * FROM playlists ORDER BY id"),
@@ -190,6 +234,14 @@ function createContentRepository(db = getDb()) {
       statements.allTrackStyles
         .all()
         .map((row) => [row.id, mapTrackStyle(row)]),
+    );
+  }
+
+  function cardStyleMap(statement) {
+    return new Map(
+      statement
+        .all()
+        .map((row) => [row.id, mapCardStyle(row)]),
     );
   }
 
@@ -242,11 +294,16 @@ function createContentRepository(db = getDb()) {
       return statements.allTrackStyles.all().map(mapTrackStyle);
     },
     getCollections() {
+      const styles = cardStyleMap(statements.allCollectionStyles);
       return statements.allCollections.all().map((row) => {
         const trackIds = statements.trackIdsByCollection
           .all(row.id)
           .map((item) => item.track_id);
-        return mapCollection(row, trackIds);
+        return mapCollection(
+          row,
+          trackIds,
+          styles.get(row.card_class) || fallbackCollectionStyle,
+        );
       });
     },
     getCollectionById(id) {
@@ -255,17 +312,28 @@ function createContentRepository(db = getDb()) {
       const trackIds = statements.trackIdsByCollection
         .all(row.id)
         .map((item) => item.track_id);
-      return mapCollection(row, trackIds);
+      const styleRow = statements.collectionStyleById.get(row.card_class);
+      return mapCollection(
+        row,
+        trackIds,
+        styleRow ? mapCardStyle(styleRow) : fallbackCollectionStyle,
+      );
     },
     getPlaylists() {
+      const styles = cardStyleMap(statements.allPlaylistStyles);
       return statements.allPlaylists.all().map((row) => {
         const trackIds = statements.trackIdsByPlaylist
           .all(row.id)
           .map((item) => item.track_id);
-        return mapPlaylist(row, trackIds);
+        return mapPlaylist(
+          row,
+          trackIds,
+          styles.get(row.artwork_class) || fallbackPlaylistStyle,
+        );
       });
     },
     getPublicPlaylists() {
+      const styles = cardStyleMap(statements.allPlaylistStyles);
       return statements.allPlaylists
         .all()
         .filter((row) => row.is_public === 1)
@@ -273,7 +341,11 @@ function createContentRepository(db = getDb()) {
           const trackIds = statements.trackIdsByPlaylist
             .all(row.id)
             .map((item) => item.track_id);
-          return mapPlaylist(row, trackIds);
+          return mapPlaylist(
+            row,
+            trackIds,
+            styles.get(row.artwork_class) || fallbackPlaylistStyle,
+          );
         });
     },
     getPublicPlaylistById(id) {
@@ -282,14 +354,41 @@ function createContentRepository(db = getDb()) {
       const trackIds = statements.trackIdsByPlaylist
         .all(row.id)
         .map((item) => item.track_id);
-      return mapPlaylist(row, trackIds);
+      const styleRow = statements.playlistStyleById.get(row.artwork_class);
+      return mapPlaylist(
+        row,
+        trackIds,
+        styleRow ? mapCardStyle(styleRow) : fallbackPlaylistStyle,
+      );
     },
     getEvents() {
-      return statements.allEvents.all().map(mapEvent);
+      const styles = cardStyleMap(statements.allEventStyles);
+      return statements.allEvents
+        .all()
+        .map((row) =>
+          mapEvent(
+            row,
+            styles.get(row.artwork_class) || fallbackEventStyle,
+          ),
+        );
     },
     getEventById(id) {
       const row = statements.eventById.get(id);
-      return row ? mapEvent(row) : null;
+      if (!row) return null;
+      const styleRow = statements.eventStyleById.get(row.artwork_class);
+      return mapEvent(
+        row,
+        styleRow ? mapCardStyle(styleRow) : fallbackEventStyle,
+      );
+    },
+    getCollectionStyles() {
+      return statements.allCollectionStyles.all().map(mapCardStyle);
+    },
+    getPlaylistStyles() {
+      return statements.allPlaylistStyles.all().map(mapCardStyle);
+    },
+    getEventStyles() {
+      return statements.allEventStyles.all().map(mapCardStyle);
     },
   };
 }

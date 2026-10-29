@@ -535,9 +535,18 @@
       .filter(Boolean);
     const genreCounts = new Map();
     const artistCounts = new Map();
-    favoriteTracks.forEach((track) => {
-      genreCounts.set(track.genre, (genreCounts.get(track.genre) || 0) + 1);
-      const artist = track.artistName || track.artist;
+    const genreTracks = favoriteTracks.filter(
+      (track) => track.genre && track.genre.trim(),
+    );
+    const artistTracks = favoriteTracks.filter((track) =>
+      (track.artistName || track.artist || "").trim(),
+    );
+    genreTracks.forEach((track) => {
+      const genre = track.genre.trim();
+      genreCounts.set(genre, (genreCounts.get(genre) || 0) + 1);
+    });
+    artistTracks.forEach((track) => {
+      const artist = (track.artistName || track.artist).trim();
       artistCounts.set(artist, (artistCounts.get(artist) || 0) + 1);
     });
     const stats = {
@@ -562,7 +571,7 @@
         genreList.append(empty);
       }
       genres.slice(0, 4).forEach(([genre, count]) => {
-        const percent = Math.round((count / favoriteTracks.length) * 100);
+        const percent = Math.round((count / genreTracks.length) * 100);
         const meter = document.createElement("div");
         meter.className = "genre-meter";
         const label = document.createElement("span");
@@ -597,7 +606,7 @@
         const name = document.createElement("strong");
         name.textContent = artist;
         const percent = document.createElement("b");
-        percent.textContent = `${Math.round((count / favoriteTracks.length) * 100)}%`;
+        percent.textContent = `${Math.round((count / artistTracks.length) * 100)}%`;
         link.append(dot, name, percent);
         artistList.append(link);
       });
