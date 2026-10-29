@@ -1,4 +1,8 @@
 const { getDb } = require("../db");
+const {
+  fallbackArtistStyle: defaultArtistPreset,
+  fallbackTrackStyle: defaultTrackPreset,
+} = require("../data/stylePresets");
 
 // Презентационные маппинги — остались на стороне репозитория, как и раньше.
 const genreKeys = {
@@ -10,18 +14,45 @@ const genreKeys = {
   Dance: "dance",
 };
 
-const palettes = {
-  "artwork-sakura": ["#b75275", "#6f3a83", "#182a42"],
-  "artwork-night": ["#9b4fa1", "#554b9a", "#192b51"],
-  "artwork-mono": ["#78878d", "#49515f", "#202735"],
-  "artwork-peach": ["#c46e65", "#a64c78", "#3a3056"],
-  "artwork-cyan": ["#248c9f", "#41569c", "#173f51"],
-  "artwork-violet": ["#7154b4", "#4e3980", "#232c55"],
-  "artwork-orange": ["#ce7650", "#a04a72", "#3f2c50"],
-  "artwork-pink": ["#c25289", "#7952a6", "#263b5d"],
+function mapArtistStyle(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    accent: row.accent,
+    backgroundStart: row.background_start,
+    backgroundEnd: row.background_end,
+    background: `linear-gradient(135deg, ${row.background_start}, ${row.background_end})`,
+  };
+}
+
+function mapTrackStyle(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    colorOne: row.color_one,
+    colorTwo: row.color_two,
+    colorThree: row.color_three,
+    colors: [row.color_one, row.color_two, row.color_three],
+    background: `radial-gradient(circle at 65% 28%, ${row.color_one}, ${row.color_two} 38%, ${row.color_three} 80%)`,
+  };
+}
+
+const fallbackArtistStyle = {
+  ...defaultArtistPreset,
+  background: `linear-gradient(135deg, ${defaultArtistPreset.backgroundStart}, ${defaultArtistPreset.backgroundEnd})`,
 };
 
-function mapTrack(row) {
+const fallbackTrackStyle = {
+  ...defaultTrackPreset,
+  colors: [
+    defaultTrackPreset.colorOne,
+    defaultTrackPreset.colorTwo,
+    defaultTrackPreset.colorThree,
+  ],
+  background: `radial-gradient(circle at 65% 28%, ${defaultTrackPreset.colorOne}, ${defaultTrackPreset.colorTwo} 38%, ${defaultTrackPreset.colorThree} 80%)`,
+};
+
+function mapTrack(row, style = fallbackTrackStyle) {
   return {
     id: row.id,
     title: row.title,
@@ -38,12 +69,13 @@ function mapTrack(row) {
     description: row.description,
     audioUrl: row.audio_url,
     imageUrl: row.image_url || "",
+    style,
     filterGenre: genreKeys[row.genre] || "all",
-    artworkColors: [...(palettes[row.artwork_class] || palettes["artwork-cyan"])],
+    artworkColors: [...style.colors],
   };
 }
 
-function mapArtist(row, trackIds = []) {
+function mapArtist(row, trackIds = [], style = fallbackArtistStyle) {
   return {
     id: row.id,
     name: row.name,
@@ -56,6 +88,7 @@ function mapArtist(row, trackIds = []) {
     listenersLabel: row.listeners_label,
     country: row.country,
     imageUrl: row.image_url || "",
+    style,
     trackIds,
     searchText: `${row.name} ${row.alias} ${row.genre_label}`.toLocaleLowerCase("ru"),
   };
@@ -122,6 +155,10 @@ function createContentRepository(db = getDb()) {
     ),
     allArtists: db.prepare("SELECT * FROM artists ORDER BY name"),
     artistById: db.prepare("SELECT * FROM artists WHERE id = ?"),
+    allArtistStyles: db.prepare("SELECT * FROM artist_styles ORDER BY name"),
+    allTrackStyles: db.prepare("SELECT * FROM track_styles ORDER BY name"),
+    artistStyleById: db.prepare("SELECT * FROM artist_styles WHERE id = ?"),
+    trackStyleById: db.prepare("SELECT * FROM track_styles WHERE id = ?"),
     allCollections: db.prepare("SELECT * FROM collections ORDER BY id"),
     collectionById: db.prepare("SELECT * FROM collections WHERE id = ?"),
     allPlaylists: db.prepare("SELECT * FROM playlists ORDER BY id"),
@@ -137,23 +174,52 @@ function createContentRepository(db = getDb()) {
     return statements.allTracks
       .all()
       .filter((row) => ids.has(row.id))
-      .map(mapTrack);
+      .map((row) => mapTrack(row));
+  }
+
+  function artistStyleMap() {
+    return new Map(
+      statements.allArtistStyles
+        .all()
+        .map((row) => [row.id, mapArtistStyle(row)]),
+    );
+  }
+
+  function trackStyleMap() {
+    return new Map(
+      statements.allTrackStyles
+        .all()
+        .map((row) => [row.id, mapTrackStyle(row)]),
+    );
   }
 
   return {
     getTracks() {
-      return statements.allTracks.all().map(mapTrack);
+      const styles = trackStyleMap();
+      return statements.allTracks
+        .all()
+        .map((row) => mapTrack(row, styles.get(row.artwork_class)));
     },
     getTrackById(id) {
       const row = statements.trackById.get(id);
-      return row ? mapTrack(row) : null;
+      if (!row) return null;
+      const styleRow = statements.trackStyleById.get(row.artwork_class);
+      return mapTrack(
+        row,
+        styleRow ? mapTrackStyle(styleRow) : fallbackTrackStyle,
+      );
     },
     getArtists() {
+      const styles = artistStyleMap();
       return statements.allArtists.all().map((row) => {
         const trackIds = statements.trackIdsByArtist
           .all(row.id)
           .map((item) => item.track_id);
-        return mapArtist(row, trackIds);
+        return mapArtist(
+          row,
+          trackIds,
+          styles.get(row.card_class) || fallbackArtistStyle,
+        );
       });
     },
     getArtistById(id) {
@@ -162,7 +228,18 @@ function createContentRepository(db = getDb()) {
       const trackIds = statements.trackIdsByArtist
         .all(row.id)
         .map((item) => item.track_id);
-      return mapArtist(row, trackIds);
+      const styleRow = statements.artistStyleById.get(row.card_class);
+      return mapArtist(
+        row,
+        trackIds,
+        styleRow ? mapArtistStyle(styleRow) : fallbackArtistStyle,
+      );
+    },
+    getArtistStyles() {
+      return statements.allArtistStyles.all().map(mapArtistStyle);
+    },
+    getTrackStyles() {
+      return statements.allTrackStyles.all().map(mapTrackStyle);
     },
     getCollections() {
       return statements.allCollections.all().map((row) => {

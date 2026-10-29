@@ -891,6 +891,10 @@
   min-width: 0;
 }
 .profile-identity h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 0 0 5px;
   color: #eef1f2;
   font-size: 19px;
@@ -907,9 +911,61 @@
   color: #737e88;
   font-size: 11px;
 }
+.profile-account-line {
+  color: var(--mint) !important;
+  font-weight: 500;
+}
+.profile-admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border: 1px solid #8f6ad6;
+  border-radius: 999px;
+  background: #7154b433;
+  color: #d9c7ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+.profile-overview-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.profile-admin-button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #7154b4;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3a2f5e, #29324d);
+  color: #e8ddff;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.profile-admin-button:hover {
+  transform: translateY(-1px);
+  border-color: #b69aef;
+  background: linear-gradient(135deg, #493b75, #31405f);
+  box-shadow: 0 6px 18px #0006, 0 0 0 3px #7154b41f;
+}
+.profile-admin-button span {
+  color: #c9b4ff;
+}
 .profile-edit {
   min-height: 34px;
-  margin-left: auto;
+  margin-left: 0;
   padding: 0 15px;
   border: 1px solid var(--control-border);
   border-radius: 8px;
@@ -1153,6 +1209,11 @@
   .profile-identity {
     flex: 1;
   }
+  .profile-overview-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
   .profile-avatar {
     width: 56px;
     height: 56px;
@@ -1160,7 +1221,7 @@
     font-size: 23px;
   }
   .profile-edit {
-    margin-left: 68px;
+    margin-left: 0;
   }
   .profile-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

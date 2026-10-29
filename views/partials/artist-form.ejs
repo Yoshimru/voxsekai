@@ -27,17 +27,17 @@
             <input
               type="radio"
               name="cardClass"
-              value="<%= style.value %>"
-              <%= currentCardClass === style.value ? "checked" : "" %>
+              value="<%= style.id %>"
+              <%= currentCardClass === style.id ? "checked" : "" %>
             />
-            <span class="admin-style-preview <%= style.value %>">
-              <span class="admin-style-preview-art">
+            <span class="admin-style-preview" style="--performer-accent: <%= style.accent %>;">
+              <span class="admin-style-preview-art" style="background: <%= style.background %>;">
                 <span class="admin-style-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-                <b><%= currentArtist && currentArtist.initials ? currentArtist.initials : style.initials %></b>
+                <b><%= currentArtist && currentArtist.initials ? currentArtist.initials : style.name.slice(0, 2).toUpperCase() %></b>
               </span>
               <span class="admin-style-preview-copy">
-                <strong><%= style.label %></strong>
-                <small><%= style.hint %></small>
+                <strong><%= style.name %></strong>
+                <small><%= style.accent %></small>
               </span>
             </span>
           </label>

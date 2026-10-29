@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/assets/css/player.css" />
     <script src="/assets/js/main.js" defer></script>
   </head>
-  <body class="directory-page profile-page">
+  <body class="directory-page profile-page" data-profile-username="<%= currentUser.username %>" data-profile-default-bio="Музыка всегда рядом, трек за треком.">
     <div class="app-shell">
       <%- include('../partials/sidebar', { currentPath: '/profile' }) %>
       <main class="main-area">
@@ -25,15 +25,26 @@
             </div>
           </header>
           <section class="profile-overview">
-            <div class="profile-avatar" data-profile-avatar aria-hidden="true">А</div>
+            <div class="profile-avatar" data-profile-avatar aria-hidden="true"><%= currentUser.username.charAt(0).toUpperCase() %></div>
             <div class="profile-identity">
-              <h2 data-profile-name>Аки</h2>
+              <h2>
+                <span data-profile-name><%= currentUser.username %></span>
+                <% if (currentUser.role === 'admin') { %>
+                  <span class="profile-admin-badge" title="Администратор">ADMIN</span>
+                <% } %>
+              </h2>
+              <p class="profile-account-line">@<%= currentUser.username %><% if (currentUser.email) { %> · <%= currentUser.email %><% } %></p>
               <p data-profile-bio>Музыка всегда рядом, трек за треком.</p>
-              <small>Локальный профиль · данные сохраняются в этом браузере</small>
+              <small><%= currentUser.role === 'admin' ? 'Аккаунт администратора' : 'Аккаунт VoxSekai' %> · профиль сохраняется в этом браузере</small>
             </div>
-            <button class="profile-edit" type="button" data-profile-edit>
-              Редактировать профиль
-            </button>
+            <div class="profile-overview-actions">
+              <% if (currentUser.role === 'admin') { %>
+                <a class="profile-admin-button" href="/admin">Админ-панель <span>↗</span></a>
+              <% } %>
+              <button class="profile-edit" type="button" data-profile-edit>
+                Редактировать профиль
+              </button>
+            </div>
           </section>
           <form class="profile-edit-form" data-profile-form hidden>
             <label class="editor-field">

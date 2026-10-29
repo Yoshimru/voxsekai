@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Стили</h1>
+      <p>Здесь редактируются цвета карточек исполнителей и обложек треков. Изменения сразу применяются на сайте.</p>
+    </div>
+
+    <% if (error) { %>
+      <p class="admin-error" role="alert"><%= error %></p>
+    <% } %>
+
+    <div class="admin-panel">
+      <h2>Стили карточек исполнителей</h2>
+      <p class="admin-hint">Градиент и акцентный цвет используются в карточках каталога и на странице исполнителя.</p>
+
+      <div class="admin-style-editor-grid">
+        <% artistStyles.forEach((style) => { %>
+          <form class="admin-style-editor" method="post" action="/admin/styles/artists/<%= style.id %>">
+            <div class="admin-style-editor-art" style="background: <%= style.background %>;">
+              <span class="admin-style-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+              <b style="color: <%= style.accent %>;"><%= style.name.slice(0, 2).toUpperCase() %></b>
+            </div>
+            <label>Название<input type="text" name="name" value="<%= style.name %>" maxlength="48" required /></label>
+            <div class="admin-color-grid">
+              <label>Акцент<input type="color" name="accent" value="<%= style.accent %>" /></label>
+              <label>Фон от<input type="color" name="backgroundStart" value="<%= style.backgroundStart %>" /></label>
+              <label>Фон до<input type="color" name="backgroundEnd" value="<%= style.backgroundEnd %>" /></label>
+            </div>
+            <div class="admin-style-editor-foot">
+              <span class="admin-muted">Используется: <b><%= style.usage %></b> · <code><%= style.id %></code></span>
+              <div class="admin-row-actions">
+                <button class="admin-button admin-button-small" type="submit">Сохранить</button>
+                <button
+                  class="admin-button-danger"
+                  type="submit"
+                  formaction="/admin/styles/artists/<%= style.id %>/delete"
+                  formmethod="post"
+                  onclick="return confirm('Удалить этот стиль?')"
+                  <%= style.usage > 0 ? 'disabled title="Стиль используется, удаление недоступно"' : '' %>
+                >Удалить</button>
+              </div>
+            </div>
+          </form>
+        <% }) %>
+      </div>
+
+      <form class="admin-style-create" method="post" action="/admin/styles/artists">
+        <h3>Добавить стиль карточки</h3>
+        <label>Название<input type="text" name="name" maxlength="48" placeholder="Например, Neon" required /></label>
+        <div class="admin-color-grid">
+          <label>Акцент<input type="color" name="accent" value="#80e8cd" /></label>
+          <label>Фон от<input type="color" name="backgroundStart" value="#172d39" /></label>
+          <label>Фон до<input type="color" name="backgroundEnd" value="#1c5b5b" /></label>
+        </div>
+        <button class="admin-button" type="submit">Добавить стиль</button>
+      </form>
+    </div>
+
+    <div class="admin-panel">
+      <h2>Стили обложек треков</h2>
+      <p class="admin-hint">Три цвета формируют градиент обложки в каталоге, списках и плеере.</p>
+
+      <div class="admin-style-editor-grid">
+        <% trackStyles.forEach((style) => { %>
+          <form class="admin-style-editor" method="post" action="/admin/styles/tracks/<%= style.id %>">
+            <div class="admin-cover-editor-art" style="background: <%= style.background %>;">
+              <span>音</span>
+            </div>
+            <label>Название<input type="text" name="name" value="<%= style.name %>" maxlength="48" required /></label>
+            <div class="admin-color-grid admin-color-grid-three">
+              <label>Цвет 1<input type="color" name="colorOne" value="<%= style.colorOne %>" /></label>
+              <label>Цвет 2<input type="color" name="colorTwo" value="<%= style.colorTwo %>" /></label>
+              <label>Цвет 3<input type="color" name="colorThree" value="<%= style.colorThree %>" /></label>
+            </div>
+            <div class="admin-style-editor-foot">
+              <span class="admin-muted">Используется: <b><%= style.usage %></b> · <code><%= style.id %></code></span>
+              <div class="admin-row-actions">
+                <button class="admin-button admin-button-small" type="submit">Сохранить</button>
+                <button
+                  class="admin-button-danger"
+                  type="submit"
+                  formaction="/admin/styles/tracks/<%= style.id %>/delete"
+                  formmethod="post"
+                  onclick="return confirm('Удалить этот стиль?')"
+                  <%= style.usage > 0 ? 'disabled title="Стиль используется, удаление недоступно"' : '' %>
+                >Удалить</button>
+              </div>
+            </div>
+          </form>
+        <% }) %>
+      </div>
+
+      <form class="admin-style-create" method="post" action="/admin/styles/tracks">
+        <h3>Добавить стиль обложки</h3>
+        <label>Название<input type="text" name="name" maxlength="48" placeholder="Например, Neon" required /></label>
+        <div class="admin-color-grid admin-color-grid-three">
+          <label>Цвет 1<input type="color" name="colorOne" value="#b6fff0" /></label>
+          <label>Цвет 2<input type="color" name="colorTwo" value="#217c83" /></label>
+          <label>Цвет 3<input type="color" name="colorThree" value="#182d45" /></label>
+        </div>
+        <button class="admin-button" type="submit">Добавить стиль</button>
+      </form>
+    </div>
+
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

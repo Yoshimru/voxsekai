@@ -7,7 +7,7 @@
   data-search-text="<%= `${track.displayTitle} ${track.title} ${track.artist} ${track.genre}`.toLocaleLowerCase('ru') %>"
   data-rating="<%= track.rating %>"
 >
-  <a class="catalog-cover <%= track.artworkClass %> <%= track.imageUrl ? 'has-photo' : '' %>" href="/track/<%= track.id %>" aria-label="Подробнее о треке <%= track.displayTitle %>">
+  <a class="catalog-cover <%= track.artworkClass %> <%= track.imageUrl ? 'has-photo' : '' %>" href="/track/<%= track.id %>" aria-label="Подробнее о треке <%= track.displayTitle %>" style="background: <%= track.style.background %>;">
     <span><%= track.displayTitle %></span><i><%= track.artworkGlyph %></i>
     <% if (track.imageUrl) { %>
       <img class="catalog-cover-photo" src="<%= track.imageUrl %>" alt="<%= track.displayTitle %>" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />

@@ -19,7 +19,10 @@
   const playerStorageKey = "voxsekai.player.v1";
   const favoritesStorageKey = "voxsekai.favorites.v1";
   const playlistsStorageKey = "voxsekai.playlists.v1";
-  const profileStorageKey = "voxsekai.profile.v1";
+  const profileUsername = document.body?.dataset.profileUsername || "";
+  const profileStorageKey = profileUsername
+    ? `voxsekai.profile.v1.${profileUsername}`
+    : "voxsekai.profile.v1";
   const playerElements = {
     title: player?.querySelector("[data-player-title]"),
     artist: player?.querySelector("[data-player-artist]"),
@@ -416,8 +419,10 @@
 
   function readProfile() {
     const defaults = {
-      displayName: "Аки",
-      bio: "Музыка всегда рядом, трек за треком.",
+      displayName: profileUsername || "Аки",
+      bio:
+        document.body?.dataset.profileDefaultBio ||
+        "Музыка всегда рядом, трек за треком.",
     };
     try {
       const saved = JSON.parse(localStorage.getItem(profileStorageKey) || "null");
@@ -648,6 +653,9 @@
     cover.className = `mini-cover ${track.artworkClass}${track.imageUrl ? " has-photo" : ""}`;
     cover.href = `/track/${track.id}`;
     cover.setAttribute("aria-label", `Подробнее о треке ${track.displayTitle}`);
+    if (track.style?.background) {
+      cover.style.background = track.style.background;
+    }
     if (track.imageUrl) {
       const image = document.createElement("img");
       image.className = "mini-cover-photo";

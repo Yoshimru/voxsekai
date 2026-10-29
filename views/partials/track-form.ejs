@@ -4,23 +4,17 @@
     typeof selectedArtistId !== "undefined" && selectedArtistId
       ? selectedArtistId
       : "";
-  const artworkClasses = [
-    "artwork-cyan",
-    "artwork-sakura",
-    "artwork-night",
-    "artwork-mono",
-    "artwork-peach",
-    "artwork-violet",
-    "artwork-orange",
-    "artwork-pink",
-  ];
+  const styles = Array.isArray(trackStyles) ? trackStyles : [];
   const currentArtwork = currentTrack
     ? currentTrack.artworkClass
-    : "artwork-cyan";
-  const canSubmit = artists.length > 0;
+    : styles[0]?.id || "artwork-cyan";
+  const canSubmit = artists.length > 0 && styles.length > 0;
 %>
 <% if (!artists.length) { %>
   <p class="admin-hint">Сначала добавьте исполнителя в разделе <a href="/admin/artists">«Исполнители»</a> — затем его можно будет выбрать здесь.</p>
+<% } %>
+<% if (!styles.length) { %>
+  <p class="admin-hint">Сначала добавьте стиль обложки в разделе <a href="/admin/styles">«Стили»</a>.</p>
 <% } %>
 <form method="post" action="<%= formAction %>" enctype="multipart/form-data">
   <div class="admin-form">
@@ -39,16 +33,30 @@
     <label>Рейтинг<span><input type="text" name="rating" value="<%= currentTrack ? currentTrack.rating : '' %>" placeholder="4.8" /></span></label>
     <label>Альбом<span><input type="text" name="album" value="<%= currentTrack && currentTrack.album ? currentTrack.album : '' %>" /></span></label>
     <label>Год выпуска<span><input type="number" name="releaseYear" min="1900" max="2100" value="<%= currentTrack && currentTrack.releaseYear ? currentTrack.releaseYear : '' %>" /></span></label>
-    <label>Стиль обложки<span>
-      <select name="artworkClass">
-        <% artworkClasses.forEach((artwork) => { %>
-          <option value="<%= artwork %>" <%= currentArtwork === artwork ? "selected" : "" %>><%= artwork %></option>
-        <% }) %>
-      </select>
-    </span></label>
     <label>Глиф обложки<span><input type="text" name="artworkGlyph" value="<%= currentTrack ? currentTrack.artworkGlyph : '' %>" placeholder="初" /></span></label>
     <label class="is-wide">Ссылка на аудио<span><input type="text" name="audioUrl" value="<%= currentTrack && currentTrack.audioUrl ? currentTrack.audioUrl : '' %>" placeholder="https://..." /></span></label>
     <label class="is-wide">Описание<span><textarea name="description" rows="2"><%= currentTrack ? currentTrack.description : '' %></textarea></span></label>
+
+    <div class="admin-style-field is-wide">
+      <span class="admin-form-label">Стиль обложки трека</span>
+      <div class="admin-cover-style-grid">
+        <% styles.forEach((style) => { %>
+          <label class="admin-cover-style-option">
+            <input
+              type="radio"
+              name="artworkClass"
+              value="<%= style.id %>"
+              <%= currentArtwork === style.id ? "checked" : "" %>
+            />
+            <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
+              <span class="admin-cover-style-glyph"><%= currentTrack ? currentTrack.artworkGlyph : '音' %></span>
+              <span class="admin-cover-style-name"><%= style.name %></span>
+            </span>
+          </label>
+        <% }) %>
+      </div>
+      <p class="admin-hint">Превью показывает реальный градиент обложки. Стили можно менять в разделе <a href="/admin/styles">«Стили»</a>.</p>
+    </div>
 
     <div class="admin-image-field is-wide">
       <span class="admin-form-label">Картинка трека</span>

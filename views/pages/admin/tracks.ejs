@@ -22,6 +22,7 @@
         formAction: '/admin/tracks',
         track: null,
         artists,
+        trackStyles,
         selectedArtistId: '',
         submitLabel: 'Добавить трек',
       }) %>
@@ -37,7 +38,7 @@
             <% tracks.forEach((track) => { %>
               <tr>
                 <td>
-                  <span class="admin-thumb admin-track-thumb" style="background: linear-gradient(135deg, <%= track.artworkColors[0] %>, <%= track.artworkColors[1] %>);">
+                  <span class="admin-thumb admin-track-thumb" style="background: <%= track.style.background %>;">
                     <% if (track.imageUrl) { %>
                       <img src="<%= track.imageUrl %>" alt="<%= track.displayTitle %>" />
                     <% } else { %>

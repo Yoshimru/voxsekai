@@ -37,7 +37,7 @@
             <% artists.forEach((artist) => { %>
               <tr>
                 <td>
-                  <span class="admin-thumb <%= artist.cardClass %>">
+                  <span class="admin-thumb <%= artist.cardClass %>" style="--performer-accent: <%= artist.style.accent %>; --performer-background: <%= artist.style.background %>;">
                     <% if (artist.imageUrl) { %>
                       <img src="<%= artist.imageUrl %>" alt="<%= artist.name %>" />
                     <% } else { %>
@@ -49,7 +49,7 @@
                   <b><%= artist.name %></b>
                   <small class="admin-muted"><%= artist.id %></small>
                 </td>
-                <td><span class="admin-style-tag <%= artist.cardClass %>"><%= artist.cardClass || '—' %></span></td>
+                <td><span class="admin-style-tag" style="--performer-accent: <%= artist.style.accent %>;"><%= artist.style.name %></span></td>
                 <td><%= artist.genreLabel %></td>
                 <td><%= artist.country %></td>
                 <td><%= artist.trackCount %></td>

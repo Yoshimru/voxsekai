@@ -232,6 +232,14 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+  max-height: 276px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #12161c;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
 .admin-form .admin-style-option {
@@ -497,6 +505,275 @@
 .admin-button-small {
   padding: 6px 10px;
   font-size: 12px;
+}
+
+/* Редактор стилей карточек и обложек */
+.admin-style-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+  max-height: 646px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 16px 0 20px;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #12161c;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.admin-style-editor {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 11px;
+  background: var(--admin-panel-2);
+}
+
+.admin-style-editor > label,
+.admin-style-create label {
+  display: grid;
+  gap: 5px;
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.admin-style-editor input[type="text"],
+.admin-style-create input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-style-editor input[type="text"]:focus,
+.admin-style-create input[type="text"]:focus {
+  outline: none;
+  border-color: var(--admin-accent-2);
+}
+
+.admin-style-editor-art {
+  position: relative;
+  isolation: isolate;
+  min-height: 106px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 10px;
+  border: 1px solid #ffffff18;
+  border-radius: 8px;
+}
+
+.admin-style-editor-art::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 72px;
+  aspect-ratio: 1;
+  top: -24px;
+  right: -16px;
+  border-radius: 50%;
+  background: #ffffff1f;
+}
+
+.admin-style-editor-art .admin-style-bars {
+  height: 54px;
+}
+
+.admin-style-editor-art b {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 10px #0006;
+}
+
+.admin-cover-editor-art {
+  min-height: 118px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #ffffff18;
+  border-radius: 8px;
+  color: #ffffffd9;
+  font-size: 40px;
+  font-weight: 700;
+  text-shadow: 0 3px 16px #0007;
+}
+
+.admin-color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-color-grid label {
+  display: grid;
+  gap: 4px;
+  color: var(--admin-muted);
+  font-size: 11px;
+}
+
+.admin-color-grid input[type="color"] {
+  width: 100%;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: var(--admin-bg);
+  cursor: pointer;
+}
+
+.admin-style-editor-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid #ffffff0d;
+}
+
+.admin-style-editor-foot .admin-muted {
+  margin: 0;
+  font-size: 11px;
+}
+
+.admin-style-editor code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #ffffff0b;
+  color: #aeb7c1;
+  font-size: 10px;
+}
+
+.admin-style-editor-foot .admin-row-actions {
+  gap: 5px;
+}
+
+.admin-style-editor-foot .admin-button,
+.admin-style-editor-foot .admin-button-danger {
+  padding: 6px 9px;
+  font-size: 11px;
+}
+
+.admin-style-editor-foot .admin-button-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.admin-style-create {
+  display: grid;
+  gap: 10px;
+  max-width: 620px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px dashed var(--admin-border);
+  border-radius: 10px;
+  background: #13171d;
+}
+
+.admin-style-create h3 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 15px;
+}
+
+.admin-style-create .admin-button {
+  justify-self: start;
+}
+
+/* Выбор стиля обложки в форме трека */
+.admin-cover-style-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  max-height: 388px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #12161c;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.admin-form .admin-cover-style-option {
+  position: relative;
+  display: block;
+  padding: 0;
+  color: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.admin-cover-style-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-cover-style-preview {
+  position: relative;
+  aspect-ratio: 1.35;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 9px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-cover-style-option:hover .admin-cover-style-preview {
+  transform: translateY(-2px);
+  border-color: #4d5f6d;
+}
+
+.admin-cover-style-option input:checked + .admin-cover-style-preview {
+  border-color: #80e8cd;
+  box-shadow: 0 0 0 2px #80e8cd2b, 0 8px 18px #0005;
+}
+
+.admin-cover-style-option input:focus-visible + .admin-cover-style-preview {
+  outline: 2px solid var(--admin-accent-2);
+  outline-offset: 2px;
+}
+
+.admin-cover-style-glyph {
+  color: #ffffffd9;
+  font-size: 25px;
+  font-weight: 700;
+  text-shadow: 0 2px 12px #0007;
+}
+
+.admin-cover-style-name {
+  color: #fffffff0;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 1px 8px #0008;
+}
+
+@media (max-width: 800px) {
+  .admin-style-editor-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-cover-style-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 800px) {

@@ -42,6 +42,24 @@ CREATE TABLE IF NOT EXISTS artist_tracks (
   PRIMARY KEY (artist_id, track_id)
 );
 
+-- Редактируемые стили карточек исполнителей
+CREATE TABLE IF NOT EXISTS artist_styles (
+  id               TEXT PRIMARY KEY,
+  name             TEXT NOT NULL,
+  accent           TEXT NOT NULL DEFAULT '#80e8cd',
+  background_start TEXT NOT NULL DEFAULT '#172d39',
+  background_end   TEXT NOT NULL DEFAULT '#1c5b5b'
+);
+
+-- Редактируемые стили обложек треков
+CREATE TABLE IF NOT EXISTS track_styles (
+  id          TEXT PRIMARY KEY,
+  name        TEXT NOT NULL,
+  color_one   TEXT NOT NULL DEFAULT '#b6fff0',
+  color_two   TEXT NOT NULL DEFAULT '#217c83',
+  color_three TEXT NOT NULL DEFAULT '#182d45'
+);
+
 CREATE TABLE IF NOT EXISTS collections (
   id          TEXT PRIMARY KEY,
   title       TEXT NOT NULL,

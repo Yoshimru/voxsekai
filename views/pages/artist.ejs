@@ -19,7 +19,7 @@
         <%- include('../partials/topbar', { searchLabel: 'Поиск по сайту', showMenuToggle: true }) %>
         <div class="content directory-content artist-detail-content">
           <a class="track-back-link" href="/artists">← Все исполнители</a>
-          <section class="artist-detail-hero <%= artist.cardClass %>">
+          <section class="artist-detail-hero <%= artist.cardClass %>" style="--performer-accent: <%= artist.style.accent %>; --performer-background: <%= artist.style.background %>;">
             <div class="artist-detail-art <%= artist.imageUrl ? 'has-photo' : '' %>">
               <% if (artist.imageUrl) { %>
                 <img class="artist-detail-photo" src="<%= artist.imageUrl %>" alt="<%= artist.name %>" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />

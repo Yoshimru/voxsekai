@@ -24,6 +24,7 @@
             <div
               class="track-detail-art <%= track.artworkClass %> <%= track.imageUrl ? 'has-photo' : '' %>"
               aria-label="Обложка <%= track.displayTitle %>"
+              style="background: <%= track.style.background %>;"
             >
               <% if (track.imageUrl) { %>
                 <img class="track-detail-photo" src="<%= track.imageUrl %>" alt="<%= track.displayTitle %>" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
@@ -100,7 +101,7 @@
             <div class="track-related-grid">
               <% tracks.filter((item) => item.id !== track.id && item.genre === track.genre).slice(0, 3).forEach((item) => { %>
               <a class="related-track-card" href="/track/<%= item.id %>">
-                <span class="related-track-art <%= item.artworkClass %> <%= item.imageUrl ? 'has-photo' : '' %>">
+                <span class="related-track-art <%= item.artworkClass %> <%= item.imageUrl ? 'has-photo' : '' %>" style="background: <%= item.style.background %>;">
                   <% if (item.imageUrl) { %>
                     <img class="related-track-photo" src="<%= item.imageUrl %>" alt="<%= item.displayTitle %>" loading="lazy" onerror="this.parentElement.classList.remove('has-photo');this.remove()" />
                   <% } %>

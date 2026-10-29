@@ -55,6 +55,40 @@ function createAdminRepository(db = getDb()) {
     `),
     deleteArtist: db.prepare("DELETE FROM artists WHERE id = ?"),
 
+    allArtistStyles: db.prepare("SELECT * FROM artist_styles ORDER BY name"),
+    artistStyleById: db.prepare("SELECT * FROM artist_styles WHERE id = ?"),
+    insertArtistStyle: db.prepare(`
+      INSERT INTO artist_styles (id, name, accent, background_start, background_end)
+      VALUES (@id, @name, @accent, @backgroundStart, @backgroundEnd)
+    `),
+    updateArtistStyle: db.prepare(`
+      UPDATE artist_styles SET
+        name = @name, accent = @accent,
+        background_start = @backgroundStart, background_end = @backgroundEnd
+      WHERE id = @id
+    `),
+    deleteArtistStyle: db.prepare("DELETE FROM artist_styles WHERE id = ?"),
+    countArtistsByStyle: db.prepare(
+      "SELECT COUNT(*) AS n FROM artists WHERE card_class = ?",
+    ),
+
+    allTrackStyles: db.prepare("SELECT * FROM track_styles ORDER BY name"),
+    trackStyleById: db.prepare("SELECT * FROM track_styles WHERE id = ?"),
+    insertTrackStyle: db.prepare(`
+      INSERT INTO track_styles (id, name, color_one, color_two, color_three)
+      VALUES (@id, @name, @colorOne, @colorTwo, @colorThree)
+    `),
+    updateTrackStyle: db.prepare(`
+      UPDATE track_styles SET
+        name = @name, color_one = @colorOne,
+        color_two = @colorTwo, color_three = @colorThree
+      WHERE id = @id
+    `),
+    deleteTrackStyle: db.prepare("DELETE FROM track_styles WHERE id = ?"),
+    countTracksByStyle: db.prepare(
+      "SELECT COUNT(*) AS n FROM tracks WHERE artwork_class = ?",
+    ),
+
     insertCollection: db.prepare(`
       INSERT INTO collections (id, title, tagline, description, card_class, featured)
       VALUES (@id, @title, @tagline, @description, @cardClass, @featured)
@@ -274,6 +308,102 @@ function createAdminRepository(db = getDb()) {
     },
     deleteArtist(id) {
       statements.deleteArtist.run(id);
+    },
+
+    // --- Стили карточек исполнителей ---
+    createArtistStyle(fields) {
+      const baseId = slug(
+        fields.id || fields.name,
+        `artist-style-${Date.now()}`,
+      );
+      let id = baseId;
+      let suffix = 2;
+      while (statements.artistStyleById.get(id)) {
+        id = `${baseId}-${suffix}`;
+        suffix += 1;
+      }
+      statements.insertArtistStyle.run({
+        id,
+        name: fields.name || "Новый стиль",
+        accent: fields.accent || "#80e8cd",
+        backgroundStart: fields.backgroundStart || "#172d39",
+        backgroundEnd: fields.backgroundEnd || "#1c5b5b",
+      });
+      return id;
+    },
+    updateArtistStyle(id, fields) {
+      const row = statements.artistStyleById.get(id);
+      if (!row) return false;
+      statements.updateArtistStyle.run({
+        id,
+        name: fields.name || row.name,
+        accent: fields.accent || row.accent,
+        backgroundStart: fields.backgroundStart || row.background_start,
+        backgroundEnd: fields.backgroundEnd || row.background_end,
+      });
+      return true;
+    },
+    deleteArtistStyle(id) {
+      if (statements.countArtistsByStyle.get(id).n > 0) return false;
+      statements.deleteArtistStyle.run(id);
+      return true;
+    },
+    getArtistStyleUsage() {
+      const usage = new Map();
+      db.prepare(
+        "SELECT card_class AS id, COUNT(*) AS n FROM artists GROUP BY card_class",
+      )
+        .all()
+        .forEach((row) => usage.set(row.id, row.n));
+      return usage;
+    },
+
+    // --- Стили обложек треков ---
+    createTrackStyle(fields) {
+      const baseId = slug(
+        fields.id || fields.name,
+        `track-style-${Date.now()}`,
+      );
+      let id = baseId;
+      let suffix = 2;
+      while (statements.trackStyleById.get(id)) {
+        id = `${baseId}-${suffix}`;
+        suffix += 1;
+      }
+      statements.insertTrackStyle.run({
+        id,
+        name: fields.name || "Новый стиль",
+        colorOne: fields.colorOne || "#b6fff0",
+        colorTwo: fields.colorTwo || "#217c83",
+        colorThree: fields.colorThree || "#182d45",
+      });
+      return id;
+    },
+    updateTrackStyle(id, fields) {
+      const row = statements.trackStyleById.get(id);
+      if (!row) return false;
+      statements.updateTrackStyle.run({
+        id,
+        name: fields.name || row.name,
+        colorOne: fields.colorOne || row.color_one,
+        colorTwo: fields.colorTwo || row.color_two,
+        colorThree: fields.colorThree || row.color_three,
+      });
+      return true;
+    },
+    deleteTrackStyle(id) {
+      if (statements.countTracksByStyle.get(id).n > 0) return false;
+      statements.deleteTrackStyle.run(id);
+      return true;
+    },
+    getTrackStyleUsage() {
+      const usage = new Map();
+      db.prepare(
+        "SELECT artwork_class AS id, COUNT(*) AS n FROM tracks GROUP BY artwork_class",
+      )
+        .all()
+        .forEach((row) => usage.set(row.id, row.n));
+      return usage;
     },
 
     // --- РџРѕРґР±РѕСЂРєРё ---

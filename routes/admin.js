@@ -10,16 +10,18 @@ const {
 
 const router = express.Router();
 
-const artistCardStyles = [
-  { value: "performer-miku", label: "Miku", hint: "Мятный", initials: "MI" },
-  { value: "performer-rin", label: "Rin", hint: "Золотой", initials: "RN" },
-  { value: "performer-luka", label: "Luka", hint: "Розовый", initials: "LU" },
-  { value: "performer-kaito", label: "Kaito", hint: "Синий", initials: "KA" },
-  { value: "performer-mira", label: "Mira", hint: "Индиго", initials: "MK" },
-  { value: "performer-meiko", label: "Meiko", hint: "Терракотовый", initials: "ME" },
-  { value: "performer-gumi", label: "Gumi", hint: "Зелёный", initials: "GU" },
-  { value: "performer-ia", label: "IA", hint: "Фиолетовый", initials: "IA" },
-];
+function normalizeColor(value, fallback) {
+  const color = String(value || "").trim();
+  if (/^#[0-9a-f]{6}$/i.test(color)) return color.toLowerCase();
+  if (/^#[0-9a-f]{3}$/i.test(color)) {
+    return `#${color
+      .slice(1)
+      .split("")
+      .map((character) => character + character)
+      .join("")}`.toLowerCase();
+  }
+  return fallback;
+}
 
 function pageError(queryError) {
   if (queryError === "artist") {
@@ -30,6 +32,12 @@ function pageError(queryError) {
   }
   if (queryError === "notfound") {
     return "Запись не найдена.";
+  }
+  if (queryError === "inuse") {
+    return "Нельзя удалить стиль, который используется в карточках или треках.";
+  }
+  if (queryError === "style") {
+    return "Не удалось сохранить стиль. Проверьте название и цвета.";
   }
   return "";
 }
@@ -129,6 +137,7 @@ router.get("/tracks", (req, res, next) => {
       section: "tracks",
       tracks: contentRepository.getTracks(),
       artists: contentRepository.getArtists(),
+      trackStyles: contentRepository.getTrackStyles(),
       error: pageError(req.query.error),
     });
   } catch (error) {
@@ -149,6 +158,7 @@ router.get("/tracks/:id/edit", (req, res, next) => {
       section: "tracks",
       track,
       artists,
+      trackStyles: contentRepository.getTrackStyles(),
       selectedArtistId: linkedArtist ? linkedArtist.id : "",
       error: pageError(req.query.error),
     });
@@ -228,7 +238,7 @@ router.get("/artists", (req, res, next) => {
       title: "Исполнители — админпанель",
       section: "artists",
       artists: contentRepository.getArtists(),
-      cardStyles: artistCardStyles,
+      cardStyles: contentRepository.getArtistStyles(),
       error: pageError(req.query.error),
     });
   } catch (error) {
@@ -244,7 +254,7 @@ router.get("/artists/:id/edit", (req, res, next) => {
       title: `Редактирование «${artist.name}» — админпанель`,
       section: "artists",
       artist,
-      cardStyles: artistCardStyles,
+      cardStyles: contentRepository.getArtistStyles(),
       error: pageError(req.query.error),
     });
   } catch (error) {
@@ -294,6 +304,126 @@ router.post("/artists/:id/delete", (req, res, next) => {
     adminRepository.deleteArtist(req.params.id);
     if (artist) cleanupImage(artist.imageUrl, "");
     res.redirect("/admin/artists");
+  } catch (error) {
+    next(error);
+  }
+});
+
+// --- Стили карточек и обложек ---
+router.get("/styles", (req, res, next) => {
+  try {
+    const artistUsage = adminRepository.getArtistStyleUsage();
+    const trackUsage = adminRepository.getTrackStyleUsage();
+    render(res, "pages/admin/styles", {
+      title: "Стили — админпанель",
+      section: "styles",
+      artistStyles: contentRepository
+        .getArtistStyles()
+        .map((style) => ({
+          ...style,
+          usage: artistUsage.get(style.id) || 0,
+        })),
+      trackStyles: contentRepository
+        .getTrackStyles()
+        .map((style) => ({
+          ...style,
+          usage: trackUsage.get(style.id) || 0,
+        })),
+      error: pageError(req.query.error),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/artists", (req, res, next) => {
+  try {
+    const name = String(req.body.name || "").trim();
+    if (!name) return res.redirect("/admin/styles?error=style");
+    adminRepository.createArtistStyle({
+      name: name.slice(0, 48),
+      accent: normalizeColor(req.body.accent, "#80e8cd"),
+      backgroundStart: normalizeColor(req.body.backgroundStart, "#172d39"),
+      backgroundEnd: normalizeColor(req.body.backgroundEnd, "#1c5b5b"),
+    });
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/artists/:id", (req, res, next) => {
+  try {
+    const current = contentRepository
+      .getArtistStyles()
+      .find((style) => style.id === req.params.id);
+    if (!current) return res.redirect("/admin/styles?error=notfound");
+    const name = String(req.body.name || "").trim();
+    if (!name) return res.redirect("/admin/styles?error=style");
+    adminRepository.updateArtistStyle(current.id, {
+      name: name.slice(0, 48),
+      accent: normalizeColor(req.body.accent, current.accent),
+      backgroundStart: normalizeColor(
+        req.body.backgroundStart,
+        current.backgroundStart,
+      ),
+      backgroundEnd: normalizeColor(req.body.backgroundEnd, current.backgroundEnd),
+    });
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/artists/:id/delete", (req, res, next) => {
+  try {
+    const deleted = adminRepository.deleteArtistStyle(req.params.id);
+    res.redirect(deleted ? "/admin/styles" : "/admin/styles?error=inuse");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/tracks", (req, res, next) => {
+  try {
+    const name = String(req.body.name || "").trim();
+    if (!name) return res.redirect("/admin/styles?error=style");
+    adminRepository.createTrackStyle({
+      name: name.slice(0, 48),
+      colorOne: normalizeColor(req.body.colorOne, "#b6fff0"),
+      colorTwo: normalizeColor(req.body.colorTwo, "#217c83"),
+      colorThree: normalizeColor(req.body.colorThree, "#182d45"),
+    });
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/tracks/:id", (req, res, next) => {
+  try {
+    const current = contentRepository
+      .getTrackStyles()
+      .find((style) => style.id === req.params.id);
+    if (!current) return res.redirect("/admin/styles?error=notfound");
+    const name = String(req.body.name || "").trim();
+    if (!name) return res.redirect("/admin/styles?error=style");
+    adminRepository.updateTrackStyle(current.id, {
+      name: name.slice(0, 48),
+      colorOne: normalizeColor(req.body.colorOne, current.colorOne),
+      colorTwo: normalizeColor(req.body.colorTwo, current.colorTwo),
+      colorThree: normalizeColor(req.body.colorThree, current.colorThree),
+    });
+    res.redirect("/admin/styles");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/styles/tracks/:id/delete", (req, res, next) => {
+  try {
+    const deleted = adminRepository.deleteTrackStyle(req.params.id);
+    res.redirect(deleted ? "/admin/styles" : "/admin/styles?error=inuse");
   } catch (error) {
     next(error);
   }
