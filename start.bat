@@ -6,7 +6,7 @@ cd /d "%~dp0"
 if not defined PORT set "PORT=3001"
 title VoxSekai — управление сервером (порт %PORT%)
 
-rem Аргументы командной строки: start / stop / restart
+rem Аргументы командной строки: start / stop / restart / install
 if /i "%~1"=="start" (
     set "CLI_MODE=1"
     goto action_start
@@ -18,6 +18,10 @@ if /i "%~1"=="stop" (
 if /i "%~1"=="restart" (
     set "CLI_MODE=1"
     goto action_restart
+)
+if /i "%~1"=="install" (
+    set "CLI_MODE=1"
+    goto action_install
 )
 if not "%~1"=="" goto usage
 
@@ -36,13 +40,15 @@ if defined SERVER_PID (
 )
 echo ============================================================
 echo.
-echo   [1] Запустить сервер
+echo   [1] Установить зависимости и запустить сервер
 echo   [2] Остановить сервер
 echo   [3] Перезагрузить сервер
-echo   [4] Выйти
+echo   [4] Переустановить зависимости
+echo   [5] Выйти
 echo.
-choice /C 1234 /N /M "Выберите действие [1-4]: "
-if errorlevel 4 exit /b 0
+choice /C 12345 /N /M "Выберите действие [1-5]: "
+if errorlevel 5 exit /b 0
+if errorlevel 4 goto action_install
 if errorlevel 3 goto action_restart
 if errorlevel 2 goto action_stop
 if errorlevel 1 goto action_start
@@ -69,6 +75,18 @@ call :start_server
 if defined CLI_MODE exit /b %errorlevel%
 goto menu_pause
 
+:action_install
+call :get_pid
+if defined SERVER_PID (
+    echo.
+    echo Сначала остановите сервер, затем переустановите зависимости.
+    if defined CLI_MODE exit /b 1
+    goto menu_pause
+)
+call :install_dependencies
+if defined CLI_MODE exit /b %errorlevel%
+goto menu_pause
+
 :menu_pause
 echo.
 pause
@@ -76,7 +94,7 @@ goto menu
 
 :usage
 echo.
-echo Использование: start.bat [start ^| stop ^| restart]
+echo Использование: start.bat [start ^| stop ^| restart ^| install]
 echo Без аргументов открывается интерактивное меню.
 exit /b 1
 
@@ -91,9 +109,13 @@ if defined SERVER_PID (
     echo Открыть: http://localhost:%PORT%
     exit /b 0
 )
+
+call :ensure_dependencies
+if errorlevel 1 exit /b 1
+
 echo.
 echo Запуск VoxSekai на порту %PORT%...
-start "VoxSekai server (порт %PORT%)" /D "%~dp0" cmd /k "node server.js"
+start "VoxSekai server (порт %PORT%)" /D "%~dp0" cmd /k "npm start"
 set /a START_TRIES=0
 
 :wait_start
@@ -111,6 +133,88 @@ echo.
 echo Не удалось запустить сервер.
 echo Проверьте, установлен ли Node.js и нет ли ошибки в окне сервера.
 exit /b 1
+
+rem ------------------------------------------------------------
+rem Проверка и установка npm-зависимостей
+rem ------------------------------------------------------------
+:ensure_dependencies
+call :check_runtime
+if errorlevel 1 exit /b 1
+
+if exist "node_modules\" (
+    call npm ls --depth=0 --silent >nul 2>&1
+    if not errorlevel 1 (
+        echo Зависимости уже установлены.
+        exit /b 0
+    )
+)
+
+echo Зависимости отсутствуют или требуют обновления.
+call :install_dependencies
+exit /b %errorlevel%
+
+:install_dependencies
+call :check_runtime
+if errorlevel 1 exit /b 1
+
+if not exist "package.json" (
+    echo.
+    echo Ошибка: файл package.json не найден в %CD%.
+    exit /b 1
+)
+
+echo.
+echo === Установка зависимостей ===
+if exist "package-lock.json" (
+    echo Выполняется npm ci...
+    call npm ci --no-audit --no-fund
+) else (
+    echo package-lock.json не найден — выполняется npm install...
+    call npm install --no-audit --no-fund
+)
+
+if errorlevel 1 (
+    echo.
+    echo Не удалось установить зависимости.
+    echo Проверьте подключение к интернету и используйте Node.js 20 или новее.
+    exit /b 1
+)
+
+echo.
+echo Все зависимости успешно установлены.
+exit /b 0
+
+:check_runtime
+where node >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo Ошибка: Node.js не найден.
+    echo Установите Node.js 20 или новее с https://nodejs.org/
+    exit /b 1
+)
+
+where npm >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo Ошибка: npm не найден. Переустановите Node.js с https://nodejs.org/
+    exit /b 1
+)
+
+set "NODE_MAJOR="
+for /f "delims=" %%V in ('node -p "process.versions.node.split('.')[0]"') do set "NODE_MAJOR=%%V"
+if not defined NODE_MAJOR (
+    echo.
+    echo Ошибка: не удалось определить версию Node.js.
+    exit /b 1
+)
+
+if %NODE_MAJOR% LSS 20 (
+    echo.
+    echo Ошибка: для текущих зависимостей требуется Node.js 20 или новее.
+    node --version
+    exit /b 1
+)
+exit /b 0
 
 rem ------------------------------------------------------------
 rem Остановка сервера
