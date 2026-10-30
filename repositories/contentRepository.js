@@ -19,6 +19,17 @@ const genreKeys = {
   Dance: "dance",
 };
 
+function parseStringArray(value) {
+  try {
+    const parsed = JSON.parse(value || "[]");
+    return Array.isArray(parsed)
+      ? parsed.map((item) => String(item).trim()).filter(Boolean)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 function mapArtistStyle(row) {
   return {
     id: row.id,
@@ -81,15 +92,27 @@ const fallbackTrackStyle = {
   background: `radial-gradient(circle at 65% 28%, ${defaultTrackPreset.colorOne}, ${defaultTrackPreset.colorTwo} 38%, ${defaultTrackPreset.colorThree} 80%)`,
 };
 
-function mapTrack(row, style = fallbackTrackStyle) {
+function mapTrack(row, style = fallbackTrackStyle, artistContext = null) {
+  const explicitGenre = String(row.genre || "").trim();
+  const artistGenreLabel = String(
+    artistContext?.artist_genre_label || "",
+  ).trim();
+  const artistGenres = parseStringArray(artistContext?.artist_genres);
+  const genre =
+    explicitGenre || artistGenreLabel || artistGenres[0] || "";
+  const artistName =
+    String(row.artist_name || "").trim() ||
+    String(artistContext?.artist_name || "").trim();
+
   return {
     id: row.id,
     title: row.title,
     displayTitle: row.display_title,
     artist: row.artist,
-    artistName: row.artist_name,
+    artistId: artistContext?.artist_id || "",
+    artistName,
     duration: row.duration,
-    genre: row.genre,
+    genre,
     artworkClass: row.artwork_class,
     artworkGlyph: row.artwork_glyph,
     rating: row.rating,
@@ -99,7 +122,8 @@ function mapTrack(row, style = fallbackTrackStyle) {
     audioUrl: row.audio_url,
     imageUrl: row.image_url || "",
     style,
-    filterGenre: genreKeys[row.genre] || "all",
+    filterGenre:
+      genreKeys[genre] || (!explicitGenre && artistGenres[0]) || "all",
     artworkColors: [...style.colors],
   };
 }
@@ -112,7 +136,7 @@ function mapArtist(row, trackIds = [], style = fallbackArtistStyle) {
     initials: row.initials,
     cardClass: row.card_class,
     genreLabel: row.genre_label,
-    genres: JSON.parse(row.genres || "[]"),
+    genres: parseStringArray(row.genres),
     trackCount: trackIds.length,
     listenersLabel: row.listeners_label,
     country: row.country,
@@ -191,6 +215,30 @@ function createContentRepository(db = getDb()) {
     allTrackStyles: db.prepare("SELECT * FROM track_styles ORDER BY name"),
     artistStyleById: db.prepare("SELECT * FROM artist_styles WHERE id = ?"),
     trackStyleById: db.prepare("SELECT * FROM track_styles WHERE id = ?"),
+    allArtistContextsByTrack: db.prepare(`
+      SELECT
+        at.track_id,
+        a.id AS artist_id,
+        a.name AS artist_name,
+        a.genre_label AS artist_genre_label,
+        a.genres AS artist_genres
+      FROM artist_tracks at
+      JOIN artists a ON a.id = at.artist_id
+      ORDER BY at.track_id, at.position, a.name
+    `),
+    artistContextByTrack: db.prepare(`
+      SELECT
+        at.track_id,
+        a.id AS artist_id,
+        a.name AS artist_name,
+        a.genre_label AS artist_genre_label,
+        a.genres AS artist_genres
+      FROM artist_tracks at
+      JOIN artists a ON a.id = at.artist_id
+      WHERE at.track_id = ?
+      ORDER BY at.position, a.name
+      LIMIT 1
+    `),
     allCollectionStyles: db.prepare(
       "SELECT * FROM collection_styles ORDER BY name",
     ),
@@ -237,6 +285,14 @@ function createContentRepository(db = getDb()) {
     );
   }
 
+  function artistContextMap() {
+    const contexts = new Map();
+    statements.allArtistContextsByTrack.all().forEach((row) => {
+      if (!contexts.has(row.track_id)) contexts.set(row.track_id, row);
+    });
+    return contexts;
+  }
+
   function cardStyleMap(statement) {
     return new Map(
       statement
@@ -248,9 +304,16 @@ function createContentRepository(db = getDb()) {
   return {
     getTracks() {
       const styles = trackStyleMap();
+      const artists = artistContextMap();
       return statements.allTracks
         .all()
-        .map((row) => mapTrack(row, styles.get(row.artwork_class)));
+        .map((row) =>
+          mapTrack(
+            row,
+            styles.get(row.artwork_class),
+            artists.get(row.id),
+          ),
+        );
     },
     getTrackById(id) {
       const row = statements.trackById.get(id);
@@ -259,6 +322,7 @@ function createContentRepository(db = getDb()) {
       return mapTrack(
         row,
         styleRow ? mapTrackStyle(styleRow) : fallbackTrackStyle,
+        statements.artistContextByTrack.get(row.id),
       );
     },
     getArtists() {

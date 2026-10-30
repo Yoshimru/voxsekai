@@ -543,11 +543,18 @@
     );
     genreTracks.forEach((track) => {
       const genre = track.genre.trim();
-      genreCounts.set(genre, (genreCounts.get(genre) || 0) + 1);
+      const key = genre.toLocaleLowerCase("ru");
+      const current = genreCounts.get(key) || { name: genre, count: 0 };
+      current.count += 1;
+      genreCounts.set(key, current);
     });
     artistTracks.forEach((track) => {
-      const artist = (track.artistName || track.artist).trim();
-      artistCounts.set(artist, (artistCounts.get(artist) || 0) + 1);
+      const name = (track.artistName || track.artist).trim();
+      const id = String(track.artistId || "").trim();
+      const key = id || name.toLocaleLowerCase("ru");
+      const current = artistCounts.get(key) || { id, name, count: 0 };
+      current.count += 1;
+      artistCounts.set(key, current);
     });
     const stats = {
       favorites: favoriteIds.length,
@@ -563,14 +570,18 @@
     const genreList = document.querySelector("[data-profile-genres]");
     if (genreList) {
       genreList.replaceChildren();
-      const genres = Array.from(genreCounts.entries()).sort((a, b) => b[1] - a[1]);
+      const genres = Array.from(genreCounts.values()).sort(
+        (first, second) =>
+          second.count - first.count ||
+          first.name.localeCompare(second.name, "ru"),
+      );
       if (!genres.length) {
         const empty = document.createElement("p");
         empty.className = "profile-empty-note";
         empty.textContent = "Добавляй треки в избранное, чтобы увидеть свои жанры.";
         genreList.append(empty);
       }
-      genres.slice(0, 4).forEach(([genre, count]) => {
+      genres.slice(0, 4).forEach(({ name: genre, count }) => {
         const percent = Math.round((count / genreTracks.length) * 100);
         const meter = document.createElement("div");
         meter.className = "genre-meter";
@@ -590,16 +601,20 @@
     const artistList = document.querySelector("[data-profile-artists]");
     if (artistList) {
       artistList.replaceChildren();
-      const artists = Array.from(artistCounts.entries()).sort((a, b) => b[1] - a[1]);
+      const artists = Array.from(artistCounts.values()).sort(
+        (first, second) =>
+          second.count - first.count ||
+          first.name.localeCompare(second.name, "ru"),
+      );
       if (!artists.length) {
         const empty = document.createElement("p");
         empty.className = "profile-empty-note";
         empty.textContent = "Здесь появятся исполнители из твоего избранного.";
         artistList.append(empty);
       }
-      artists.slice(0, 4).forEach(([artist, count], index) => {
+      artists.slice(0, 4).forEach(({ id, name: artist, count }, index) => {
         const link = document.createElement("a");
-        link.href = "/artists";
+        link.href = id ? `/artists/${encodeURIComponent(id)}` : "/artists";
         const dot = document.createElement("span");
         dot.className = `profile-artist-dot profile-artist-dot-${index % 4}`;
         dot.textContent = Array.from(artist)[0] || "♪";

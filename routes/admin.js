@@ -353,6 +353,11 @@ router.get("/styles", (req, res, next) => {
           title: "Стили карточек подборок",
           hint: "Градиент и акцент используются в карточках подборок и на странице подборки.",
           glyph: "≋",
+          defaults: {
+            accent: "#83c5ed",
+            backgroundStart: "#21415c",
+            backgroundEnd: "#1f5663",
+          },
           styles: withUsage(
             contentRepository.getCollectionStyles(),
             collectionUsage,
@@ -363,6 +368,11 @@ router.get("/styles", (req, res, next) => {
           title: "Стили карточек плейлистов",
           hint: "Цвета применяются к обложкам плейлистов в библиотеке и публичных плейлистах.",
           glyph: "☷",
+          defaults: {
+            accent: "#ee987d",
+            backgroundStart: "#54352f",
+            backgroundEnd: "#77443a",
+          },
           styles: withUsage(
             contentRepository.getPlaylistStyles(),
             playlistUsage,
@@ -373,6 +383,11 @@ router.get("/styles", (req, res, next) => {
           title: "Стили карточек событий",
           hint: "Цвета применяются к карточкам и странице события.",
           glyph: "✦",
+          defaults: {
+            accent: "#d586d4",
+            backgroundStart: "#492d44",
+            backgroundEnd: "#6b3d62",
+          },
           styles: withUsage(contentRepository.getEventStyles(), eventUsage),
         },
       ],
