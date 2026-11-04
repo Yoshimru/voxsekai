@@ -144,8 +144,13 @@ if errorlevel 1 exit /b 1
 if exist "node_modules\" (
     call npm ls --depth=0 --silent >nul 2>&1
     if not errorlevel 1 (
-        echo Зависимости уже установлены.
-        exit /b 0
+        call :check_native_dependencies
+        if not errorlevel 1 (
+            echo Зависимости уже установлены и совместимы с этим компьютером.
+            exit /b 0
+        )
+        echo Обнаружены зависимости, перенесенные с другого компьютера.
+        echo Нативные модули будут переустановлены для текущей версии Node.js.
     )
 )
 
@@ -177,6 +182,19 @@ if errorlevel 1 (
     echo.
     echo Не удалось установить зависимости.
     echo Проверьте подключение к интернету и используйте Node.js 20 или новее.
+    echo Текущая среда:
+    node --version
+    node -p "process.platform + ' ' + process.arch"
+    exit /b 1
+)
+
+call :check_native_dependencies
+if errorlevel 1 (
+    echo.
+    echo Зависимости установлены, но нативный модуль better-sqlite3 не запускается.
+    echo Установите 64-битную LTS-версию Node.js и повторите установку.
+    echo Диагностика:
+    node -e "const Database=require('better-sqlite3'); const db=new Database(':memory:'); db.close()"
     exit /b 1
 )
 
@@ -214,6 +232,14 @@ if %NODE_MAJOR% LSS 20 (
     node --version
     exit /b 1
 )
+exit /b 0
+
+rem ------------------------------------------------------------
+rem Проверка нативных модулей, зависящих от ОС, архитектуры и Node.js
+rem ------------------------------------------------------------
+:check_native_dependencies
+node -e "const Database=require('better-sqlite3'); const db=new Database(':memory:'); db.close()" >nul 2>&1
+if errorlevel 1 exit /b 1
 exit /b 0
 
 rem ------------------------------------------------------------
