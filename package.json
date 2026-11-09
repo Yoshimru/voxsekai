@@ -4,7 +4,8 @@
   "private": true,
   "description": "VoxSekai server-rendered frontend with EJS",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:report": "node --test tests/report-tests.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
