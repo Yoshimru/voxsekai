@@ -5,6 +5,8 @@
   "description": "VoxSekai server-rendered frontend with EJS",
   "scripts": {
     "start": "node server.js",
+    "demo:build": "node scripts/create-demo-database.js",
+    "test:demo": "node --test tests/demo-database-tests.js",
     "test:report": "node --test tests/report-tests.js"
   },
   "dependencies": {

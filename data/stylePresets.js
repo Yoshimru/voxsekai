@@ -56,6 +56,13 @@ const artistStyles = [
     backgroundStart: "#2d284d",
     backgroundEnd: "#544478",
   },
+  {
+    id: "performer-teto",
+    name: "Teto",
+    accent: "#ef829c",
+    backgroundStart: "#472535",
+    backgroundEnd: "#843f58",
+  },
 ];
 
 const trackStyles = [

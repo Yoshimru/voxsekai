@@ -1,4 +1,7 @@
 node_modules/
 db/*.db
 db/*.db-*
+db/runtime/
+!db/demo/
+!db/demo/voxsekai-demo.db
 assets/uploads/

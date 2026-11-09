@@ -42,6 +42,19 @@ if /i "%~1"=="install" (
     set "CLI_MODE=1"
     goto action_install
 )
+if /i "%~1"=="use-demo" (
+    set "CLI_MODE=1"
+    goto action_use_demo
+)
+if /i "%~1"=="restore-db" (
+    set "CLI_MODE=1"
+    goto action_restore_db
+)
+if /i "%~1"=="clear-db" (
+    set "CLI_MODE=1"
+    set "CLEAR_CONFIRM=%~2"
+    goto action_clear_db
+)
 if not "%~1"=="" goto usage
 
 :menu
@@ -57,17 +70,28 @@ if defined SERVER_PID (
 ) else (
     echo   Status: stopped
 )
+if exist "db\runtime\demo-active.json" (
+    echo   Database: demo
+) else (
+    echo   Database: original
+)
 echo ============================================================
 echo.
 echo   [1] Install dependencies and start
 echo   [2] Stop server
 echo   [3] Restart server
 echo   [4] Reinstall dependencies
-echo   [5] Exit
+echo   [5] Install/reset demo database
+echo   [6] Restore original database
+echo   [7] Clear ORIGINAL database
+echo   [8] Exit
 echo.
 set "MENU_CHOICE="
-set /p "MENU_CHOICE=Select an action [1-5]: "
-if "%MENU_CHOICE%"=="5" exit 0
+set /p "MENU_CHOICE=Select an action [1-8]: "
+if "%MENU_CHOICE%"=="8" exit 0
+if "%MENU_CHOICE%"=="7" goto action_clear_db
+if "%MENU_CHOICE%"=="6" goto action_restore_db
+if "%MENU_CHOICE%"=="5" goto action_use_demo
 if "%MENU_CHOICE%"=="4" goto action_install
 if "%MENU_CHOICE%"=="3" goto action_restart
 if "%MENU_CHOICE%"=="2" goto action_stop
@@ -108,6 +132,48 @@ call :install_dependencies
 if defined CLI_MODE exit /b %errorlevel%
 goto menu_pause
 
+:action_use_demo
+call :require_server_stopped
+if errorlevel 1 (
+    if defined CLI_MODE exit /b 1
+    goto menu_pause
+)
+call :run_database_manager use-demo
+if defined CLI_MODE exit /b %errorlevel%
+goto menu_pause
+
+:action_restore_db
+call :require_server_stopped
+if errorlevel 1 (
+    if defined CLI_MODE exit /b 1
+    goto menu_pause
+)
+call :run_database_manager restore
+if defined CLI_MODE exit /b %errorlevel%
+goto menu_pause
+
+:action_clear_db
+call :require_server_stopped
+if errorlevel 1 (
+    if defined CLI_MODE exit /b 1
+    goto menu_pause
+)
+if /i "%CLEAR_CONFIRM%"=="--yes" goto clear_db_confirmed
+echo.
+echo WARNING: This deletes the ORIGINAL database.
+echo The committed demo template will not be changed.
+set "CLEAR_CHOICE="
+set /p "CLEAR_CHOICE=Type CLEAR to continue: "
+if /i "%CLEAR_CHOICE%"=="CLEAR" goto clear_db_confirmed
+echo Database cleanup cancelled.
+if defined CLI_MODE exit /b 1
+goto menu_pause
+
+:clear_db_confirmed
+call :run_database_manager clear-original
+if defined CLI_MODE exit /b %errorlevel%
+goto menu_pause
+
 :menu_pause
 echo.
 pause
@@ -115,9 +181,40 @@ goto menu
 
 :usage
 echo.
-echo Usage: start.bat [start ^| stop ^| restart ^| install]
+echo Usage: start.bat [start ^| stop ^| restart ^| install ^| use-demo ^| restore-db ^| clear-db [--yes]]
 echo Run start.bat without arguments to open the interactive menu.
 exit /b 1
+
+rem ------------------------------------------------------------
+rem Database switching. The server must be stopped so SQLite WAL
+rem files can be handled without losing original data.
+rem ------------------------------------------------------------
+:require_server_stopped
+call :get_pid
+if defined SERVER_PID (
+    echo.
+    echo Stop the server before changing the database ^(PID %SERVER_PID%^).
+    exit /b 1
+)
+exit /b 0
+
+:run_database_manager
+call :check_runtime
+if errorlevel 1 exit /b 1
+if defined VOXSEKAI_DB (
+    echo.
+    echo ERROR: Database menu commands manage only db\voxsekai.db.
+    echo Temporarily clear VOXSEKAI_DB before using this command.
+    exit /b 1
+)
+if not exist "scripts\database-manager.js" (
+    echo.
+    echo ERROR: scripts\database-manager.js was not found.
+    exit /b 1
+)
+echo.
+node "scripts\database-manager.js" %~1
+exit /b %errorlevel%
 
 rem ------------------------------------------------------------
 rem Start the Node.js server in a separate, persistent window.
