@@ -681,14 +681,6 @@ kbd {
 .logout-form {
   margin: 0;
 }
-.icon-button {
-  position: relative;
-  border: 0;
-  background: transparent;
-  color: var(--soft);
-  font-size: 22px;
-  cursor: pointer;
-}
 .notification span {
   position: absolute;
   right: 0;
@@ -722,9 +714,6 @@ kbd {
 .chevron {
   color: var(--muted);
   font-size: 20px;
-}
-.mobile-menu {
-  display: none;
 }
 .content {
   padding: 16px 40px 0;

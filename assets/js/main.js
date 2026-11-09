@@ -1481,9 +1481,4 @@
     }
   }
 
-  const menuToggle = document.getElementById("menu-toggle");
-  menuToggle?.addEventListener("click", () =>
-    notify("Мобильное меню: используйте нижнюю навигацию"),
-  );
-
 })();

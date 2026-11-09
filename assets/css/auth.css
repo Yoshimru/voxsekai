@@ -647,9 +647,6 @@
   .error-page .topbar .account-actions {
     display: flex;
   }
-  .error-page .topbar .account-actions .icon-button {
-    display: none;
-  }
   .error-page .topbar .search-link {
     min-width: 0;
     flex: 1;
