@@ -598,6 +598,12 @@
         card.hidden = false;
         card.parentElement.append(card);
       });
+    const profileFavoritesEmpty = document.querySelector(
+      "[data-profile-favorites-empty]",
+    );
+    if (profileFavoritesEmpty) {
+      profileFavoritesEmpty.hidden = favoriteTracks.length > 0;
+    }
   }
 
   async function libraryRequest(pathname, options = {}) {

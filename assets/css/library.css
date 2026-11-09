@@ -1125,6 +1125,13 @@
   border-radius: 8px;
   background: #191d23;
 }
+.profile-rating-grid article[hidden],
+.profile-rating-grid [data-profile-favorites-empty][hidden] {
+  display: none;
+}
+.profile-rating-grid [data-profile-favorites-empty] {
+  grid-column: 1 / -1;
+}
 .profile-rating-grid h3 {
   overflow: hidden;
   margin: 0 0 5px;
