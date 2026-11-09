@@ -11,13 +11,13 @@
 %>
 <form method="post" action="<%= formAction %>" enctype="multipart/form-data">
   <div class="admin-form">
-    <label>Имя (name)<span><input type="text" name="name" value="<%= currentArtist ? currentArtist.name : '' %>" required /></span></label>
-    <label>Алиас на русском<span><input type="text" name="alias" value="<%= currentArtist ? currentArtist.alias : '' %>" /></span></label>
+    <label>Имя (name)<span><input type="text" name="name" maxlength="150" value="<%= currentArtist ? currentArtist.name : '' %>" required /></span></label>
+    <label>Алиас на русском<span><input type="text" name="alias" maxlength="150" value="<%= currentArtist ? currentArtist.alias : '' %>" /></span></label>
     <label>Инициалы<span><input type="text" name="initials" maxlength="4" value="<%= currentArtist ? currentArtist.initials : '' %>" placeholder="MI" /></span></label>
-    <label>Подпись жанра<span><input type="text" name="genreLabel" value="<%= currentArtist ? currentArtist.genreLabel : '' %>" placeholder="J-POP · ВОКАЛОИД" /></span></label>
-    <label>Жанры (через запятую)<span><input type="text" name="genres" value="<%= genresValue %>" placeholder="vocaloid, j-pop" /></span></label>
-    <label>Слушатели<span><input type="text" name="listenersLabel" value="<%= currentArtist ? currentArtist.listenersLabel : '' %>" placeholder="1,2 млн" /></span></label>
-    <label>Страна<span><input type="text" name="country" value="<%= currentArtist ? currentArtist.country : '' %>" placeholder="Япония" /></span></label>
+    <label>Подпись жанра<span><input type="text" name="genreLabel" maxlength="150" value="<%= currentArtist ? currentArtist.genreLabel : '' %>" placeholder="J-POP · ВОКАЛОИД" /></span></label>
+    <label>Жанры (через запятую)<span><input type="text" name="genres" maxlength="500" value="<%= genresValue %>" placeholder="vocaloid, j-pop" /></span></label>
+    <label>Слушатели<span><input type="text" name="listenersLabel" maxlength="100" value="<%= currentArtist ? currentArtist.listenersLabel : '' %>" placeholder="1,2 млн" /></span></label>
+    <label>Страна<span><input type="text" name="country" maxlength="100" value="<%= currentArtist ? currentArtist.country : '' %>" placeholder="Япония" /></span></label>
 
     <div class="admin-style-field is-wide">
       <span class="admin-form-label">Стиль карточки исполнителя</span>

@@ -274,6 +274,12 @@ function createContentRepository(db = getDb()) {
        LEFT JOIN users u ON u.id = p.owner_id
        WHERE p.id = ? AND p.is_public = 1`,
     ),
+    anyPlaylistById: db.prepare(`
+      SELECT p.*, u.username AS owner_name
+      FROM playlists p
+      LEFT JOIN users u ON u.id = p.owner_id
+      WHERE p.id = ?
+    `),
     allEvents: db.prepare("SELECT * FROM events ORDER BY date"),
     eventById: db.prepare("SELECT * FROM events WHERE id = ?"),
   };
@@ -444,6 +450,19 @@ function createContentRepository(db = getDb()) {
     },
     getPublicPlaylistById(id) {
       const row = statements.playlistById.get(id);
+      if (!row) return null;
+      const trackIds = statements.trackIdsByPlaylist
+        .all(row.id)
+        .map((item) => item.track_id);
+      const styleRow = statements.playlistStyleById.get(row.artwork_class);
+      return mapPlaylist(
+        row,
+        trackIds,
+        styleRow ? mapCardStyle(styleRow) : fallbackPlaylistStyle,
+      );
+    },
+    getPlaylistById(id) {
+      const row = statements.anyPlaylistById.get(id);
       if (!row) return null;
       const trackIds = statements.trackIdsByPlaylist
         .all(row.id)

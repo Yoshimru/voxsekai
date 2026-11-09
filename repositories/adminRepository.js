@@ -152,6 +152,15 @@ function createAdminRepository(db = getDb()) {
       INSERT INTO collections (id, title, tagline, description, card_class, featured)
       VALUES (@id, @title, @tagline, @description, @cardClass, @featured)
     `),
+    updateCollection: db.prepare(`
+      UPDATE collections SET
+        title = @title,
+        tagline = @tagline,
+        description = @description,
+        card_class = @cardClass,
+        featured = @featured
+      WHERE id = @id
+    `),
     insertCollectionTrack: db.prepare(
       "INSERT OR IGNORE INTO collection_tracks (collection_id, track_id, position) VALUES (?, ?, ?)",
     ),
@@ -167,6 +176,16 @@ function createAdminRepository(db = getDb()) {
         (@id, @title, @description, @label, @artworkClass, @isPublic,
          datetime('now'), datetime('now'))
     `),
+    updatePlaylist: db.prepare(`
+      UPDATE playlists SET
+        title = @title,
+        description = @description,
+        label = @label,
+        artwork_class = @artworkClass,
+        is_public = @isPublic,
+        updated_at = datetime('now')
+      WHERE id = @id
+    `),
     insertPlaylistTrack: db.prepare(
       "INSERT OR IGNORE INTO playlist_tracks (playlist_id, track_id, position) VALUES (?, ?, ?)",
     ),
@@ -178,6 +197,24 @@ function createAdminRepository(db = getDb()) {
         time, category, artwork_class, artwork_glyph, tag, description)
       VALUES (@id, @title, @type, @venue, @location, @date, @dateLabel, @day, @month,
         @time, @category, @artworkClass, @artworkGlyph, @tag, @description)
+    `),
+    updateEvent: db.prepare(`
+      UPDATE events SET
+        title = @title,
+        type = @type,
+        venue = @venue,
+        location = @location,
+        date = @date,
+        date_label = @dateLabel,
+        day = @day,
+        month = @month,
+        time = @time,
+        category = @category,
+        artwork_class = @artworkClass,
+        artwork_glyph = @artworkGlyph,
+        tag = @tag,
+        description = @description
+      WHERE id = @id
     `),
     deleteEvent: db.prepare("DELETE FROM events WHERE id = ?"),
   };
@@ -608,7 +645,7 @@ function createAdminRepository(db = getDb()) {
       return usage;
     },
 
-    // --- РџРѕРґР±РѕСЂРєРё ---
+    // --- Подборки ---
     createCollection(fields) {
       const collection = {
         id: slug(fields.id, `collection-${Date.now()}`),
@@ -616,7 +653,12 @@ function createAdminRepository(db = getDb()) {
         tagline: (fields.tagline || fields.title || "").toLocaleUpperCase("ru"),
         description: fields.description || "",
         cardClass: fields.cardClass || "collection-mood-new",
-        featured: fields.featured === "on" || fields.featured === "1" ? 1 : 0,
+        featured:
+          fields.featured === true ||
+          fields.featured === "on" ||
+          fields.featured === "1"
+            ? 1
+            : 0,
       };
       const create = db.transaction(() => {
         if (collection.featured) {
@@ -627,6 +669,31 @@ function createAdminRepository(db = getDb()) {
       });
       create.call(this);
       return collection.id;
+    },
+    updateCollection(id, fields) {
+      const row = db.prepare("SELECT id FROM collections WHERE id = ?").get(id);
+      if (!row) return false;
+      const featured =
+        fields.featured === true ||
+        fields.featured === "on" ||
+        fields.featured === "1"
+          ? 1
+          : 0;
+      db.transaction(() => {
+        if (featured) {
+          db.prepare("UPDATE collections SET featured = 0 WHERE id <> ?").run(id);
+        }
+        statements.updateCollection.run({
+          id,
+          title: fields.title,
+          tagline: (fields.tagline || fields.title).toLocaleUpperCase("ru"),
+          description: fields.description || "",
+          cardClass: fields.cardClass,
+          featured,
+        });
+        this.setCollectionTracks(id, fields.trackIds);
+      })();
+      return true;
     },
     setCollectionTracks(id, rawTrackIds) {
       return db.transaction(() => {
@@ -640,7 +707,7 @@ function createAdminRepository(db = getDb()) {
       statements.deleteCollection.run(id);
     },
 
-    // --- РџР»РµР№Р»РёСЃС‚С‹ ---
+    // --- Плейлисты ---
     createPlaylist(fields) {
       const playlist = {
         id: slug(fields.id, `playlist-${Date.now()}`),
@@ -648,7 +715,12 @@ function createAdminRepository(db = getDb()) {
         description: fields.description || "",
         label: (fields.label || fields.title || "").toLocaleUpperCase("ru"),
         artworkClass: fields.artworkClass || "playlist-card-new",
-        isPublic: fields.isPublic === "on" || fields.isPublic === "1" ? 1 : 0,
+        isPublic:
+          fields.isPublic === true ||
+          fields.isPublic === "on" ||
+          fields.isPublic === "1"
+            ? 1
+            : 0,
       };
       const create = db.transaction(() => {
         statements.insertPlaylist.run(playlist);
@@ -656,6 +728,27 @@ function createAdminRepository(db = getDb()) {
       });
       create.call(this);
       return playlist.id;
+    },
+    updatePlaylist(id, fields) {
+      const row = db.prepare("SELECT id FROM playlists WHERE id = ?").get(id);
+      if (!row) return false;
+      db.transaction(() => {
+        statements.updatePlaylist.run({
+          id,
+          title: fields.title,
+          description: fields.description || "",
+          label: (fields.label || fields.title).toLocaleUpperCase("ru"),
+          artworkClass: fields.artworkClass,
+          isPublic:
+            fields.isPublic === true ||
+            fields.isPublic === "on" ||
+            fields.isPublic === "1"
+              ? 1
+              : 0,
+        });
+        this.setPlaylistTracks(id, fields.trackIds);
+      })();
+      return true;
     },
     setPlaylistTracks(id, rawTrackIds) {
       return db.transaction(() => {
@@ -669,9 +762,10 @@ function createAdminRepository(db = getDb()) {
       statements.deletePlaylist.run(id);
     },
 
-    // --- РЎРѕР±С‹С‚РёСЏ ---
+    // --- События ---
     createEvent(fields) {
       const date = fields.date || new Date().toISOString().slice(0, 10);
+      const dateObject = new Date(`${date}T12:00:00`);
       const event = {
         id: slug(fields.id, `event-${Date.now()}`),
         title: fields.title || "",
@@ -679,9 +773,20 @@ function createAdminRepository(db = getDb()) {
         venue: fields.venue || "",
         location: fields.location || "",
         date,
-        dateLabel: fields.dateLabel || new Date(date).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" }),
+        dateLabel:
+          fields.dateLabel ||
+          dateObject.toLocaleDateString("ru", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
         day: fields.day || date.slice(8, 10),
-        month: fields.month || "",
+        month:
+          fields.month ||
+          dateObject
+            .toLocaleDateString("ru", { month: "short" })
+            .replace(".", "")
+            .toLocaleUpperCase("ru"),
         time: fields.time || "",
         category: fields.category || "",
         artworkClass: fields.artworkClass || "event-card-neon",
@@ -691,6 +796,40 @@ function createAdminRepository(db = getDb()) {
       };
       statements.insertEvent.run(event);
       return event.id;
+    },
+    updateEvent(id, fields) {
+      const row = db.prepare("SELECT id FROM events WHERE id = ?").get(id);
+      if (!row) return false;
+      const dateObject = new Date(`${fields.date}T12:00:00`);
+      statements.updateEvent.run({
+        id,
+        title: fields.title,
+        type: fields.type,
+        venue: fields.venue || "",
+        location: fields.location || "",
+        date: fields.date,
+        dateLabel:
+          fields.dateLabel ||
+          dateObject.toLocaleDateString("ru", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
+        day: fields.day || fields.date.slice(8, 10),
+        month:
+          fields.month ||
+          dateObject
+            .toLocaleDateString("ru", { month: "short" })
+            .replace(".", "")
+            .toLocaleUpperCase("ru"),
+        time: fields.time || "",
+        category: fields.category || "",
+        artworkClass: fields.artworkClass,
+        artworkGlyph: fields.artworkGlyph || "◆",
+        tag: (fields.tag || "").toLocaleUpperCase("ru"),
+        description: fields.description || "",
+      });
+      return true;
     },
     deleteEvent(id) {
       statements.deleteEvent.run(id);

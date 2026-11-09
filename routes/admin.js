@@ -3,6 +3,16 @@ const contentRepository = require("../repositories/contentRepository");
 const authRepository = require("../repositories/authRepository");
 const adminRepository = require("../repositories/adminRepository");
 const {
+  AdminValidationError,
+  validateArtist,
+  validateCollection,
+  validateEvent,
+  validatePlaylist,
+  validateTrack,
+  validateTrackIds,
+  validateUser,
+} = require("../middleware/adminValidation");
+const {
   uploadImage,
   uploadTrackMedia,
   resolveImageUrl,
@@ -25,7 +35,7 @@ function normalizeColor(value, fallback) {
   return fallback;
 }
 
-function pageError(queryError) {
+function pageError(queryError, queryMessage = "") {
   if (queryError === "artist") {
     return "Выберите исполнителя из списка добавленных.";
   }
@@ -41,7 +51,28 @@ function pageError(queryError) {
   if (queryError === "style") {
     return "Не удалось сохранить стиль. Проверьте название и цвета.";
   }
+  if (queryError === "userexists") {
+    return "Пользователь с таким логином уже существует.";
+  }
+  if (queryError === "validation") {
+    return String(queryMessage || "Проверьте заполнение формы.").slice(0, 300);
+  }
   return "";
+}
+
+function validationUrl(path, error) {
+  return `${path}${path.includes("?") ? "&" : "?"}error=validation&message=${encodeURIComponent(error.message)}`;
+}
+
+function cleanupRejectedUploads(req) {
+  if (req.imageFile || req.file) cleanupImage(resolveImageUrl(req), "");
+  if (req.audioFile) cleanupImage(resolveAudioUrl(req), "");
+}
+
+function handleValidation(error, req, res, next, path) {
+  cleanupRejectedUploads(req);
+  if (!(error instanceof AdminValidationError)) return next(error);
+  return res.redirect(validationUrl(path, error));
 }
 
 // --- Гарантия наличия админского аккаунта (Yoshimru / adminadmin) ---
@@ -140,7 +171,7 @@ router.get("/tracks", (req, res, next) => {
       tracks: contentRepository.getTracks(),
       artists: contentRepository.getArtists(),
       trackStyles: contentRepository.getTrackStyles(),
-      error: pageError(req.query.error),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -162,7 +193,7 @@ router.get("/tracks/:id/edit", (req, res, next) => {
       artists,
       trackStyles: contentRepository.getTrackStyles(),
       selectedArtistId: linkedArtist ? linkedArtist.id : "",
-      error: pageError(req.query.error),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -176,23 +207,21 @@ router.post("/tracks", uploadTrackMedia, (req, res, next) => {
       req.imageUploadError ||
       req.audioUploadError
     ) {
+      cleanupRejectedUploads(req);
       return res.redirect("/admin/tracks?error=upload");
     }
-    const artist = req.body.artistId
-      ? contentRepository.getArtistById(String(req.body.artistId))
-      : null;
-    if (!artist) {
-      return res.redirect("/admin/tracks?error=artist");
-    }
+    const fields = validateTrack(req.body, {
+      artists: contentRepository.getArtists(),
+      styles: contentRepository.getTrackStyles(),
+    });
     adminRepository.createTrack({
-      ...req.body,
-      artistId: artist.id,
+      ...fields,
       imageUrl: resolveImageUrl(req),
       audioUrl: resolveAudioUrl(req),
     });
     res.redirect("/admin/tracks");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/tracks");
   }
 });
 
@@ -205,24 +234,20 @@ router.post("/tracks/:id/edit", uploadTrackMedia, (req, res, next) => {
       req.imageUploadError ||
       req.audioUploadError
     ) {
+      cleanupRejectedUploads(req);
       return res.redirect(
         `/admin/tracks/${encodeURIComponent(track.id)}/edit?error=upload`,
       );
     }
-    const artist = req.body.artistId
-      ? contentRepository.getArtistById(String(req.body.artistId))
-      : null;
-    if (!artist) {
-      return res.redirect(
-        `/admin/tracks/${encodeURIComponent(track.id)}/edit?error=artist`,
-      );
-    }
+    const fields = validateTrack(req.body, {
+      artists: contentRepository.getArtists(),
+      styles: contentRepository.getTrackStyles(),
+    });
 
     const imageUrl = resolveImageUrl(req, track.imageUrl);
     const audioUrl = resolveAudioUrl(req, track.audioUrl);
     adminRepository.updateTrack(track.id, {
-      ...req.body,
-      artistId: artist.id,
+      ...fields,
       imageUrl,
       audioUrl,
     });
@@ -230,7 +255,13 @@ router.post("/tracks/:id/edit", uploadTrackMedia, (req, res, next) => {
     cleanupImage(track.audioUrl, audioUrl);
     res.redirect("/admin/tracks");
   } catch (error) {
-    next(error);
+    handleValidation(
+      error,
+      req,
+      res,
+      next,
+      `/admin/tracks/${encodeURIComponent(req.params.id)}/edit`,
+    );
   }
 });
 
@@ -256,7 +287,7 @@ router.get("/artists", (req, res, next) => {
       section: "artists",
       artists: contentRepository.getArtists(),
       cardStyles: contentRepository.getArtistStyles(),
-      error: pageError(req.query.error),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -272,7 +303,7 @@ router.get("/artists/:id/edit", (req, res, next) => {
       section: "artists",
       artist,
       cardStyles: contentRepository.getArtistStyles(),
-      error: pageError(req.query.error),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -282,15 +313,19 @@ router.get("/artists/:id/edit", (req, res, next) => {
 router.post("/artists", uploadImage, (req, res, next) => {
   try {
     if (req.imageUploadError) {
+      cleanupRejectedUploads(req);
       return res.redirect("/admin/artists?error=upload");
     }
+    const fields = validateArtist(req.body, {
+      styles: contentRepository.getArtistStyles(),
+    });
     adminRepository.createArtist({
-      ...req.body,
+      ...fields,
       imageUrl: resolveImageUrl(req),
     });
     res.redirect("/admin/artists");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/artists");
   }
 });
 
@@ -299,19 +334,29 @@ router.post("/artists/:id/edit", uploadImage, (req, res, next) => {
     const artist = contentRepository.getArtistById(req.params.id);
     if (!artist) return res.redirect("/admin/artists?error=notfound");
     if (req.imageUploadError) {
+      cleanupRejectedUploads(req);
       return res.redirect(
         `/admin/artists/${encodeURIComponent(artist.id)}/edit?error=upload`,
       );
     }
+    const fields = validateArtist(req.body, {
+      styles: contentRepository.getArtistStyles(),
+    });
     const imageUrl = resolveImageUrl(req, artist.imageUrl);
     adminRepository.updateArtist(artist.id, {
-      ...req.body,
+      ...fields,
       imageUrl,
     });
     cleanupImage(artist.imageUrl, imageUrl);
     res.redirect("/admin/artists");
   } catch (error) {
-    next(error);
+    handleValidation(
+      error,
+      req,
+      res,
+      next,
+      `/admin/artists/${encodeURIComponent(req.params.id)}/edit`,
+    );
   }
 });
 
@@ -391,7 +436,7 @@ router.get("/styles", (req, res, next) => {
           styles: withUsage(contentRepository.getEventStyles(), eventUsage),
         },
       ],
-      error: pageError(req.query.error),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -635,6 +680,24 @@ router.get("/collections", (req, res, next) => {
       collections: contentRepository.getCollections(),
       tracks: contentRepository.getTracks(),
       cardStyles: contentRepository.getCollectionStyles(),
+      error: pageError(req.query.error, req.query.message),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/collections/:id/edit", (req, res, next) => {
+  try {
+    const collection = contentRepository.getCollectionById(req.params.id);
+    if (!collection) return res.redirect("/admin/collections?error=notfound");
+    render(res, "pages/admin/collection-edit", {
+      title: `Редактирование «${collection.title}» — админпанель`,
+      section: "collections",
+      collection,
+      tracks: contentRepository.getTracks(),
+      cardStyles: contentRepository.getCollectionStyles(),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -643,19 +706,52 @@ router.get("/collections", (req, res, next) => {
 
 router.post("/collections", (req, res, next) => {
   try {
-    adminRepository.createCollection(req.body);
+    const fields = validateCollection(req.body, {
+      tracks: contentRepository.getTracks(),
+      styles: contentRepository.getCollectionStyles(),
+    });
+    adminRepository.createCollection(fields);
     res.redirect("/admin/collections");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/collections");
+  }
+});
+
+router.post("/collections/:id/edit", (req, res, next) => {
+  try {
+    if (!contentRepository.getCollectionById(req.params.id)) {
+      return res.redirect("/admin/collections?error=notfound");
+    }
+    const fields = validateCollection(req.body, {
+      tracks: contentRepository.getTracks(),
+      styles: contentRepository.getCollectionStyles(),
+    });
+    adminRepository.updateCollection(req.params.id, fields);
+    res.redirect("/admin/collections");
+  } catch (error) {
+    handleValidation(
+      error,
+      req,
+      res,
+      next,
+      `/admin/collections/${encodeURIComponent(req.params.id)}/edit`,
+    );
   }
 });
 
 router.post("/collections/:id/tracks", (req, res, next) => {
   try {
-    adminRepository.setCollectionTracks(req.params.id, req.body.trackIds);
+    const tracks = contentRepository.getTracks();
+    if (!contentRepository.getCollectionById(req.params.id)) {
+      return res.redirect("/admin/collections?error=notfound");
+    }
+    adminRepository.setCollectionTracks(
+      req.params.id,
+      validateTrackIds(req.body.trackIds, tracks),
+    );
     res.redirect("/admin/collections");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/collections");
   }
 });
 
@@ -677,6 +773,24 @@ router.get("/playlists", (req, res, next) => {
       playlists: contentRepository.getPlaylists(),
       tracks: contentRepository.getTracks(),
       cardStyles: contentRepository.getPlaylistStyles(),
+      error: pageError(req.query.error, req.query.message),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/playlists/:id/edit", (req, res, next) => {
+  try {
+    const playlist = contentRepository.getPlaylistById(req.params.id);
+    if (!playlist) return res.redirect("/admin/playlists?error=notfound");
+    render(res, "pages/admin/playlist-edit", {
+      title: `Редактирование «${playlist.title}» — админпанель`,
+      section: "playlists",
+      playlist,
+      tracks: contentRepository.getTracks(),
+      cardStyles: contentRepository.getPlaylistStyles(),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -685,19 +799,52 @@ router.get("/playlists", (req, res, next) => {
 
 router.post("/playlists", (req, res, next) => {
   try {
-    adminRepository.createPlaylist(req.body);
+    const fields = validatePlaylist(req.body, {
+      tracks: contentRepository.getTracks(),
+      styles: contentRepository.getPlaylistStyles(),
+    });
+    adminRepository.createPlaylist(fields);
     res.redirect("/admin/playlists");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/playlists");
+  }
+});
+
+router.post("/playlists/:id/edit", (req, res, next) => {
+  try {
+    if (!contentRepository.getPlaylistById(req.params.id)) {
+      return res.redirect("/admin/playlists?error=notfound");
+    }
+    const fields = validatePlaylist(req.body, {
+      tracks: contentRepository.getTracks(),
+      styles: contentRepository.getPlaylistStyles(),
+    });
+    adminRepository.updatePlaylist(req.params.id, fields);
+    res.redirect("/admin/playlists");
+  } catch (error) {
+    handleValidation(
+      error,
+      req,
+      res,
+      next,
+      `/admin/playlists/${encodeURIComponent(req.params.id)}/edit`,
+    );
   }
 });
 
 router.post("/playlists/:id/tracks", (req, res, next) => {
   try {
-    adminRepository.setPlaylistTracks(req.params.id, req.body.trackIds);
+    const tracks = contentRepository.getTracks();
+    if (!contentRepository.getPlaylistById(req.params.id)) {
+      return res.redirect("/admin/playlists?error=notfound");
+    }
+    adminRepository.setPlaylistTracks(
+      req.params.id,
+      validateTrackIds(req.body.trackIds, tracks),
+    );
     res.redirect("/admin/playlists");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/playlists");
   }
 });
 
@@ -718,6 +865,23 @@ router.get("/events", (req, res, next) => {
       section: "events",
       events: contentRepository.getEvents(),
       cardStyles: contentRepository.getEventStyles(),
+      error: pageError(req.query.error, req.query.message),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/events/:id/edit", (req, res, next) => {
+  try {
+    const event = contentRepository.getEventById(req.params.id);
+    if (!event) return res.redirect("/admin/events?error=notfound");
+    render(res, "pages/admin/event-edit", {
+      title: `Редактирование «${event.title}» — админпанель`,
+      section: "events",
+      event,
+      cardStyles: contentRepository.getEventStyles(),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -726,10 +890,34 @@ router.get("/events", (req, res, next) => {
 
 router.post("/events", (req, res, next) => {
   try {
-    adminRepository.createEvent(req.body);
+    const fields = validateEvent(req.body, {
+      styles: contentRepository.getEventStyles(),
+    });
+    adminRepository.createEvent(fields);
     res.redirect("/admin/events");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/events");
+  }
+});
+
+router.post("/events/:id/edit", (req, res, next) => {
+  try {
+    if (!contentRepository.getEventById(req.params.id)) {
+      return res.redirect("/admin/events?error=notfound");
+    }
+    const fields = validateEvent(req.body, {
+      styles: contentRepository.getEventStyles(),
+    });
+    adminRepository.updateEvent(req.params.id, fields);
+    res.redirect("/admin/events");
+  } catch (error) {
+    handleValidation(
+      error,
+      req,
+      res,
+      next,
+      `/admin/events/${encodeURIComponent(req.params.id)}/edit`,
+    );
   }
 });
 
@@ -749,6 +937,7 @@ router.get("/users", (req, res, next) => {
       title: "Пользователи — админпанель",
       section: "users",
       users: authRepository.getUsers(),
+      error: pageError(req.query.error, req.query.message),
     });
   } catch (error) {
     next(error);
@@ -757,20 +946,14 @@ router.get("/users", (req, res, next) => {
 
 router.post("/users", (req, res, next) => {
   try {
-    const { username, password, role } = req.body;
-    if (username && password) {
-      const existing = authRepository.getUserByUsername(String(username).trim());
-      if (!existing) {
-        authRepository.createUser({
-          username: String(username).trim(),
-          password: String(password),
-          role: role === "admin" ? "admin" : "user",
-        });
-      }
+    const fields = validateUser(req.body);
+    if (authRepository.getUserByUsername(fields.username)) {
+      return res.redirect("/admin/users?error=userexists");
     }
+    authRepository.createUser(fields);
     res.redirect("/admin/users");
   } catch (error) {
-    next(error);
+    handleValidation(error, req, res, next, "/admin/users");
   }
 });
 

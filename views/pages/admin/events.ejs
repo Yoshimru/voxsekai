@@ -15,42 +15,13 @@
     </div>
     <div class="admin-panel">
       <h2>Новое событие</h2>
-      <form method="post" action="/admin/events">
-        <div class="admin-form">
-          <label>Название<span><input type="text" name="title" required /></span></label>
-          <label>Формат<span>
-            <select name="type">
-              <option value="offline">офлайн</option>
-              <option value="online">онлайн</option>
-            </select>
-          </span></label>
-          <label>Площадка (venue)<span><input type="text" name="venue" /></span></label>
-          <label>Город<span><input type="text" name="location" /></span></label>
-          <label>Дата (YYYY-MM-DD)<span><input type="date" name="date" required /></span></label>
-          <label>Время<span><input type="text" name="time" placeholder="20:00" /></span></label>
-          <label>Категория<span><input type="text" name="category" placeholder="Концерт" /></span></label>
-          <label>Подпись (tag)<span><input type="text" name="tag" placeholder="LIVE SHOW · 02" /></span></label>
-          <div class="admin-style-field is-wide">
-            <span class="admin-form-label">Стиль обложки события</span>
-            <div class="admin-cover-style-grid">
-              <% cardStyles.forEach((style, index) => { %>
-                <label class="admin-cover-style-option">
-                  <input type="radio" name="artworkClass" value="<%= style.id %>" <%= index === 0 ? 'checked' : '' %> />
-                  <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
-                    <span class="admin-cover-style-glyph"><%= style.glyph %></span>
-                    <span class="admin-cover-style-name"><%= style.name %></span>
-                  </span>
-                </label>
-              <% }) %>
-            </div>
-          </div>
-          <label>Глиф<span><input type="text" name="artworkGlyph" placeholder="VS" /></span></label>
-          <label class="is-wide">Описание<span><textarea name="description" rows="2"></textarea></span></label>
-          <div class="admin-actions">
-            <button class="admin-button" type="submit">Добавить событие</button>
-          </div>
-        </div>
-      </form>
+      <% if (error) { %><p class="admin-error" role="alert"><%= error %></p><% } %>
+      <%- include('../../partials/event-form', {
+        formAction: '/admin/events',
+        event: null,
+        cardStyles,
+        submitLabel: 'Добавить событие',
+      }) %>
     </div>
     <div class="admin-panel">
       <h2>Все события</h2>
@@ -68,9 +39,12 @@
                 <td><%= event.location %></td>
                 <td><%= event.time %></td>
                 <td>
-                  <form method="post" action="/admin/events/<%= event.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить событие?')">
-                    <button class="admin-button-danger" type="submit">Удалить</button>
-                  </form>
+                  <div class="admin-row-actions">
+                    <a class="admin-button admin-button-secondary admin-button-small" href="/admin/events/<%= event.id %>/edit">Редактировать</a>
+                    <form method="post" action="/admin/events/<%= event.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить событие?')">
+                      <button class="admin-button-danger" type="submit">Удалить</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             <% }) %>

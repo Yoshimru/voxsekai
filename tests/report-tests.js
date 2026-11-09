@@ -43,6 +43,9 @@ let userCookie = "";
 let adminCookie = "";
 let secondUserCookie = "";
 let userPlaylistId = "";
+let adminCollectionId = "";
+let adminPlaylistId = "";
+let adminEventId = "";
 
 before(async () => {
   server = await new Promise((resolve, reject) => {
@@ -84,6 +87,12 @@ function json(method, body, cookie = "") {
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   };
+}
+
+function authenticatedForm(body, cookie) {
+  const options = form(body);
+  options.headers.cookie = cookie;
+  return options;
 }
 
 after(async () => {
@@ -437,4 +446,270 @@ test("TC-23: владелец редактирует и удаляет свой 
     ).n,
     0,
   );
+});
+
+test("TC-24: администратор создаёт подборку с треком", async () => {
+  const style = db.prepare("SELECT id FROM collection_styles ORDER BY id LIMIT 1").get();
+  const response = await request(
+    "/admin/collections",
+    authenticatedForm(
+      {
+        title: "Административная подборка",
+        tagline: "ADMIN PICKS",
+        description: "Создана интеграционным тестом",
+        cardClass: style.id,
+        featured: "on",
+        trackIds: "report-track",
+      },
+      adminCookie,
+    ),
+  );
+  const collection = db
+    .prepare("SELECT id, title, featured FROM collections WHERE title = ?")
+    .get("Административная подборка");
+  adminCollectionId = collection.id;
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("location"), "/admin/collections");
+  assert.equal(collection.featured, 1);
+  assert.equal(
+    db.prepare("SELECT COUNT(*) AS n FROM collection_tracks WHERE collection_id = ? AND track_id = ?").get(
+      adminCollectionId,
+      "report-track",
+    ).n,
+    1,
+  );
+});
+
+test("TC-25: администратор редактирует все поля подборки", async () => {
+  const style = db.prepare("SELECT id FROM collection_styles ORDER BY id DESC LIMIT 1").get();
+  const editPage = await request(`/admin/collections/${adminCollectionId}/edit`, {
+    headers: { cookie: adminCookie },
+  });
+  const editHtml = await editPage.text();
+  assert.equal(editPage.status, 200);
+  assert.match(editHtml, /Редактирование подборки/);
+
+  const response = await request(
+    `/admin/collections/${adminCollectionId}/edit`,
+    authenticatedForm(
+      {
+        title: "Обновлённая подборка",
+        tagline: "UPDATED",
+        description: "Новое описание подборки",
+        cardClass: style.id,
+        trackIds: "report-track",
+      },
+      adminCookie,
+    ),
+  );
+  const collection = db
+    .prepare("SELECT title, tagline, description, card_class, featured FROM collections WHERE id = ?")
+    .get(adminCollectionId);
+  assert.equal(response.status, 302);
+  assert.deepEqual(collection, {
+    title: "Обновлённая подборка",
+    tagline: "UPDATED",
+    description: "Новое описание подборки",
+    card_class: style.id,
+    featured: 0,
+  });
+});
+
+test("TC-26: администратор создаёт и редактирует серверный плейлист", async () => {
+  const styles = db.prepare("SELECT id FROM playlist_styles ORDER BY id").all();
+  const createResponse = await request(
+    "/admin/playlists",
+    authenticatedForm(
+      {
+        title: "Административный плейлист",
+        label: "ADMIN MIX",
+        description: "Исходное описание",
+        artworkClass: styles[0].id,
+        isPublic: "on",
+        trackIds: "report-track",
+      },
+      adminCookie,
+    ),
+  );
+  adminPlaylistId = db
+    .prepare("SELECT id FROM playlists WHERE title = ?")
+    .get("Административный плейлист").id;
+  assert.equal(createResponse.status, 302);
+
+  const editPage = await request(`/admin/playlists/${adminPlaylistId}/edit`, {
+    headers: { cookie: adminCookie },
+  });
+  assert.equal(editPage.status, 200);
+
+  const updateResponse = await request(
+    `/admin/playlists/${adminPlaylistId}/edit`,
+    authenticatedForm(
+      {
+        title: "Обновлённый серверный плейлист",
+        label: "UPDATED MIX",
+        description: "Обновлённое описание",
+        artworkClass: styles.at(-1).id,
+        trackIds: "report-track",
+      },
+      adminCookie,
+    ),
+  );
+  const playlist = db
+    .prepare("SELECT owner_id, title, label, description, artwork_class, is_public FROM playlists WHERE id = ?")
+    .get(adminPlaylistId);
+  assert.equal(updateResponse.status, 302);
+  assert.deepEqual(playlist, {
+    owner_id: null,
+    title: "Обновлённый серверный плейлист",
+    label: "UPDATED MIX",
+    description: "Обновлённое описание",
+    artwork_class: styles.at(-1).id,
+    is_public: 0,
+  });
+});
+
+test("TC-27: администратор создаёт и редактирует событие", async () => {
+  const styles = db.prepare("SELECT id FROM event_styles ORDER BY id").all();
+  const createResponse = await request(
+    "/admin/events",
+    authenticatedForm(
+      {
+        title: "Административное событие",
+        type: "offline",
+        venue: "Тестовая сцена",
+        location: "Астрахань",
+        date: "2026-12-20",
+        time: "20:00",
+        category: "Концерт",
+        tag: "LIVE",
+        artworkClass: styles[0].id,
+        artworkGlyph: "VS",
+        description: "Исходное описание",
+      },
+      adminCookie,
+    ),
+  );
+  adminEventId = db
+    .prepare("SELECT id FROM events WHERE title = ?")
+    .get("Административное событие").id;
+  assert.equal(createResponse.status, 302);
+
+  const editPage = await request(`/admin/events/${adminEventId}/edit`, {
+    headers: { cookie: adminCookie },
+  });
+  assert.equal(editPage.status, 200);
+
+  const updateResponse = await request(
+    `/admin/events/${adminEventId}/edit`,
+    authenticatedForm(
+      {
+        title: "Обновлённое событие",
+        type: "online",
+        venue: "Онлайн",
+        location: "Интернет",
+        date: "2027-01-15",
+        time: "19:30",
+        category: "Трансляция",
+        tag: "ONLINE",
+        artworkClass: styles.at(-1).id,
+        artworkGlyph: "ON",
+        description: "Новое описание",
+      },
+      adminCookie,
+    ),
+  );
+  const event = db
+    .prepare("SELECT title, type, venue, location, date, time, category, artwork_class, artwork_glyph, tag, description FROM events WHERE id = ?")
+    .get(adminEventId);
+  assert.equal(updateResponse.status, 302);
+  assert.deepEqual(event, {
+    title: "Обновлённое событие",
+    type: "online",
+    venue: "Онлайн",
+    location: "Интернет",
+    date: "2027-01-15",
+    time: "19:30",
+    category: "Трансляция",
+    artwork_class: styles.at(-1).id,
+    artwork_glyph: "ON",
+    tag: "ONLINE",
+    description: "Новое описание",
+  });
+});
+
+test("TC-28: административная валидация отклоняет пустое название", async () => {
+  const style = db.prepare("SELECT id FROM collection_styles LIMIT 1").get();
+  const response = await request(
+    "/admin/collections",
+    authenticatedForm(
+      {
+        title: " ",
+        cardClass: style.id,
+      },
+      adminCookie,
+    ),
+  );
+  assert.equal(response.status, 302);
+  assert.match(response.headers.get("location"), /^\/admin\/collections\?error=validation/);
+});
+
+test("TC-29: административная валидация отклоняет неверные числа", async () => {
+  const style = db.prepare("SELECT id FROM track_styles LIMIT 1").get();
+  const response = await request(
+    "/admin/tracks",
+    authenticatedForm(
+      {
+        title: "Некорректный трек",
+        displayTitle: "Некорректный трек",
+        artistId: "report-artist",
+        duration: "-1",
+        rating: "9",
+        artworkClass: style.id,
+      },
+      adminCookie,
+    ),
+  );
+  assert.equal(response.status, 302);
+  assert.match(response.headers.get("location"), /^\/admin\/tracks\?error=validation/);
+  assert.equal(
+    db.prepare("SELECT COUNT(*) AS n FROM tracks WHERE title = ?").get(
+      "Некорректный трек",
+    ).n,
+    0,
+  );
+});
+
+test("TC-30: административная валидация отклоняет невозможную дату", async () => {
+  const style = db.prepare("SELECT id FROM event_styles LIMIT 1").get();
+  const response = await request(
+    "/admin/events",
+    authenticatedForm(
+      {
+        title: "Событие с ошибкой",
+        type: "offline",
+        date: "2026-02-31",
+        artworkClass: style.id,
+      },
+      adminCookie,
+    ),
+  );
+  assert.equal(response.status, 302);
+  assert.match(response.headers.get("location"), /^\/admin\/events\?error=validation/);
+});
+
+test("TC-31: администратор удаляет созданные сущности", async () => {
+  for (const [route, id] of [
+    ["collections", adminCollectionId],
+    ["playlists", adminPlaylistId],
+    ["events", adminEventId],
+  ]) {
+    const response = await request(
+      `/admin/${route}/${id}/delete`,
+      authenticatedForm({}, adminCookie),
+    );
+    assert.equal(response.status, 302);
+  }
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM collections WHERE id = ?").get(adminCollectionId).n, 0);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM playlists WHERE id = ?").get(adminPlaylistId).n, 0);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM events WHERE id = ?").get(adminEventId).n, 0);
 });

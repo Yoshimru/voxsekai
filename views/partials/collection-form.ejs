@@ -1,0 +1,44 @@
+<%
+  const currentCollection = typeof collection !== 'undefined' && collection ? collection : null;
+  const selectedStyle = currentCollection?.style?.id || cardStyles[0]?.id || '';
+  const selectedTracks = currentCollection?.trackIds || [];
+%>
+<form method="post" action="<%= formAction %>">
+  <div class="admin-form">
+    <label>Название<span><input type="text" name="title" maxlength="150" value="<%= currentCollection?.title || '' %>" required /></span></label>
+    <label>Подпись (tagline)<span><input type="text" name="tagline" maxlength="100" value="<%= currentCollection?.tagline || '' %>" placeholder="AFTER HOURS" /></span></label>
+    <div class="admin-style-field is-wide">
+      <span class="admin-form-label">Стиль карточки подборки</span>
+      <div class="admin-cover-style-grid">
+        <% cardStyles.forEach((style) => { %>
+          <label class="admin-cover-style-option">
+            <input type="radio" name="cardClass" value="<%= style.id %>" <%= selectedStyle === style.id ? 'checked' : '' %> required />
+            <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
+              <span class="admin-cover-style-glyph"><%= style.glyph %></span>
+              <span class="admin-cover-style-name"><%= style.name %></span>
+            </span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+    <label class="is-wide">Описание<span><textarea name="description" rows="3" maxlength="1000"><%= currentCollection?.description || '' %></textarea></span></label>
+    <label class="checkbox-row">
+      <input type="checkbox" name="featured" <%= currentCollection?.featured ? 'checked' : '' %> />
+      Сделать подборкой недели
+    </label>
+    <label class="is-wide">Треки подборки
+      <span class="admin-track-picker">
+        <% tracks.forEach((track) => { %>
+          <label>
+            <input type="checkbox" name="trackIds" value="<%= track.id %>" <%= selectedTracks.includes(track.id) ? 'checked' : '' %> />
+            <%= track.displayTitle %> · <%= track.artistName %>
+          </label>
+        <% }) %>
+      </span>
+    </label>
+    <div class="admin-actions">
+      <button class="admin-button" type="submit"><%= submitLabel %></button>
+      <% if (currentCollection) { %><a class="admin-button admin-button-secondary" href="/admin/collections">Отмена</a><% } %>
+    </div>
+  </div>
+</form>

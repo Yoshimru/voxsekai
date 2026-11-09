@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <%- include('../../partials/admin-header', { adminUser, section, basePath: '/admin' }) %>
+    <div class="admin-heading">
+      <h1>Редактирование плейлиста</h1>
+      <p><a class="admin-back-link" href="/admin/playlists">← Назад к плейлистам</a></p>
+    </div>
+    <div class="admin-panel">
+      <h2><%= playlist.title %> <small class="admin-muted"><%= playlist.id %></small></h2>
+      <% if (playlist.ownerName) { %><p class="admin-muted">Владелец: @<%= playlist.ownerName %></p><% } %>
+      <% if (error) { %><p class="admin-error" role="alert"><%= error %></p><% } %>
+      <%- include('../../partials/admin-playlist-form', {
+        formAction: `/admin/playlists/${playlist.id}/edit`,
+        playlist,
+        tracks,
+        cardStyles,
+        submitLabel: 'Сохранить изменения',
+      }) %>
+    </div>
+    <%- include('../../partials/admin-footer') %>
+  </body>
+</html>

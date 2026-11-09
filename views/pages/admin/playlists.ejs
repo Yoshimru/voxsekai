@@ -15,79 +15,37 @@
     </div>
     <div class="admin-panel">
       <h2>Новый плейлист</h2>
-      <form method="post" action="/admin/playlists">
-        <div class="admin-form">
-          <label>Название<span><input type="text" name="title" required /></span></label>
-          <label>Подпись (label)<span><input type="text" name="label" placeholder="ON REPEAT" /></span></label>
-          <div class="admin-style-field is-wide">
-            <span class="admin-form-label">Стиль обложки плейлиста</span>
-            <div class="admin-cover-style-grid">
-              <% cardStyles.forEach((style, index) => { %>
-                <label class="admin-cover-style-option">
-                  <input type="radio" name="artworkClass" value="<%= style.id %>" <%= index === 0 ? 'checked' : '' %> />
-                  <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
-                    <span class="admin-cover-style-glyph"><%= style.glyph %></span>
-                    <span class="admin-cover-style-name"><%= style.name %></span>
-                  </span>
-                </label>
-              <% }) %>
-            </div>
-          </div>
-          <label class="is-wide">Описание<span><input type="text" name="description" /></span></label>
-          <label class="checkbox-row">
-            <input type="checkbox" name="isPublic" checked />
-            Публичный плейлист
-          </label>
-          <label class="is-wide">Треки плейлиста
-            <span class="admin-track-picker">
-              <% tracks.forEach((track) => { %>
-                <label>
-                  <input type="checkbox" name="trackIds" value="<%= track.id %>" />
-                  <%= track.displayTitle %> · <%= track.artistName %>
-                </label>
-              <% }) %>
-            </span>
-          </label>
-          <div class="admin-actions">
-            <button class="admin-button" type="submit">Создать плейлист</button>
-          </div>
-        </div>
-      </form>
+      <% if (error) { %><p class="admin-error" role="alert"><%= error %></p><% } %>
+      <%- include('../../partials/admin-playlist-form', {
+        formAction: '/admin/playlists',
+        playlist: null,
+        tracks,
+        cardStyles,
+        submitLabel: 'Создать плейлист',
+      }) %>
     </div>
     <div class="admin-panel">
       <h2>Все плейлисты</h2>
       <% if (playlists.length) { %>
         <table class="admin-table">
           <thead>
-            <tr><th>Название</th><th>Открытый</th><th>Треков</th><th>Состав</th><th></th><th></th></tr>
+            <tr><th>Название</th><th>Владелец</th><th>Открытый</th><th>Треков</th><th>Состав</th><th></th></tr>
           </thead>
           <tbody>
             <% playlists.forEach((playlist) => { %>
               <tr>
                 <td><b><%= playlist.title %></b> <small style="color:var(--admin-muted)"><%= playlist.id %></small></td>
+                <td><%= playlist.ownerName ? `@${playlist.ownerName}` : 'системный' %></td>
                 <td><span class="admin-badge <%= playlist.isPublic ? 'admin-badge-admin' : 'admin-badge-user' %>"><%= playlist.isPublic ? 'публичный' : 'приватный' %></span></td>
                 <td><%= playlist.trackCount %></td>
                 <td style="color:var(--admin-muted);font-size:12px"><%= playlist.trackIds.join(', ') || '—' %></td>
                 <td>
-                  <form method="post" action="/admin/playlists/<%= playlist.id %>/tracks" style="margin:0">
-                    <details>
-                      <summary style="cursor:pointer;color:var(--admin-muted)">Изменить треки</summary>
-                      <span class="admin-track-picker" style="margin-top:8px">
-                        <% tracks.forEach((track) => { %>
-                          <label>
-                            <input type="checkbox" name="trackIds" value="<%= track.id %>" <%= playlist.trackIds.includes(track.id) ? 'checked' : '' %> />
-                            <%= track.displayTitle %>
-                          </label>
-                        <% }) %>
-                      </span>
-                      <button class="admin-button admin-button-secondary" type="submit" style="margin-top:8px">Сохранить треки плейлиста</button>
-                    </details>
-                  </form>
-                </td>
-                <td>
-                  <form method="post" action="/admin/playlists/<%= playlist.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить плейлист?')">
-                    <button class="admin-button-danger" type="submit">Удалить</button>
-                  </form>
+                  <div class="admin-row-actions">
+                    <a class="admin-button admin-button-secondary admin-button-small" href="/admin/playlists/<%= playlist.id %>/edit">Редактировать</a>
+                    <form method="post" action="/admin/playlists/<%= playlist.id %>/delete" style="margin:0" onsubmit="return confirm('Удалить плейлист?')">
+                      <button class="admin-button-danger" type="submit">Удалить</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             <% }) %>

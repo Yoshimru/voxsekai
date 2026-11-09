@@ -15,10 +15,11 @@
     </div>
     <div class="admin-panel">
       <h2>Новый пользователь</h2>
+      <% if (error) { %><p class="admin-error" role="alert"><%= error %></p><% } %>
       <form method="post" action="/admin/users">
         <div class="admin-form">
-          <label>Логин<span><input type="text" name="username" required /></span></label>
-          <label>Пароль<span><input type="password" name="password" required /></span></label>
+          <label>Логин<span><input type="text" name="username" minlength="2" maxlength="32" required /></span></label>
+          <label>Пароль<span><input type="password" name="password" minlength="8" maxlength="200" required /></span></label>
           <label>Роль<span>
             <select name="role">
               <option value="user">user</option>

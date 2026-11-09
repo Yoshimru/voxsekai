@@ -1,0 +1,41 @@
+<%
+  const currentEvent = typeof event !== 'undefined' && event ? event : null;
+  const selectedStyle = currentEvent?.style?.id || cardStyles[0]?.id || '';
+%>
+<form method="post" action="<%= formAction %>">
+  <div class="admin-form">
+    <label>Название<span><input type="text" name="title" maxlength="180" value="<%= currentEvent?.title || '' %>" required /></span></label>
+    <label>Формат<span>
+      <select name="type" required>
+        <option value="offline" <%= currentEvent?.type !== 'online' ? 'selected' : '' %>>офлайн</option>
+        <option value="online" <%= currentEvent?.type === 'online' ? 'selected' : '' %>>онлайн</option>
+      </select>
+    </span></label>
+    <label>Площадка (venue)<span><input type="text" name="venue" maxlength="180" value="<%= currentEvent?.venue || '' %>" /></span></label>
+    <label>Город<span><input type="text" name="location" maxlength="180" value="<%= currentEvent?.location || '' %>" /></span></label>
+    <label>Дата (YYYY-MM-DD)<span><input type="date" name="date" value="<%= currentEvent?.date || '' %>" required /></span></label>
+    <label>Время<span><input type="time" name="time" value="<%= currentEvent?.time || '' %>" /></span></label>
+    <label>Категория<span><input type="text" name="category" maxlength="100" value="<%= currentEvent?.category || '' %>" placeholder="Концерт" /></span></label>
+    <label>Подпись (tag)<span><input type="text" name="tag" maxlength="100" value="<%= currentEvent?.tag || '' %>" placeholder="LIVE SHOW · 02" /></span></label>
+    <div class="admin-style-field is-wide">
+      <span class="admin-form-label">Стиль обложки события</span>
+      <div class="admin-cover-style-grid">
+        <% cardStyles.forEach((style) => { %>
+          <label class="admin-cover-style-option">
+            <input type="radio" name="artworkClass" value="<%= style.id %>" <%= selectedStyle === style.id ? 'checked' : '' %> required />
+            <span class="admin-cover-style-preview" style="background: <%= style.background %>;">
+              <span class="admin-cover-style-glyph"><%= style.glyph %></span>
+              <span class="admin-cover-style-name"><%= style.name %></span>
+            </span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+    <label>Глиф<span><input type="text" name="artworkGlyph" maxlength="8" value="<%= currentEvent?.artworkGlyph || '' %>" placeholder="VS" /></span></label>
+    <label class="is-wide">Описание<span><textarea name="description" rows="3" maxlength="2000"><%= currentEvent?.description || '' %></textarea></span></label>
+    <div class="admin-actions">
+      <button class="admin-button" type="submit"><%= submitLabel %></button>
+      <% if (currentEvent) { %><a class="admin-button admin-button-secondary" href="/admin/events">Отмена</a><% } %>
+    </div>
+  </div>
+</form>
