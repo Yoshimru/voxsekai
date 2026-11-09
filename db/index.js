@@ -36,10 +36,39 @@ function migrate(db) {
   ensureColumn(db, "users", "email", "TEXT");
   ensureColumn(db, "artists", "image_url", "TEXT NOT NULL DEFAULT ''");
   ensureColumn(db, "tracks", "image_url", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn(
+    db,
+    "playlists",
+    "owner_id",
+    "INTEGER REFERENCES users(id) ON DELETE CASCADE",
+  );
+  ensureColumn(
+    db,
+    "playlists",
+    "created_at",
+    "TEXT NOT NULL DEFAULT ''",
+  );
+  ensureColumn(
+    db,
+    "playlists",
+    "updated_at",
+    "TEXT NOT NULL DEFAULT ''",
+  );
   db.exec(`
     CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
       ON users (email)
-      WHERE email IS NOT NULL AND email <> ''
+      WHERE email IS NOT NULL AND email <> '';
+
+    CREATE INDEX IF NOT EXISTS idx_playlists_owner
+      ON playlists (owner_id);
+
+    UPDATE playlists
+      SET created_at = datetime('now')
+      WHERE created_at = '';
+
+    UPDATE playlists
+      SET updated_at = created_at
+      WHERE updated_at = '';
   `);
 }
 

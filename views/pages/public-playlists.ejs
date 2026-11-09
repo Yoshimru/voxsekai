@@ -41,7 +41,7 @@
                       </div>
                       <div class="playlist-card-info">
                         <h3><%= playlist.title %></h3>
-                        <p><%= playlist.trackCount %> треков · открытый</p>
+                        <p><%= playlist.trackCount %> треков · открытый<%= playlist.ownerName ? ` · @${playlist.ownerName}` : '' %></p>
                         <small><%= playlist.description %></small>
                         <span aria-hidden="true">↗</span>
                       </div>

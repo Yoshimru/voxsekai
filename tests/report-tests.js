@@ -41,6 +41,8 @@ let baseUrl;
 
 let userCookie = "";
 let adminCookie = "";
+let secondUserCookie = "";
+let userPlaylistId = "";
 
 before(async () => {
   server = await new Promise((resolve, reject) => {
@@ -70,6 +72,17 @@ function form(body) {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(body),
+  };
+}
+
+function json(method, body, cookie = "") {
+  return {
+    method,
+    headers: {
+      "content-type": "application/json",
+      ...(cookie ? { cookie } : {}),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
   };
 }
 
@@ -263,4 +276,165 @@ test("TC-15: администратор входит и открывает да�
   assert.match(html, /Админпанель/);
   assert.match(html, /Треки/);
   assert.match(html, /Пользователи/);
+});
+
+test("TC-16: пользователь создаёт плейлист в базе данных", async () => {
+  const response = await request(
+    "/api/library/playlists",
+    json(
+      "POST",
+      {
+        title: "Серверный плейлист",
+        description: "Проверка пользовательской библиотеки",
+        trackIds: ["report-track"],
+        isPublic: true,
+      },
+      userCookie,
+    ),
+  );
+  const payload = await response.json();
+  userPlaylistId = payload.playlist.id;
+  const user = db
+    .prepare("SELECT id FROM users WHERE username = ?")
+    .get("report_user");
+  const playlist = db
+    .prepare("SELECT owner_id, title, is_public FROM playlists WHERE id = ?")
+    .get(userPlaylistId);
+  const tracks = db
+    .prepare("SELECT track_id FROM playlist_tracks WHERE playlist_id = ?")
+    .all(userPlaylistId);
+
+  assert.equal(response.status, 201);
+  assert.equal(playlist.owner_id, user.id);
+  assert.equal(playlist.title, "Серверный плейлист");
+  assert.equal(playlist.is_public, 1);
+  assert.deepEqual(tracks, [{ track_id: "report-track" }]);
+});
+
+test("TC-17: сервер отклоняет плейлист без названия", async () => {
+  const response = await request(
+    "/api/library/playlists",
+    json(
+      "POST",
+      {
+        title: " ",
+        description: "Некорректный плейлист",
+        trackIds: ["report-track"],
+        isPublic: false,
+      },
+      userCookie,
+    ),
+  );
+  const payload = await response.json();
+  assert.equal(response.status, 400);
+  assert.match(payload.error, /Название/);
+});
+
+test("TC-18: избранное пользователя сохраняется в базе данных", async () => {
+  const response = await request(
+    "/api/library/favorites/report-track",
+    json("POST", { favorite: true }, userCookie),
+  );
+  const user = db
+    .prepare("SELECT id FROM users WHERE username = ?")
+    .get("report_user");
+  const favorite = db
+    .prepare("SELECT track_id FROM favorites WHERE user_id = ? AND track_id = ?")
+    .get(user.id, "report-track");
+  assert.equal(response.status, 200);
+  assert.equal(favorite.track_id, "report-track");
+});
+
+test("TC-19: публичный пользовательский плейлист доступен гостю", async () => {
+  const listResponse = await request("/public-playlists");
+  const listHtml = await listResponse.text();
+  const detailResponse = await request(`/playlists/${userPlaylistId}`);
+  const detailHtml = await detailResponse.text();
+
+  assert.equal(listResponse.status, 200);
+  assert.match(listHtml, /Серверный плейлист/);
+  assert.equal(detailResponse.status, 200);
+  assert.match(detailHtml, /Отчётный трек/);
+});
+
+test("TC-20: второй пользователь регистрируется с отдельной библиотекой", async () => {
+  const response = await request(
+    "/register",
+    form({
+      name: "second_user",
+      email: "second@example.test",
+      password: "second-password",
+      next: "",
+    }),
+  );
+  secondUserCookie = cookieFrom(response);
+  assert.equal(response.status, 302);
+  assert.match(secondUserCookie, /^connect\.sid=/);
+});
+
+test("TC-21: другой пользователь не может изменить чужой плейлист", async () => {
+  const response = await request(
+    `/api/library/playlists/${userPlaylistId}`,
+    json(
+      "PUT",
+      {
+        title: "Чужое изменение",
+        description: "",
+        trackIds: [],
+        isPublic: false,
+      },
+      secondUserCookie,
+    ),
+  );
+  const playlist = db
+    .prepare("SELECT title, is_public FROM playlists WHERE id = ?")
+    .get(userPlaylistId);
+  assert.equal(response.status, 404);
+  assert.equal(playlist.title, "Серверный плейлист");
+  assert.equal(playlist.is_public, 1);
+});
+
+test("TC-22: библиотеки двух пользователей изолированы", async () => {
+  const response = await request("/playlists", {
+    headers: { cookie: secondUserCookie },
+  });
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(html, /Серверный плейлист/);
+  assert.match(html, /id="favorite-track-ids">\[\]<\/script>/);
+});
+
+test("TC-23: владелец редактирует и удаляет свой плейлист", async () => {
+  const updateResponse = await request(
+    `/api/library/playlists/${userPlaylistId}`,
+    json(
+      "PUT",
+      {
+        title: "Обновлённый плейлист",
+        description: "Новое описание",
+        trackIds: ["report-track"],
+        isPublic: false,
+      },
+      userCookie,
+    ),
+  );
+  assert.equal(updateResponse.status, 200);
+  assert.deepEqual(
+    db.prepare("SELECT title, is_public FROM playlists WHERE id = ?").get(
+      userPlaylistId,
+    ),
+    { title: "Обновлённый плейлист", is_public: 0 },
+  );
+
+  const deleteResponse = await request(
+    `/api/library/playlists/${userPlaylistId}`,
+    json("DELETE", undefined, userCookie),
+  );
+  assert.equal(deleteResponse.status, 204);
+  assert.equal(
+    db.prepare("SELECT COUNT(*) AS n FROM playlists WHERE id = ?").get(
+      userPlaylistId,
+    ).n,
+    0,
+  );
 });

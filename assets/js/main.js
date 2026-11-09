@@ -17,8 +17,6 @@
     : [];
   const tracksById = new Map(trackCatalog.map((track) => [track.id, track]));
   const playerStorageKey = "voxsekai.player.v1";
-  const favoritesStorageKey = "voxsekai.favorites.v1";
-  const playlistsStorageKey = "voxsekai.playlists.v1";
   const profileUsername = document.body?.dataset.profileUsername || "";
   const profileStorageKey = profileUsername
     ? `voxsekai.profile.v1.${profileUsername}`
@@ -399,9 +397,10 @@
 
   function readFavorites() {
     try {
-      const stored = JSON.parse(localStorage.getItem(favoritesStorageKey) || "[]");
+      const element = document.getElementById("favorite-track-ids");
+      const stored = element ? JSON.parse(element.textContent || "[]") : [];
       if (!Array.isArray(stored)) {
-        console.warn("В хранилище избранного ожидался список идентификаторов треков.");
+        console.warn("Сервер вернул избранное в неверном формате.");
         return [];
       }
       const validIds = stored.filter(
@@ -412,7 +411,7 @@
       }
       return [...new Set(validIds)];
     } catch (error) {
-      console.warn("Не удалось прочитать избранное.", error);
+      console.warn("Не удалось прочитать избранное с сервера.", error);
       return [];
     }
   }
@@ -441,63 +440,22 @@
   }
 
   function readPlaylists() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(playlistsStorageKey) || "null");
-      if (saved === null) {
-        return Array.from(
-          document.querySelectorAll("[data-playlist-item]"),
-          (card) => ({
-            id: card.dataset.playlistId,
-            title: card.dataset.playlistTitle,
-            description: card.dataset.playlistDescription || "",
-            label: card.dataset.playlistLabel || "MY MIX",
-            artworkClass: card.classList.contains("playlist-card-custom")
-              ? "playlist-card-custom"
-              : Array.from(card.classList).find((name) => name.startsWith("playlist-card-")) || "playlist-card-custom",
-            trackIds: (card.dataset.playlistTrackIds || "")
-              .split(",")
-              .filter((id) => tracksById.has(id)),
-            isPublic: card.dataset.playlistPublic === "true",
-          }),
-        );
-      }
-      if (!Array.isArray(saved)) {
-        console.warn("В хранилище плейлистов ожидался список.");
-        return [];
-      }
-      return saved
-        .filter(
-          (playlist) =>
-            playlist &&
-            typeof playlist.id === "string" &&
-            typeof playlist.title === "string" &&
-            playlist.title.trim(),
-        )
-        .map((playlist) => ({
-          id: playlist.id.slice(0, 80),
-          title: playlist.title.trim().slice(0, 48),
-          description:
-            typeof playlist.description === "string"
-              ? playlist.description.slice(0, 180)
-              : "",
-          label:
-            typeof playlist.label === "string" ? playlist.label.slice(0, 20) : "MY MIX",
-          artworkClass:
-            typeof playlist.artworkClass === "string" &&
-            /^playlist-card-(night|repeat|morning|drive|new|custom)$/.test(
-              playlist.artworkClass,
-            )
-              ? playlist.artworkClass
-              : "playlist-card-custom",
-          trackIds: Array.isArray(playlist.trackIds)
-            ? [...new Set(playlist.trackIds.filter((id) => tracksById.has(id)))]
-            : [],
-          isPublic: playlist.isPublic === true,
-        }));
-    } catch (error) {
-      console.warn("Не удалось прочитать плейлисты.", error);
-      return [];
-    }
+    return Array.from(
+      document.querySelectorAll("[data-playlist-item]"),
+      (card) => ({
+        id: card.dataset.playlistId,
+        title: card.dataset.playlistTitle,
+        description: card.dataset.playlistDescription || "",
+        label: card.dataset.playlistLabel || "MY MIX",
+        artworkClass: card.classList.contains("playlist-card-custom")
+          ? "playlist-card-custom"
+          : Array.from(card.classList).find((name) => name.startsWith("playlist-card-")) || "playlist-card-custom",
+        trackIds: (card.dataset.playlistTrackIds || "")
+          .split(",")
+          .filter((id) => tracksById.has(id)),
+        isPublic: card.dataset.playlistPublic === "true",
+      }),
+    );
   }
 
   let profileState = readProfile();
@@ -642,15 +600,31 @@
       });
   }
 
-  function savePlaylists() {
-    try {
-      localStorage.setItem(playlistsStorageKey, JSON.stringify(playlists));
-      return true;
-    } catch (error) {
-      console.warn("Не удалось сохранить плейлисты.", error);
-      notify("Не удалось сохранить плейлист в этом браузере.");
-      return false;
+  async function libraryRequest(pathname, options = {}) {
+    const response = await fetch(pathname, {
+      ...options,
+      headers: {
+        "content-type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
+    if (response.status === 401) {
+      window.location.assign(
+        `/login?next=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`,
+      );
+      throw new Error("Необходимо войти в аккаунт.");
     }
+    let payload = {};
+    if (response.status !== 204) {
+      const contentType = response.headers.get("content-type") || "";
+      payload = contentType.includes("application/json")
+        ? await response.json()
+        : { error: await response.text() };
+    }
+    if (!response.ok) {
+      throw new Error(payload.error || "Не удалось сохранить изменения.");
+    }
+    return payload;
   }
 
   function createPlaylistTrackRow(track) {
@@ -984,37 +958,35 @@
     renderTaste();
   }
 
-  document.querySelectorAll("[data-favorite-track]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const id = button.dataset.favoriteTrack;
-      favoriteIds = favoriteIds.includes(id)
-        ? favoriteIds.filter((favoriteId) => favoriteId !== id)
-        : [...favoriteIds, id];
-      try {
-        localStorage.setItem(favoritesStorageKey, JSON.stringify(favoriteIds));
-      } catch (error) {
-        console.warn("Не удалось сохранить избранное.", error);
-        notify("Не удалось сохранить избранное в этом браузере.");
-        favoriteIds = readFavorites();
-        renderFavorites();
-        return;
-      }
-      renderFavorites();
-      notify(favoriteIds.includes(id) ? "Добавлено в избранное" : "Удалено из избранного");
-    });
+  document.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-favorite-track]");
+    if (!button) return;
+    const id = button.dataset.favoriteTrack;
+    const favorite = !favoriteIds.includes(id);
+    button.disabled = true;
+    try {
+      await libraryRequest(`/api/library/favorites/${encodeURIComponent(id)}`, {
+        method: "POST",
+        body: JSON.stringify({ favorite }),
+      });
+      favoriteIds = favorite
+        ? [...favoriteIds, id]
+        : favoriteIds.filter((favoriteId) => favoriteId !== id);
+    } catch (error) {
+      console.warn("Не удалось сохранить избранное.", error);
+      notify(error.message);
+      return;
+    } finally {
+      button.disabled = false;
+    }
+    renderFavorites();
+    notify(favorite ? "Добавлено в избранное" : "Удалено из избранного");
   });
   renderFavorites();
   renderPlaylists();
   syncPlaylistFromLocation();
   window.addEventListener("storage", (event) => {
-    if (event.key === favoritesStorageKey) {
-      favoriteIds = readFavorites();
-      renderFavorites();
-      renderPlaylists();
-    } else if (event.key === playlistsStorageKey) {
-      playlists = readPlaylists();
-      renderPlaylists();
-    } else if (event.key === profileStorageKey) {
+    if (event.key === profileStorageKey) {
       profileState = readProfile();
       renderProfile();
     } else if (event.key === playerStorageKey) {
@@ -1023,7 +995,7 @@
     }
   });
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener("click", async (event) => {
     const openLink = event.target.closest("[data-playlist-open]");
     if (openLink) {
       event.preventDefault();
@@ -1057,16 +1029,28 @@
             }
           : item,
       );
-      if (savePlaylists()) {
+      try {
+        await libraryRequest(
+          `/api/library/playlists/${encodeURIComponent(playlist.id)}/tracks`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              trackIds: playlists.find((item) => item.id === playlist.id).trackIds,
+            }),
+          },
+        );
         renderPlaylists();
         notify(
           hasTrack
             ? `«${track.displayTitle}» удалён из «${playlist.title}»`
             : `«${track.displayTitle}» добавлен в «${playlist.title}»`,
         );
-      } else {
-        playlists = readPlaylists();
+      } catch (error) {
+        playlists = playlists.map((item) =>
+          item.id === playlist.id ? playlist : item,
+        );
         renderPlaylists();
+        notify(error.message);
       }
       return;
     }
@@ -1086,14 +1070,19 @@
     if (!deleteButton) return;
     const playlist = playlists.find((item) => item.id === deleteButton.dataset.playlistDelete);
     if (!playlist || !window.confirm(`Удалить плейлист «${playlist.title}»?`)) return;
-    const previousPlaylists = playlists;
-    playlists = playlists.filter((item) => item.id !== playlist.id);
-    if (savePlaylists()) {
+    deleteButton.disabled = true;
+    try {
+      await libraryRequest(
+        `/api/library/playlists/${encodeURIComponent(playlist.id)}`,
+        { method: "DELETE" },
+      );
+      playlists = playlists.filter((item) => item.id !== playlist.id);
       renderPlaylists();
       notify(`Плейлист «${playlist.title}» удалён`);
-    } else {
-      playlists = previousPlaylists;
-      renderPlaylists();
+    } catch (error) {
+      notify(error.message);
+    } finally {
+      deleteButton.disabled = false;
     }
   });
   window.addEventListener("popstate", syncPlaylistFromLocation);
@@ -1333,7 +1322,7 @@
     });
   });
 
-  playlistForm?.addEventListener("submit", (event) => {
+  playlistForm?.addEventListener("submit", async (event) => {
       event.preventDefault();
       const form = event.currentTarget;
       const title = form.elements.title.value.trim();
@@ -1350,7 +1339,6 @@
         message.classList.add("is-visible");
         return;
       }
-      const previousPlaylists = playlists;
       const nextPlaylist = {
         ...(editingPlaylist || {
           id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -1362,22 +1350,26 @@
         trackIds: Array.from(selectedTrackIds),
         isPublic: form.elements.public.checked,
       };
-      playlists = editingPlaylist
-        ? playlists.map((playlist) =>
-            playlist.id === editingPlaylist.id ? nextPlaylist : playlist,
-          )
-        : [...playlists, nextPlaylist];
-      if (!savePlaylists()) {
-        playlists = previousPlaylists;
-        message.textContent = "Не удалось сохранить плейлист. Проверь доступное место в хранилище браузера.";
+      const submitButton = form.querySelector("button[type=submit]");
+      submitButton.disabled = true;
+      try {
+        const payload = await libraryRequest(
+          editingPlaylist
+            ? `/api/library/playlists/${encodeURIComponent(editingPlaylist.id)}`
+            : "/api/library/playlists",
+          {
+            method: editingPlaylist ? "PUT" : "POST",
+            body: JSON.stringify(nextPlaylist),
+          },
+        );
+        window.location.assign(
+          `/playlists?playlist=${encodeURIComponent(payload.playlist.id)}`,
+        );
+      } catch (error) {
+        message.textContent = error.message;
         message.classList.add("is-visible");
-        return;
+        submitButton.disabled = false;
       }
-      window.location.assign(
-        editingPlaylist
-          ? `/playlists?playlist=${encodeURIComponent(editingPlaylist.id)}`
-          : "/playlists",
-      );
     });
 
   const profileForm = document.querySelector("[data-profile-form]");

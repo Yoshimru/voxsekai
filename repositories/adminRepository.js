@@ -161,8 +161,11 @@ function createAdminRepository(db = getDb()) {
     deleteCollection: db.prepare("DELETE FROM collections WHERE id = ?"),
 
     insertPlaylist: db.prepare(`
-      INSERT INTO playlists (id, title, description, label, artwork_class, is_public)
-      VALUES (@id, @title, @description, @label, @artworkClass, @isPublic)
+      INSERT INTO playlists
+        (id, title, description, label, artwork_class, is_public, created_at, updated_at)
+      VALUES
+        (@id, @title, @description, @label, @artworkClass, @isPublic,
+         datetime('now'), datetime('now'))
     `),
     insertPlaylistTrack: db.prepare(
       "INSERT OR IGNORE INTO playlist_tracks (playlist_id, track_id, position) VALUES (?, ?, ?)",

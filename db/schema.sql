@@ -106,11 +106,14 @@ CREATE TABLE IF NOT EXISTS collection_tracks (
 
 CREATE TABLE IF NOT EXISTS playlists (
   id            TEXT PRIMARY KEY,
+  owner_id      INTEGER REFERENCES users(id) ON DELETE CASCADE,
   title         TEXT NOT NULL,
   description   TEXT NOT NULL DEFAULT '',
   label         TEXT NOT NULL DEFAULT '',
   artwork_class TEXT NOT NULL DEFAULT '',
-  is_public     INTEGER NOT NULL DEFAULT 0
+  is_public     INTEGER NOT NULL DEFAULT 0,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 -- Связь «плейлист — треки» (многие ко многим)
@@ -157,7 +160,16 @@ CREATE TABLE IF NOT EXISTS track_ratings (
   PRIMARY KEY (user_id, track_id)
 );
 
+-- Избранные треки пользователя
+CREATE TABLE IF NOT EXISTS favorites (
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  track_id   TEXT NOT NULL REFERENCES tracks(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, track_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_track_ratings_track ON track_ratings (track_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_track ON favorites (track_id);
 
 
 CREATE INDEX IF NOT EXISTS idx_artist_tracks_track  ON artist_tracks (track_id);

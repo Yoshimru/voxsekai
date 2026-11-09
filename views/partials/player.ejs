@@ -111,3 +111,4 @@
   <audio data-player-audio preload="none"></audio>
 </section>
 <script type="application/json" id="track-catalog"><%- JSON.stringify(trackCatalog).replace(/</g, '\\u003c') %></script>
+<script type="application/json" id="favorite-track-ids"><%- JSON.stringify(typeof favoriteTrackIds === 'undefined' ? [] : favoriteTrackIds).replace(/</g, '\\u003c') %></script>

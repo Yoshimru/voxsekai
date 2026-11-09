@@ -29,7 +29,7 @@
               <p class="directory-kicker">ОТКРЫТЫЙ ПЛЕЙЛИСТ · <%= playlist.label %></p>
               <h1><%= playlist.title %></h1>
               <p><%= playlist.description %></p>
-              <span><%= tracks.length %> треков в подборке VoxSekai</span>
+              <span><%= tracks.length %> треков<%= playlist.ownerName ? ` · автор @${playlist.ownerName}` : ' в подборке VoxSekai' %></span>
             </div>
           </section>
           <section class="artist-track-section" aria-labelledby="playlist-tracks-heading">

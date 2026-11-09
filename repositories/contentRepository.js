@@ -164,6 +164,8 @@ function mapCollection(row, trackIds = [], style = fallbackCollectionStyle) {
 function mapPlaylist(row, trackIds = [], style = fallbackPlaylistStyle) {
   return {
     id: row.id,
+    ownerId: row.owner_id ?? null,
+    ownerName: row.owner_name || "",
     title: row.title,
     description: row.description,
     label: row.label,
@@ -253,9 +255,24 @@ function createContentRepository(db = getDb()) {
     eventStyleById: db.prepare("SELECT * FROM event_styles WHERE id = ?"),
     allCollections: db.prepare("SELECT * FROM collections ORDER BY id"),
     collectionById: db.prepare("SELECT * FROM collections WHERE id = ?"),
-    allPlaylists: db.prepare("SELECT * FROM playlists ORDER BY id"),
+    allPlaylists: db.prepare(`
+      SELECT p.*, u.username AS owner_name
+      FROM playlists p
+      LEFT JOIN users u ON u.id = p.owner_id
+      ORDER BY p.id
+    `),
+    playlistsByOwner: db.prepare(`
+      SELECT p.*, u.username AS owner_name
+      FROM playlists p
+      JOIN users u ON u.id = p.owner_id
+      WHERE p.owner_id = ?
+      ORDER BY p.updated_at DESC, p.created_at DESC, p.id
+    `),
     playlistById: db.prepare(
-      "SELECT * FROM playlists WHERE id = ? AND is_public = 1",
+      `SELECT p.*, u.username AS owner_name
+       FROM playlists p
+       LEFT JOIN users u ON u.id = p.owner_id
+       WHERE p.id = ? AND p.is_public = 1`,
     ),
     allEvents: db.prepare("SELECT * FROM events ORDER BY date"),
     eventById: db.prepare("SELECT * FROM events WHERE id = ?"),
@@ -386,6 +403,19 @@ function createContentRepository(db = getDb()) {
     getPlaylists() {
       const styles = cardStyleMap(statements.allPlaylistStyles);
       return statements.allPlaylists.all().map((row) => {
+        const trackIds = statements.trackIdsByPlaylist
+          .all(row.id)
+          .map((item) => item.track_id);
+        return mapPlaylist(
+          row,
+          trackIds,
+          styles.get(row.artwork_class) || fallbackPlaylistStyle,
+        );
+      });
+    },
+    getPlaylistsByOwner(userId) {
+      const styles = cardStyleMap(statements.allPlaylistStyles);
+      return statements.playlistsByOwner.all(userId).map((row) => {
         const trackIds = statements.trackIdsByPlaylist
           .all(row.id)
           .map((item) => item.track_id);

@@ -4,7 +4,9 @@ const session = require("express-session");
 const contentRepository = require("./repositories/contentRepository");
 const authRepository = require("./repositories/authRepository");
 const ratingRepository = require("./repositories/ratingRepository");
+const libraryRepository = require("./repositories/libraryRepository");
 const adminRouter = require("./routes/admin");
+const libraryRouter = require("./routes/library");
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -161,8 +163,12 @@ app.use((req, res, next) => {
   const user = userId ? authRepository.getUserById(userId) : null;
   if (userId && !user) delete req.session.userId;
   res.locals.currentUser = user;
+  res.locals.favoriteTrackIds = user
+    ? libraryRepository.getFavoriteTrackIds(user.id)
+    : [];
   next();
 });
+app.use("/api/library", libraryRouter);
 app.use("/admin", adminRouter);
 app.use((req, res, next) => {
   Promise.resolve()
@@ -407,7 +413,9 @@ for (const [route, page] of Object.entries(pages)) {
         viewData.collections = await contentRepository.getCollections();
       }
       if (route === "/playlists") {
-        viewData.playlists = await contentRepository.getPlaylists();
+        viewData.playlists = await contentRepository.getPlaylistsByOwner(
+          res.locals.currentUser.id,
+        );
         viewData.tracks = res.locals.trackCatalog;
       }
       if (route === "/public-playlists") {
@@ -416,7 +424,9 @@ for (const [route, page] of Object.entries(pages)) {
       }
       if (route === "/profile" || route === "/create-playlist") {
         viewData.tracks = res.locals.trackCatalog;
-        viewData.playlists = await contentRepository.getPlaylists();
+        viewData.playlists = await contentRepository.getPlaylistsByOwner(
+          res.locals.currentUser.id,
+        );
       }
       res.render(page.view, viewData);
     } catch (error) {
